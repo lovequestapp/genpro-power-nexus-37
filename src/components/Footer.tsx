@@ -1,19 +1,8 @@
-
 import { Button } from '@/components/ui/button';
-import { 
-  Phone, 
-  Mail, 
-  MapPin, 
-  Clock, 
-  Facebook, 
-  Instagram, 
-  Youtube 
-} from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, Facebook, Instagram, Youtube } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
 const Footer = () => {
-  return (
-    <footer className="bg-primary text-white">
+  return <footer className="bg-primary text-white">
       {/* Main Footer */}
       <div className="container mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -33,13 +22,13 @@ const Footer = () => {
               expert service, and 24/7 support for all your power needs.
             </p>
             <div className="flex space-x-4">
-              <Button size="sm" variant="outline" className="border-steel-600 text-steel-300 hover:bg-accent hover:border-accent">
+              <Button size="sm" variant="outline" className="border-steel-600 hover:border-accent text-slate-900 bg-slate-50">
                 <Facebook className="w-4 h-4" />
               </Button>
-              <Button size="sm" variant="outline" className="border-steel-600 text-steel-300 hover:bg-accent hover:border-accent">
+              <Button size="sm" variant="outline" className="border-steel-600 hover:border-accent text-slate-900 bg-slate-50">
                 <Instagram className="w-4 h-4" />
               </Button>
-              <Button size="sm" variant="outline" className="border-steel-600 text-steel-300 hover:bg-accent hover:border-accent">
+              <Button size="sm" variant="outline" className="border-steel-600 hover:border-accent bg-slate-50 text-slate-900">
                 <Youtube className="w-4 h-4" />
               </Button>
             </div>
@@ -121,8 +110,6 @@ const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
