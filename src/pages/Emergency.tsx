@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -138,13 +139,13 @@ const Emergency = () => {
     {
       step: '2',
       title: 'Fuel and Oil Changes',
-      description: 'Change your generator's fuel and oil to ensure optimal performance during storms.',
+      description: "Change your generator's fuel and oil to ensure optimal performance during storms.",
       timeframe: '1-2 weeks before storm season'
     },
     {
       step: '3',
       title: 'Battery Maintenance',
-      description: 'Check and replace your generator's battery to ensure it can provide power during a storm.',
+      description: "Check and replace your generator's battery to ensure it can provide power during a storm.",
       timeframe: '1-2 weeks before storm season'
     },
     {
@@ -236,7 +237,7 @@ const Emergency = () => {
               const IconComponent = service.icon;
               return (
                 <Card 
-                  key={service.id} 
+                  key={index} 
                   className="text-center hover:shadow-xl transition-all duration-300 border-steel-200 hover:border-red-300 group"
                 >
                   <CardContent className="p-8">
@@ -245,7 +246,7 @@ const Emergency = () => {
                     </div>
                     <h3 className="font-bold text-primary mb-4 text-lg">{service.title}</h3>
                     <p className="text-steel-600 mb-4 text-sm">{service.description}</p>
-                    <div className="text-red-600 font-bold text-lg mb-4">{service.responseTime}</div>
+                    <div className="text-red-600 font-bold text-lg mb-4">{service.response}</div>
                     
                     <ul className="space-y-2 mb-6 text-left">
                       {service.features.map((feature, idx) => (
@@ -289,7 +290,7 @@ const Emergency = () => {
                   >
                     <MapPin className="w-5 h-5 text-red-600 mx-auto mb-2" />
                     <div className="font-semibold text-primary text-sm">{area.area}</div>
-                    <div className="text-red-600 font-bold text-xs">{area.responseTime}</div>
+                    <div className="text-red-600 font-bold text-xs">{area.time}</div>
                   </div>
                 ))}
               </div>
