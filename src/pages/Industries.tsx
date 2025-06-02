@@ -1,289 +1,184 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  ArrowRight, 
-  Phone, 
-  MessageSquare,
-  Building2,
-  Home,
-  Factory,
-  ShoppingCart,
-  GraduationCap,
-  Activity,
-  Wrench,
-  CheckCircle,
-  Shield,
-  Clock,
-  Users,
-  Building,
-  Stethoscope,
-  TrendingUp
-} from 'lucide-react';
+import { ArrowRight, Phone, MessageSquare, Building2, Home, Factory, ShoppingCart, GraduationCap, Activity, Wrench, CheckCircle, Shield, Clock, Users, Building, Stethoscope, TrendingUp } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-
 const Industries = () => {
-  const industries = [
-    {
-      id: 'healthcare',
-      name: 'Healthcare & Medical',
-      icon: Stethoscope,
-      description: 'Mission-critical power solutions for hospitals, clinics, and medical facilities.',
-      requirements: [
-        'UPS and battery backup systems',
-        'Emergency lighting compliance',
-        'Life safety system support',
-        'Redundant power configurations',
-        'NFPA 99 compliance',
-        '24/7 monitoring and support'
-      ],
-      projects: 100,
-      powerSize: '2MW',
-      uptime: '99.9%',
-      challenge: 'Power outages disrupt patient care and revenue.',
-      solution: 'Customized generator solutions with 24/7 monitoring and support.',
-      image: 'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      caseStudy: 'Houston Methodist Hospital - 2MW redundant power system'
-    },
-    {
-      id: 'commercial',
-      name: 'Commercial Buildings',
-      icon: Building2,
-      description: 'Reliable backup power for office buildings, retail centers, and commercial complexes.',
-      requirements: [
-        'Automatic transfer switches',
-        'Load management systems',
-        'Fire pump power backup',
-        'Elevator emergency power',
-        'HVAC system support',
-        'Tenant notification systems'
-      ],
-      projects: 50,
-      powerSize: '500kW',
-      uptime: '99.9%',
-      challenge: 'Power outages disrupt business operations and revenue.',
-      solution: 'Customized generator solutions with 24/7 monitoring and support.',
-      image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      caseStudy: 'Galleria Office Complex - 500kW seamless backup power'
-    },
-    {
-      id: 'industrial',
-      name: 'Industrial & Manufacturing',
-      icon: Factory,
-      description: 'Heavy-duty power solutions for manufacturing plants and industrial facilities.',
-      requirements: [
-        'High-capacity generators',
-        'Load sequencing systems',
-        'Paralleling switchgear',
-        'Process continuity protection',
-        'Motor starting capability',
-        'Environmental compliance'
-      ],
-      projects: 75,
-      powerSize: '3MW',
-      uptime: '99.9%',
-      challenge: 'Power outages disrupt production and revenue.',
-      solution: 'Customized generator solutions with 24/7 monitoring and support.',
-      image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      caseStudy: 'Exxon Baytown Refinery - 3MW industrial backup system'
-    },
-    {
-      id: 'education',
-      name: 'Educational Institutions',
-      icon: GraduationCap,
-      description: 'Comprehensive power solutions for schools, universities, and research facilities.',
-      requirements: [
-        'Campus-wide power distribution',
-        'Emergency evacuation lighting',
-        'HVAC system continuity',
-        'IT infrastructure protection',
-        'Laboratory equipment backup',
-        'Student safety systems'
-      ],
-      projects: 25,
-      powerSize: '1.5MW',
-      uptime: '99.9%',
-      challenge: 'Power outages disrupt learning and operations.',
-      solution: 'Customized generator solutions with 24/7 monitoring and support.',
-      image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      caseStudy: 'Rice University Campus - 1.5MW distributed power network'
-    },
-    {
-      id: 'retail',
-      name: 'Retail & Hospitality',
-      icon: ShoppingCart,
-      description: 'Keeping businesses operational during outages to protect revenue and customer experience.',
-      requirements: [
-        'POS system continuity',
-        'Refrigeration backup',
-        'Security system power',
-        'Customer safety lighting',
-        'WiFi and communications',
-        'Quick startup capability'
-      ],
-      projects: 100,
-      powerSize: '200kW',
-      uptime: '99.9%',
-      challenge: 'Power outages disrupt business operations and revenue.',
-      solution: 'Customized generator solutions with 24/7 monitoring and support.',
-      image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      caseStudy: 'HEB Supermarket Chain - 200+ locations with backup power'
-    },
-    {
-      id: 'residential',
-      name: 'Residential Communities',
-      icon: Home,
-      description: 'Protecting homes and families with reliable residential generator solutions.',
-      requirements: [
-        'Whole house coverage',
-        'Essential circuits backup',
-        'Quiet operation',
-        'Weather protection',
-        'Smart home integration',
-        'Automatic operation'
-      ],
-      projects: 50,
-      powerSize: '60kW',
-      uptime: '99.9%',
-      challenge: 'Power outages disrupt home operations and safety.',
-      solution: 'Customized generator solutions with 24/7 monitoring and support.',
-      image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      caseStudy: 'River Oaks Estate - 60kW whole-house generator system'
-    }
-  ];
-
-  const caseStudies = [
-    {
-      id: 'hospital',
-      title: 'Houston Methodist Hospital',
-      image: 'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      industry: 'Healthcare & Medical',
-      challenge: 'Power outages disrupt patient care and revenue.',
-      solution: 'Customized generator solutions with 24/7 monitoring and support.',
-      powerSize: '2MW',
-      uptime: '99.9%'
-    },
-    {
-      id: 'galleria',
-      title: 'Galleria Office Complex',
-      image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      industry: 'Commercial Buildings',
-      challenge: 'Power outages disrupt business operations and revenue.',
-      solution: 'Customized generator solutions with 24/7 monitoring and support.',
-      powerSize: '500kW',
-      uptime: '99.9%'
-    },
-    {
-      id: 'exxon',
-      title: 'Exxon Baytown Refinery',
-      image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      industry: 'Industrial & Manufacturing',
-      challenge: 'Power outages disrupt production and revenue.',
-      solution: 'Customized generator solutions with 24/7 monitoring and support.',
-      powerSize: '3MW',
-      uptime: '99.9%'
-    },
-    {
-      id: 'rice',
-      title: 'Rice University Campus',
-      image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      industry: 'Educational Institutions',
-      challenge: 'Power outages disrupt learning and operations.',
-      solution: 'Customized generator solutions with 24/7 monitoring and support.',
-      powerSize: '1.5MW',
-      uptime: '99.9%'
-    },
-    {
-      id: 'heb',
-      title: 'HEB Supermarket Chain',
-      image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      industry: 'Retail & Hospitality',
-      challenge: 'Power outages disrupt business operations and revenue.',
-      solution: 'Customized generator solutions with 24/7 monitoring and support.',
-      powerSize: '200kW',
-      uptime: '99.9%'
-    },
-    {
-      id: 'riveroaks',
-      title: 'River Oaks Estate',
-      image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      industry: 'Residential Communities',
-      challenge: 'Power outages disrupt home operations and safety.',
-      solution: 'Customized generator solutions with 24/7 monitoring and support.',
-      powerSize: '60kW',
-      uptime: '99.9%'
-    }
-  ];
-
-  const solutions = [
-    {
-      id: 'basic',
-      name: 'Basic Power Solution',
-      icon: Activity,
-      description: 'A comprehensive power solution for small to medium-sized businesses.',
-      features: [
-        'UPS and battery backup systems',
-        'Automatic transfer switches',
-        'Load management systems'
-      ],
-      startingPrice: '$10,000'
-    },
-    {
-      id: 'premium',
-      name: 'Premium Power Solution',
-      icon: Wrench,
-      description: 'A high-performance power solution for critical industrial applications.',
-      features: [
-        'High-capacity generators',
-        'Load sequencing systems',
-        'Paralleling switchgear',
-        'Process continuity protection',
-        'Motor starting capability',
-        'Environmental compliance'
-      ],
-      startingPrice: '$50,000'
-    },
-    {
-      id: 'enterprise',
-      name: 'Enterprise Power Solution',
-      icon: Shield,
-      description: 'A customized power solution tailored to meet the unique needs of your business.',
-      features: [
-        '24/7 monitoring and support',
-        'Customized generator configurations',
-        'Advanced safety features',
-        'Integrated IT infrastructure protection'
-      ],
-      startingPrice: '$100,000'
-    }
-  ];
-
-  const benefits = [
-    {
-      icon: Shield,
-      title: 'Business Continuity',
-      description: 'Minimize downtime and protect revenue during power outages'
-    },
-    {
-      icon: Clock,
-      title: 'Rapid Response',
-      description: 'Automatic startup within 10 seconds of power loss'
-    },
-    {
-      icon: Users,
-      title: 'Safety Compliance',
-      description: 'Meet OSHA, NFPA, and industry-specific safety requirements'
-    },
-    {
-      icon: TrendingUp,
-      title: 'ROI Protection',
-      description: 'Protect investments and maintain operational efficiency'
-    }
-  ];
-
-  return (
-    <div className="min-h-screen bg-white">
+  const industries = [{
+    id: 'healthcare',
+    name: 'Healthcare & Medical',
+    icon: Stethoscope,
+    description: 'Mission-critical power solutions for hospitals, clinics, and medical facilities.',
+    requirements: ['UPS and battery backup systems', 'Emergency lighting compliance', 'Life safety system support', 'Redundant power configurations', 'NFPA 99 compliance', '24/7 monitoring and support'],
+    projects: 100,
+    powerSize: '2MW',
+    uptime: '99.9%',
+    challenge: 'Power outages disrupt patient care and revenue.',
+    solution: 'Customized generator solutions with 24/7 monitoring and support.',
+    image: 'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    caseStudy: 'Houston Methodist Hospital - 2MW redundant power system'
+  }, {
+    id: 'commercial',
+    name: 'Commercial Buildings',
+    icon: Building2,
+    description: 'Reliable backup power for office buildings, retail centers, and commercial complexes.',
+    requirements: ['Automatic transfer switches', 'Load management systems', 'Fire pump power backup', 'Elevator emergency power', 'HVAC system support', 'Tenant notification systems'],
+    projects: 50,
+    powerSize: '500kW',
+    uptime: '99.9%',
+    challenge: 'Power outages disrupt business operations and revenue.',
+    solution: 'Customized generator solutions with 24/7 monitoring and support.',
+    image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    caseStudy: 'Galleria Office Complex - 500kW seamless backup power'
+  }, {
+    id: 'industrial',
+    name: 'Industrial & Manufacturing',
+    icon: Factory,
+    description: 'Heavy-duty power solutions for manufacturing plants and industrial facilities.',
+    requirements: ['High-capacity generators', 'Load sequencing systems', 'Paralleling switchgear', 'Process continuity protection', 'Motor starting capability', 'Environmental compliance'],
+    projects: 75,
+    powerSize: '3MW',
+    uptime: '99.9%',
+    challenge: 'Power outages disrupt production and revenue.',
+    solution: 'Customized generator solutions with 24/7 monitoring and support.',
+    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    caseStudy: 'Exxon Baytown Refinery - 3MW industrial backup system'
+  }, {
+    id: 'education',
+    name: 'Educational Institutions',
+    icon: GraduationCap,
+    description: 'Comprehensive power solutions for schools, universities, and research facilities.',
+    requirements: ['Campus-wide power distribution', 'Emergency evacuation lighting', 'HVAC system continuity', 'IT infrastructure protection', 'Laboratory equipment backup', 'Student safety systems'],
+    projects: 25,
+    powerSize: '1.5MW',
+    uptime: '99.9%',
+    challenge: 'Power outages disrupt learning and operations.',
+    solution: 'Customized generator solutions with 24/7 monitoring and support.',
+    image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    caseStudy: 'Rice University Campus - 1.5MW distributed power network'
+  }, {
+    id: 'retail',
+    name: 'Retail & Hospitality',
+    icon: ShoppingCart,
+    description: 'Keeping businesses operational during outages to protect revenue and customer experience.',
+    requirements: ['POS system continuity', 'Refrigeration backup', 'Security system power', 'Customer safety lighting', 'WiFi and communications', 'Quick startup capability'],
+    projects: 100,
+    powerSize: '200kW',
+    uptime: '99.9%',
+    challenge: 'Power outages disrupt business operations and revenue.',
+    solution: 'Customized generator solutions with 24/7 monitoring and support.',
+    image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    caseStudy: 'HEB Supermarket Chain - 200+ locations with backup power'
+  }, {
+    id: 'residential',
+    name: 'Residential Communities',
+    icon: Home,
+    description: 'Protecting homes and families with reliable residential generator solutions.',
+    requirements: ['Whole house coverage', 'Essential circuits backup', 'Quiet operation', 'Weather protection', 'Smart home integration', 'Automatic operation'],
+    projects: 50,
+    powerSize: '60kW',
+    uptime: '99.9%',
+    challenge: 'Power outages disrupt home operations and safety.',
+    solution: 'Customized generator solutions with 24/7 monitoring and support.',
+    image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    caseStudy: 'River Oaks Estate - 60kW whole-house generator system'
+  }];
+  const caseStudies = [{
+    id: 'hospital',
+    title: 'Houston Methodist Hospital',
+    image: 'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    industry: 'Healthcare & Medical',
+    challenge: 'Power outages disrupt patient care and revenue.',
+    solution: 'Customized generator solutions with 24/7 monitoring and support.',
+    powerSize: '2MW',
+    uptime: '99.9%'
+  }, {
+    id: 'galleria',
+    title: 'Galleria Office Complex',
+    image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    industry: 'Commercial Buildings',
+    challenge: 'Power outages disrupt business operations and revenue.',
+    solution: 'Customized generator solutions with 24/7 monitoring and support.',
+    powerSize: '500kW',
+    uptime: '99.9%'
+  }, {
+    id: 'exxon',
+    title: 'Exxon Baytown Refinery',
+    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    industry: 'Industrial & Manufacturing',
+    challenge: 'Power outages disrupt production and revenue.',
+    solution: 'Customized generator solutions with 24/7 monitoring and support.',
+    powerSize: '3MW',
+    uptime: '99.9%'
+  }, {
+    id: 'rice',
+    title: 'Rice University Campus',
+    image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    industry: 'Educational Institutions',
+    challenge: 'Power outages disrupt learning and operations.',
+    solution: 'Customized generator solutions with 24/7 monitoring and support.',
+    powerSize: '1.5MW',
+    uptime: '99.9%'
+  }, {
+    id: 'heb',
+    title: 'HEB Supermarket Chain',
+    image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    industry: 'Retail & Hospitality',
+    challenge: 'Power outages disrupt business operations and revenue.',
+    solution: 'Customized generator solutions with 24/7 monitoring and support.',
+    powerSize: '200kW',
+    uptime: '99.9%'
+  }, {
+    id: 'riveroaks',
+    title: 'River Oaks Estate',
+    image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    industry: 'Residential Communities',
+    challenge: 'Power outages disrupt home operations and safety.',
+    solution: 'Customized generator solutions with 24/7 monitoring and support.',
+    powerSize: '60kW',
+    uptime: '99.9%'
+  }];
+  const solutions = [{
+    id: 'basic',
+    name: 'Basic Power Solution',
+    icon: Activity,
+    description: 'A comprehensive power solution for small to medium-sized businesses.',
+    features: ['UPS and battery backup systems', 'Automatic transfer switches', 'Load management systems'],
+    startingPrice: '$10,000'
+  }, {
+    id: 'premium',
+    name: 'Premium Power Solution',
+    icon: Wrench,
+    description: 'A high-performance power solution for critical industrial applications.',
+    features: ['High-capacity generators', 'Load sequencing systems', 'Paralleling switchgear', 'Process continuity protection', 'Motor starting capability', 'Environmental compliance'],
+    startingPrice: '$50,000'
+  }, {
+    id: 'enterprise',
+    name: 'Enterprise Power Solution',
+    icon: Shield,
+    description: 'A customized power solution tailored to meet the unique needs of your business.',
+    features: ['24/7 monitoring and support', 'Customized generator configurations', 'Advanced safety features', 'Integrated IT infrastructure protection'],
+    startingPrice: '$100,000'
+  }];
+  const benefits = [{
+    icon: Shield,
+    title: 'Business Continuity',
+    description: 'Minimize downtime and protect revenue during power outages'
+  }, {
+    icon: Clock,
+    title: 'Rapid Response',
+    description: 'Automatic startup within 10 seconds of power loss'
+  }, {
+    icon: Users,
+    title: 'Safety Compliance',
+    description: 'Meet OSHA, NFPA, and industry-specific safety requirements'
+  }, {
+    icon: TrendingUp,
+    title: 'ROI Protection',
+    description: 'Protect investments and maintain operational efficiency'
+  }];
+  return <div className="min-h-screen bg-white">
       <Header />
       
       {/* Hero Section - Added more top padding */}
@@ -306,7 +201,7 @@ const Industries = () => {
                 <Phone className="w-5 h-5 mr-2" />
                 Industry Consultation
               </Button>
-              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-primary px-8 py-4">
+              <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-4 text-slate-900">
                 <MessageSquare className="w-5 h-5 mr-2" />
                 Custom Solution Quote
               </Button>
@@ -327,18 +222,10 @@ const Industries = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {industries.map((industry, index) => {
-              const IconComponent = industry.icon;
-              return (
-                <Card 
-                  key={industry.id} 
-                  className="group hover:shadow-xl transition-all duration-300 border-steel-200 hover:border-accent/30 overflow-hidden"
-                >
+            const IconComponent = industry.icon;
+            return <Card key={industry.id} className="group hover:shadow-xl transition-all duration-300 border-steel-200 hover:border-accent/30 overflow-hidden">
                   <div className="relative h-48 bg-gradient-to-br from-steel-100 to-steel-200 overflow-hidden">
-                    <img 
-                      src={industry.image} 
-                      alt={industry.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
+                    <img src={industry.image} alt={industry.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <div className="absolute bottom-4 left-4">
                       <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mb-3">
@@ -359,12 +246,10 @@ const Industries = () => {
                     <div className="space-y-3 mb-6">
                       <h4 className="font-semibold text-primary text-sm">Key Requirements:</h4>
                       <ul className="space-y-2">
-                        {industry.requirements.map((req, idx) => (
-                          <li key={idx} className="text-sm text-steel-600 flex items-center">
+                        {industry.requirements.map((req, idx) => <li key={idx} className="text-sm text-steel-600 flex items-center">
                             <CheckCircle className="w-4 h-4 text-accent mr-3 flex-shrink-0" />
                             {req}
-                          </li>
-                        ))}
+                          </li>)}
                       </ul>
                     </div>
                     
@@ -373,9 +258,8 @@ const Industries = () => {
                       Learn More
                     </Button>
                   </CardContent>
-                </Card>
-              );
-            })}
+                </Card>;
+          })}
           </div>
         </div>
       </section>
@@ -391,15 +275,10 @@ const Industries = () => {
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {caseStudies.map((study, index) => (
-              <Card key={index} className="overflow-hidden shadow-lg border-0">
+            {caseStudies.map((study, index) => <Card key={index} className="overflow-hidden shadow-lg border-0">
                 <div className="grid grid-cols-1 md:grid-cols-2">
                   <div className="relative h-64 md:h-auto">
-                    <img 
-                      src={study.image} 
-                      alt={study.title}
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={study.image} alt={study.title} className="w-full h-full object-cover" />
                     <div className="absolute top-4 left-4">
                       <Badge className="bg-accent text-white">
                         {study.industry}
@@ -432,8 +311,7 @@ const Industries = () => {
                     </Button>
                   </CardContent>
                 </div>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -450,9 +328,8 @@ const Industries = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {solutions.map((solution, index) => {
-              const IconComponent = solution.icon;
-              return (
-                <Card key={index} className="text-center hover:shadow-xl transition-shadow duration-300 border-steel-200 hover:border-accent/30">
+            const IconComponent = solution.icon;
+            return <Card key={index} className="text-center hover:shadow-xl transition-shadow duration-300 border-steel-200 hover:border-accent/30">
                   <CardContent className="p-8">
                     <div className="w-16 h-16 bg-accent rounded-lg flex items-center justify-center mx-auto mb-6">
                       <IconComponent className="w-8 h-8 text-white" />
@@ -461,12 +338,10 @@ const Industries = () => {
                     <p className="text-steel-600 mb-6">{solution.description}</p>
                     
                     <ul className="space-y-3 mb-8 text-left">
-                      {solution.features.map((feature, idx) => (
-                        <li key={idx} className="text-sm text-steel-600 flex items-center">
+                      {solution.features.map((feature, idx) => <li key={idx} className="text-sm text-steel-600 flex items-center">
                           <CheckCircle className="w-4 h-4 text-accent mr-3 flex-shrink-0" />
                           {feature}
-                        </li>
-                      ))}
+                        </li>)}
                     </ul>
                     
                     <div className="text-3xl font-bold text-accent mb-6">{solution.startingPrice}</div>
@@ -476,9 +351,8 @@ const Industries = () => {
                       Get Custom Quote
                     </Button>
                   </CardContent>
-                </Card>
-              );
-            })}
+                </Card>;
+          })}
           </div>
         </div>
       </section>
@@ -504,8 +378,6 @@ const Industries = () => {
       </section>
 
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Industries;
