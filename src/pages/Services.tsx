@@ -115,8 +115,8 @@ const Services = () => {
     <div className="min-h-screen bg-white">
       <Header />
       
-      {/* Hero Section */}
-      <section className="pt-28 pb-20 bg-gradient-to-br from-primary via-steel-800 to-steel-900 text-white">
+      {/* Hero Section - Added more top padding */}
+      <section className="pt-32 pb-20 bg-gradient-to-br from-primary via-steel-800 to-steel-900 text-white">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center">
             <Badge className="mb-6 bg-accent text-white border-accent px-4 py-2">
