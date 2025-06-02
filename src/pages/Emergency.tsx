@@ -1,196 +1,124 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  ArrowRight, 
-  Phone, 
-  MessageSquare,
-  AlertTriangle,
-  Clock,
-  MapPin,
-  Shield,
-  Zap,
-  Truck,
-  Users,
-  CheckCircle,
-  Star,
-  Calendar,
-  Fuel,
-  Wrench,
-  Timer
-} from 'lucide-react';
+import { ArrowRight, Phone, MessageSquare, AlertTriangle, Clock, MapPin, Shield, Zap, Truck, Users, CheckCircle, Star, Calendar, Fuel, Wrench, Timer } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-
 const Emergency = () => {
-  const emergencyServices = [
-    {
-      title: 'Generator Repair',
-      icon: Wrench,
-      response: '2-Hour Response',
-      description: 'Immediate on-site diagnosis and repair for all generator makes and models.',
-      features: [
-        'Emergency diagnostic equipment',
-        'Mobile repair capabilities',
-        'OEM parts inventory',
-        'Field technician expertise'
-      ]
-    },
-    {
-      title: 'Emergency Fuel Delivery',
-      icon: Fuel,
-      response: '1-Hour Delivery',
-      description: 'Critical fuel delivery to keep your generators running during extended outages.',
-      features: [
-        'Diesel and propane delivery',
-        '24/7 fuel monitoring',
-        'Emergency fuel contracts',
-        'Storm preparation services'
-      ]
-    },
-    {
-      title: 'Temporary Power',
-      icon: Truck,
-      response: 'Same Day Setup',
-      description: 'Portable generator rentals with immediate delivery and professional setup.',
-      features: [
-        'Trailer-mounted units',
-        'Power distribution panels',
-        'Professional installation',
-        'Extended runtime capability'
-      ]
-    },
-    {
-      title: 'Load Bank Testing',
-      icon: Zap,
-      response: '4-Hour Response',
-      description: 'Emergency load testing to verify generator performance under actual conditions.',
-      features: [
-        'Portable load bank units',
-        'Performance verification',
-        'Load capacity testing',
-        'Compliance documentation'
-      ]
-    }
-  ];
-
-  const responseAreas = [
-    {
-      area: 'Central Houston',
-      time: '30 minutes',
-      coverage: ['Downtown', 'Midtown', 'Museum District', 'Heights']
-    },
-    {
-      area: 'West Houston',
-      time: '45 minutes',
-      coverage: ['Katy', 'Sugar Land', 'Richmond', 'Rosenberg']
-    },
-    {
-      area: 'North Houston',
-      time: '45 minutes',
-      coverage: ['The Woodlands', 'Spring', 'Tomball', 'Conroe']
-    },
-    {
-      area: 'East Houston',
-      time: '60 minutes',
-      coverage: ['Pasadena', 'Baytown', 'Deer Park', 'La Porte']
-    },
-    {
-      area: 'South Houston',
-      time: '60 minutes',
-      coverage: ['Pearland', 'League City', 'Friendswood', 'Alvin']
-    },
-    {
-      area: 'Southeast Houston',
-      time: '75 minutes',
-      coverage: ['Clear Lake', 'Webster', 'Seabrook', 'Kemah']
-    }
-  ];
-
-  const emergencyContacts = [
-    {
-      title: 'Primary Emergency Line',
-      number: '(832) 555-POWER',
-      description: '24/7 emergency dispatch',
-      priority: 'high'
-    },
-    {
-      title: 'Storm Preparation Hotline',
-      number: '(832) 555-STORM',
-      description: 'Hurricane & severe weather prep',
-      priority: 'medium'
-    },
-    {
-      title: 'Fuel Emergency Line',
-      number: '(832) 555-FUEL',
-      description: 'Emergency fuel delivery',
-      priority: 'medium'
-    }
-  ];
-
-  const preparationSteps = [
-    {
-      step: '1',
-      title: 'Pre-Storm Inspection',
-      description: 'Conduct a thorough inspection of your generator system to identify any potential issues.',
-      timeframe: '1-2 weeks before storm season'
-    },
-    {
-      step: '2',
-      title: 'Fuel and Oil Changes',
-      description: "Change your generator's fuel and oil to ensure optimal performance during storms.",
-      timeframe: '1-2 weeks before storm season'
-    },
-    {
-      step: '3',
-      title: 'Battery Maintenance',
-      description: "Check and replace your generator's battery to ensure it can provide power during a storm.",
-      timeframe: '1-2 weeks before storm season'
-    },
-    {
-      step: '4',
-      title: 'Generator Testing',
-      description: 'Perform a load test on your generator to ensure it can handle the expected load during a storm.',
-      timeframe: '1-2 weeks before storm season'
-    },
-    {
-      step: '5',
-      title: 'Backup Generator Setup',
-      description: 'Ensure your backup generator is properly connected and ready to use during a storm.',
-      timeframe: '1-2 weeks before storm season'
-    },
-    {
-      step: '6',
-      title: 'Emergency Contact Information',
-      description: 'Keep your emergency contact information up-to-date and easily accessible.',
-      timeframe: '1-2 weeks before storm season'
-    }
-  ];
-
-  const testimonials = [
-    {
-      name: 'Dr. Sarah Mitchell',
-      company: 'Houston Methodist Hospital',
-      text: 'When our backup generator failed during Hurricane Harvey, HOU GEN PROS had a team on-site within 90 minutes. Their rapid response saved our critical operations.',
-      rating: 5
-    },
-    {
-      name: 'Mike Rodriguez',
-      company: 'ExxonMobil Baytown',
-      text: 'Outstanding emergency service. Their 24/7 response team has consistently delivered when we needed them most. True professionals.',
-      rating: 5
-    },
-    {
-      name: 'Jennifer Chen',
-      company: 'Memorial Hermann',
-      text: 'Reliable, fast, and professional. HOU GEN PROS is our trusted partner for all emergency power needs. Highly recommended.',
-      rating: 5
-    }
-  ];
-
-  return (
-    <div className="min-h-screen bg-white">
+  const emergencyServices = [{
+    title: 'Generator Repair',
+    icon: Wrench,
+    response: '2-Hour Response',
+    description: 'Immediate on-site diagnosis and repair for all generator makes and models.',
+    features: ['Emergency diagnostic equipment', 'Mobile repair capabilities', 'OEM parts inventory', 'Field technician expertise']
+  }, {
+    title: 'Emergency Fuel Delivery',
+    icon: Fuel,
+    response: '1-Hour Delivery',
+    description: 'Critical fuel delivery to keep your generators running during extended outages.',
+    features: ['Diesel and propane delivery', '24/7 fuel monitoring', 'Emergency fuel contracts', 'Storm preparation services']
+  }, {
+    title: 'Temporary Power',
+    icon: Truck,
+    response: 'Same Day Setup',
+    description: 'Portable generator rentals with immediate delivery and professional setup.',
+    features: ['Trailer-mounted units', 'Power distribution panels', 'Professional installation', 'Extended runtime capability']
+  }, {
+    title: 'Load Bank Testing',
+    icon: Zap,
+    response: '4-Hour Response',
+    description: 'Emergency load testing to verify generator performance under actual conditions.',
+    features: ['Portable load bank units', 'Performance verification', 'Load capacity testing', 'Compliance documentation']
+  }];
+  const responseAreas = [{
+    area: 'Central Houston',
+    time: '30 minutes',
+    coverage: ['Downtown', 'Midtown', 'Museum District', 'Heights']
+  }, {
+    area: 'West Houston',
+    time: '45 minutes',
+    coverage: ['Katy', 'Sugar Land', 'Richmond', 'Rosenberg']
+  }, {
+    area: 'North Houston',
+    time: '45 minutes',
+    coverage: ['The Woodlands', 'Spring', 'Tomball', 'Conroe']
+  }, {
+    area: 'East Houston',
+    time: '60 minutes',
+    coverage: ['Pasadena', 'Baytown', 'Deer Park', 'La Porte']
+  }, {
+    area: 'South Houston',
+    time: '60 minutes',
+    coverage: ['Pearland', 'League City', 'Friendswood', 'Alvin']
+  }, {
+    area: 'Southeast Houston',
+    time: '75 minutes',
+    coverage: ['Clear Lake', 'Webster', 'Seabrook', 'Kemah']
+  }];
+  const emergencyContacts = [{
+    title: 'Primary Emergency Line',
+    number: '(832) 555-POWER',
+    description: '24/7 emergency dispatch',
+    priority: 'high'
+  }, {
+    title: 'Storm Preparation Hotline',
+    number: '(832) 555-STORM',
+    description: 'Hurricane & severe weather prep',
+    priority: 'medium'
+  }, {
+    title: 'Fuel Emergency Line',
+    number: '(832) 555-FUEL',
+    description: 'Emergency fuel delivery',
+    priority: 'medium'
+  }];
+  const preparationSteps = [{
+    step: '1',
+    title: 'Pre-Storm Inspection',
+    description: 'Conduct a thorough inspection of your generator system to identify any potential issues.',
+    timeframe: '1-2 weeks before storm season'
+  }, {
+    step: '2',
+    title: 'Fuel and Oil Changes',
+    description: "Change your generator's fuel and oil to ensure optimal performance during storms.",
+    timeframe: '1-2 weeks before storm season'
+  }, {
+    step: '3',
+    title: 'Battery Maintenance',
+    description: "Check and replace your generator's battery to ensure it can provide power during a storm.",
+    timeframe: '1-2 weeks before storm season'
+  }, {
+    step: '4',
+    title: 'Generator Testing',
+    description: 'Perform a load test on your generator to ensure it can handle the expected load during a storm.',
+    timeframe: '1-2 weeks before storm season'
+  }, {
+    step: '5',
+    title: 'Backup Generator Setup',
+    description: 'Ensure your backup generator is properly connected and ready to use during a storm.',
+    timeframe: '1-2 weeks before storm season'
+  }, {
+    step: '6',
+    title: 'Emergency Contact Information',
+    description: 'Keep your emergency contact information up-to-date and easily accessible.',
+    timeframe: '1-2 weeks before storm season'
+  }];
+  const testimonials = [{
+    name: 'Dr. Sarah Mitchell',
+    company: 'Houston Methodist Hospital',
+    text: 'When our backup generator failed during Hurricane Harvey, HOU GEN PROS had a team on-site within 90 minutes. Their rapid response saved our critical operations.',
+    rating: 5
+  }, {
+    name: 'Mike Rodriguez',
+    company: 'ExxonMobil Baytown',
+    text: 'Outstanding emergency service. Their 24/7 response team has consistently delivered when we needed them most. True professionals.',
+    rating: 5
+  }, {
+    name: 'Jennifer Chen',
+    company: 'Memorial Hermann',
+    text: 'Reliable, fast, and professional. HOU GEN PROS is our trusted partner for all emergency power needs. Highly recommended.',
+    rating: 5
+  }];
+  return <div className="min-h-screen bg-white">
       <Header />
       
       {/* Hero Section - Added more top padding */}
@@ -213,7 +141,7 @@ const Emergency = () => {
                 <Phone className="w-6 h-6 mr-3" />
                 EMERGENCY: (832) 555-POWER
               </Button>
-              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-red-800 px-8 py-6">
+              <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-6 text-slate-950">
                 <Clock className="w-5 h-5 mr-2" />
                 2-Hour Response Guarantee
               </Button>
@@ -234,12 +162,8 @@ const Emergency = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {emergencyServices.map((service, index) => {
-              const IconComponent = service.icon;
-              return (
-                <Card 
-                  key={index} 
-                  className="text-center hover:shadow-xl transition-all duration-300 border-steel-200 hover:border-red-300 group"
-                >
+            const IconComponent = service.icon;
+            return <Card key={index} className="text-center hover:shadow-xl transition-all duration-300 border-steel-200 hover:border-red-300 group">
                   <CardContent className="p-8">
                     <div className="w-16 h-16 bg-red-100 group-hover:bg-red-600 rounded-lg flex items-center justify-center mx-auto mb-6 transition-colors duration-300">
                       <IconComponent className="w-8 h-8 text-red-600 group-hover:text-white transition-colors duration-300" />
@@ -249,12 +173,10 @@ const Emergency = () => {
                     <div className="text-red-600 font-bold text-lg mb-4">{service.response}</div>
                     
                     <ul className="space-y-2 mb-6 text-left">
-                      {service.features.map((feature, idx) => (
-                        <li key={idx} className="text-sm text-steel-600 flex items-center">
+                      {service.features.map((feature, idx) => <li key={idx} className="text-sm text-steel-600 flex items-center">
                           <CheckCircle className="w-4 h-4 text-red-600 mr-3 flex-shrink-0" />
                           {feature}
-                        </li>
-                      ))}
+                        </li>)}
                     </ul>
                     
                     <Button variant="outline" className="w-full border-red-600 text-red-600 hover:bg-red-600 hover:text-white">
@@ -262,9 +184,8 @@ const Emergency = () => {
                       Call Now
                     </Button>
                   </CardContent>
-                </Card>
-              );
-            })}
+                </Card>;
+          })}
           </div>
         </div>
       </section>
@@ -283,16 +204,11 @@ const Emergency = () => {
             <div>
               <h3 className="text-2xl font-bold text-primary mb-8">Service Areas & Response Times</h3>
               <div className="grid grid-cols-2 gap-4">
-                {responseAreas.map((area, index) => (
-                  <div 
-                    key={index}
-                    className="bg-white p-4 rounded-lg shadow-sm border border-steel-200 text-center hover:shadow-md transition-shadow duration-300"
-                  >
+                {responseAreas.map((area, index) => <div key={index} className="bg-white p-4 rounded-lg shadow-sm border border-steel-200 text-center hover:shadow-md transition-shadow duration-300">
                     <MapPin className="w-5 h-5 text-red-600 mx-auto mb-2" />
                     <div className="font-semibold text-primary text-sm">{area.area}</div>
                     <div className="text-red-600 font-bold text-xs">{area.time}</div>
-                  </div>
-                ))}
+                  </div>)}
               </div>
               
               <div className="mt-8 p-6 bg-red-50 border border-red-200 rounded-lg">
@@ -308,11 +224,7 @@ const Emergency = () => {
             </div>
             
             <div className="relative">
-              <img 
-                src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                alt="Emergency response truck"
-                className="w-full h-80 object-cover rounded-lg shadow-lg"
-              />
+              <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Emergency response truck" className="w-full h-80 object-cover rounded-lg shadow-lg" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-lg" />
               <div className="absolute bottom-6 left-6 text-white">
                 <Badge className="bg-red-600 text-white mb-3">
@@ -339,8 +251,7 @@ const Emergency = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {preparationSteps.map((step, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-shadow duration-300 border-steel-200">
+            {preparationSteps.map((step, index) => <Card key={index} className="text-center hover:shadow-lg transition-shadow duration-300 border-steel-200">
                 <CardContent className="p-8">
                   <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-xl font-bold">
                     {step.step}
@@ -349,8 +260,7 @@ const Emergency = () => {
                   <p className="text-steel-600 mb-4 text-sm">{step.description}</p>
                   <div className="text-blue-600 font-semibold text-sm">{step.timeframe}</div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
           
           <div className="text-center mt-12">
@@ -427,8 +337,6 @@ const Emergency = () => {
       </section>
 
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Emergency;
