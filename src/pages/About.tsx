@@ -26,7 +26,7 @@ import Footer from '@/components/Footer';
 const About = () => {
   const teamMembers = [
     {
-      name: 'Michael Rodriguez',
+      name: 'Jeff Ali',
       title: 'Founder & CEO',
       experience: '20+ Years',
       specialization: 'Commercial Power Systems',
@@ -34,7 +34,7 @@ const About = () => {
       image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
     },
     {
-      name: 'Sarah Chen',
+      name: 'Sarah Johnson',
       title: 'VP of Operations',
       experience: '15+ Years',
       specialization: 'Project Management',
@@ -42,7 +42,7 @@ const About = () => {
       image: 'https://images.unsplash.com/photo-1494790108755-2616b612b44b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
     },
     {
-      name: 'David Thompson',
+      name: 'Mike Thompson',
       title: 'Lead Service Technician',
       experience: '18+ Years',
       specialization: 'Emergency Response',
@@ -134,26 +134,26 @@ const About = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="pt-24 pb-16 bg-gradient-to-br from-primary via-steel-800 to-steel-900 text-white">
+      <section className="pt-28 pb-20 bg-gradient-to-br from-primary via-steel-800 to-steel-900 text-white">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center">
-            <Badge className="mb-4 bg-accent text-white border-accent">
+            <Badge className="mb-6 bg-accent text-white border-accent px-4 py-2">
               Since 2008 - Houston's Trusted Power Partner
             </Badge>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            <h1 className="text-5xl md:text-6xl font-bold mb-8 leading-tight">
               Powering Houston's
               <span className="block text-accent">Success Stories</span>
             </h1>
-            <p className="text-xl text-steel-200 mb-8 leading-relaxed">
+            <p className="text-xl text-steel-200 mb-10 leading-relaxed max-w-3xl mx-auto">
               For over 15 years, HOU GEN PROS has been Houston's premier generator solutions provider, 
               delivering Fortune 500-level service to businesses and families across Greater Houston.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-accent hover:bg-orange-600 text-white">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center">
+              <Button size="lg" className="bg-accent hover:bg-orange-600 text-white px-8 py-4">
                 <Phone className="w-5 h-5 mr-2" />
                 Meet Our Team
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
+              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-primary px-8 py-4">
                 <MessageSquare className="w-5 h-5 mr-2" />
                 Our Story
               </Button>
@@ -163,9 +163,9 @@ const About = () => {
       </section>
 
       {/* Company Stats */}
-      <section className="py-16 bg-steel-50">
+      <section className="py-20 bg-steel-50">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-12">
             {companyStats.map((stat, index) => {
               const IconComponent = stat.icon;
               return (
@@ -174,13 +174,13 @@ const About = () => {
                   className="text-center animate-fade-in"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                    <IconComponent className="w-8 h-8 text-white" />
+                  <div className="w-20 h-20 bg-accent rounded-full flex items-center justify-center mx-auto mb-6">
+                    <IconComponent className="w-10 h-10 text-white" />
                   </div>
-                  <div className="text-3xl font-bold text-primary mb-1">
+                  <div className="text-4xl font-bold text-primary mb-2">
                     {stat.number}
                   </div>
-                  <div className="text-steel-600 font-medium text-sm">
+                  <div className="text-steel-600 font-medium">
                     {stat.label}
                   </div>
                 </div>
@@ -191,17 +191,17 @@ const About = () => {
       </section>
 
       {/* Our Story */}
-      <section className="py-16">
+      <section className="py-20">
         <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-primary mb-4">Our Houston Story</h2>
-              <p className="text-steel-600 max-w-2xl mx-auto">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-primary mb-6">Our Houston Story</h2>
+              <p className="text-xl text-steel-600 max-w-3xl mx-auto">
                 Born and raised in Houston, we understand the unique power challenges our community faces.
               </p>
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div>
                 <img 
                   src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
@@ -210,25 +210,25 @@ const About = () => {
                 />
               </div>
               
-              <div className="space-y-6">
-                <p className="text-steel-600 leading-relaxed">
-                  Founded in 2008 by Master Electrician Michael Rodriguez, HOU GEN PROS began with a simple mission: 
+              <div className="space-y-8">
+                <p className="text-lg text-steel-600 leading-relaxed">
+                  Founded in 2008 by Master Electrician Jeff Ali, HOU GEN PROS began with a simple mission: 
                   provide Houston businesses and families with reliable, professional generator solutions they can trust.
                 </p>
                 
-                <p className="text-steel-600 leading-relaxed">
+                <p className="text-lg text-steel-600 leading-relaxed">
                   From our humble beginnings as a small electrical contractor, we've grown into Houston's most trusted 
                   generator service provider, serving everyone from Fortune 500 corporations to local families.
                 </p>
                 
-                <p className="text-steel-600 leading-relaxed">
+                <p className="text-lg text-steel-600 leading-relaxed">
                   Through hurricanes, winter storms, and summer blackouts, we've been there for our community, 
                   providing the power solutions that keep Houston running.
                 </p>
                 
-                <div className="flex items-center space-x-4 pt-4">
-                  <MapPin className="w-5 h-5 text-accent" />
-                  <span className="text-steel-700 font-medium">Proudly serving Greater Houston since 2008</span>
+                <div className="flex items-center space-x-4 pt-6">
+                  <MapPin className="w-6 h-6 text-accent" />
+                  <span className="text-steel-700 font-medium text-lg">Proudly serving Greater Houston since 2008</span>
                 </div>
               </div>
             </div>
@@ -237,31 +237,31 @@ const About = () => {
       </section>
 
       {/* Company Timeline */}
-      <section className="py-16 bg-steel-50">
+      <section className="py-20 bg-steel-50">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-primary mb-4">Our Journey</h2>
-            <p className="text-steel-600 max-w-2xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-primary mb-6">Our Journey</h2>
+            <p className="text-xl text-steel-600 max-w-3xl mx-auto">
               Key milestones in our growth as Houston's premier generator service provider.
             </p>
           </div>
           
-          <div className="max-w-4xl mx-auto">
-            <div className="space-y-8">
+          <div className="max-w-5xl mx-auto">
+            <div className="space-y-12">
               {milestones.map((milestone, index) => (
                 <div 
                   key={index} 
-                  className="flex items-start space-x-6 animate-fade-in"
+                  className="flex items-start space-x-8 animate-fade-in"
                   style={{ animationDelay: `${index * 150}ms` }}
                 >
-                  <div className="flex-shrink-0 w-20 text-center">
-                    <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center text-white font-bold text-lg">
+                  <div className="flex-shrink-0 w-24 text-center">
+                    <div className="w-20 h-20 bg-accent rounded-full flex items-center justify-center text-white font-bold text-lg">
                       {milestone.year}
                     </div>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold text-primary mb-2">{milestone.title}</h3>
-                    <p className="text-steel-600">{milestone.description}</p>
+                  <div className="flex-1 pt-2">
+                    <h3 className="text-2xl font-bold text-primary mb-3">{milestone.title}</h3>
+                    <p className="text-lg text-steel-600">{milestone.description}</p>
                   </div>
                 </div>
               ))}
@@ -271,43 +271,43 @@ const About = () => {
       </section>
 
       {/* Team Section */}
-      <section className="py-16">
+      <section className="py-20">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-primary mb-4">Meet Our Leadership Team</h2>
-            <p className="text-steel-600 max-w-2xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-primary mb-6">Meet Our Leadership Team</h2>
+            <p className="text-xl text-steel-600 max-w-3xl mx-auto">
               Experienced professionals dedicated to delivering exceptional generator solutions.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {teamMembers.map((member, index) => (
               <Card 
                 key={index} 
-                className="text-center hover:shadow-xl transition-all duration-300 animate-fade-in"
+                className="text-center hover:shadow-xl transition-all duration-300 animate-fade-in border-0 shadow-lg"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <CardContent className="p-6">
-                  <div className="relative mb-6">
+                <CardContent className="p-8">
+                  <div className="relative mb-8">
                     <img 
                       src={member.image} 
                       alt={member.name}
-                      className="w-24 h-24 rounded-full mx-auto object-cover border-4 border-accent/20"
+                      className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-accent/20"
                     />
-                    <Badge className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-accent text-white">
+                    <Badge className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-accent text-white px-3 py-1">
                       {member.experience}
                     </Badge>
                   </div>
                   
-                  <h3 className="text-xl font-bold text-primary mb-1">{member.name}</h3>
-                  <p className="text-accent font-semibold mb-3">{member.title}</p>
-                  <p className="text-steel-600 mb-4">{member.specialization}</p>
+                  <h3 className="text-2xl font-bold text-primary mb-2">{member.name}</h3>
+                  <p className="text-accent font-semibold mb-4 text-lg">{member.title}</p>
+                  <p className="text-steel-600 mb-6">{member.specialization}</p>
                   
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-primary text-sm">Certifications:</h4>
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-primary">Certifications:</h4>
                     {member.certifications.map((cert, idx) => (
-                      <div key={idx} className="flex items-center justify-center text-xs text-steel-600">
-                        <CheckCircle className="w-3 h-3 text-accent mr-2" />
+                      <div key={idx} className="flex items-center justify-center text-sm text-steel-600">
+                        <CheckCircle className="w-4 h-4 text-accent mr-2" />
                         {cert}
                       </div>
                     ))}
@@ -320,16 +320,16 @@ const About = () => {
       </section>
 
       {/* Values Section */}
-      <section className="py-16 bg-steel-50">
+      <section className="py-20 bg-steel-50">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-primary mb-4">Our Core Values</h2>
-            <p className="text-steel-600 max-w-2xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-primary mb-6">Our Core Values</h2>
+            <p className="text-xl text-steel-600 max-w-3xl mx-auto">
               The principles that guide everything we do for our Houston community.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
             {values.map((value, index) => {
               const IconComponent = value.icon;
               return (
@@ -338,11 +338,11 @@ const About = () => {
                   className="text-center group animate-fade-in"
                   style={{ animationDelay: `${index * 150}ms` }}
                 >
-                  <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <IconComponent className="w-8 h-8 text-white" />
+                  <div className="w-20 h-20 bg-accent rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <IconComponent className="w-10 h-10 text-white" />
                   </div>
-                  <h3 className="text-lg font-bold text-primary mb-2">{value.title}</h3>
-                  <p className="text-steel-600">{value.description}</p>
+                  <h3 className="text-xl font-bold text-primary mb-4">{value.title}</h3>
+                  <p className="text-steel-600 leading-relaxed">{value.description}</p>
                 </div>
               );
             })}
@@ -351,25 +351,25 @@ const About = () => {
       </section>
 
       {/* Certifications */}
-      <section className="py-16">
+      <section className="py-20">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-primary mb-4">Licenses & Certifications</h2>
-            <p className="text-steel-600 max-w-2xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-primary mb-6">Licenses & Certifications</h2>
+            <p className="text-xl text-steel-600 max-w-3xl mx-auto">
               Fully licensed, bonded, and certified by leading industry organizations.
             </p>
           </div>
           
-          <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {certifications.map((cert, index) => (
                 <div 
                   key={index} 
-                  className="flex items-center space-x-3 p-4 bg-steel-50 rounded-lg animate-fade-in"
+                  className="flex items-center space-x-4 p-6 bg-steel-50 rounded-lg animate-fade-in"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  <CheckCircle className="w-5 h-5 text-accent flex-shrink-0" />
-                  <span className="text-steel-700">{cert}</span>
+                  <CheckCircle className="w-6 h-6 text-accent flex-shrink-0" />
+                  <span className="text-steel-700 text-lg">{cert}</span>
                 </div>
               ))}
             </div>
@@ -378,18 +378,18 @@ const About = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-primary text-white">
+      <section className="py-20 bg-primary text-white">
         <div className="container mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Experience the HOU GEN PROS Difference?</h2>
-          <p className="text-xl text-steel-200 mb-8 max-w-2xl mx-auto">
+          <h2 className="text-4xl font-bold mb-6">Ready to Experience the HOU GEN PROS Difference?</h2>
+          <p className="text-xl text-steel-200 mb-10 max-w-3xl mx-auto">
             Join hundreds of satisfied Houston customers who trust us with their power needs.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-accent hover:bg-orange-600 text-white">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <Button size="lg" className="bg-accent hover:bg-orange-600 text-white px-8 py-4">
               <Phone className="w-5 h-5 mr-2" />
               (832) 555-POWER
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
+            <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-primary px-8 py-4">
               <MessageSquare className="w-5 h-5 mr-2" />
               Start Your Project
             </Button>
