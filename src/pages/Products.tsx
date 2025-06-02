@@ -3,124 +3,143 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  ArrowRight, 
-  Phone, 
-  MessageSquare,
-  Zap,
-  Shield,
-  Settings,
-  Home,
-  Building,
-  Truck,
-  Fuel,
-  CheckCircle,
-  Star,
-  Award,
-  Download
-} from 'lucide-react';
+import { ArrowRight, Phone, MessageSquare, Zap, Shield, Settings, Home, Building, Truck, Fuel, CheckCircle, Star, Award, Download } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-
 const Products = () => {
   const [activeCategory, setActiveCategory] = useState('all');
-
-  const products = [
-    {
-      id: 1,
-      name: "Industrial Diesel Series",
-      category: "Commercial",
-      power: "50kW - 2MW",
-      fuel: "Diesel",
-      description: "Heavy-duty generators for industrial applications.",
-      icon: Building,
-      features: ["Continuous Power", "Weather Resistant", "Remote Monitoring", "Automatic Transfer Switch"],
-      image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      badge: "Most Popular",
-      rating: 4.8,
-      price: "$15,000 - $150,000"
-    },
-    {
-      id: 2,
-      name: "Residential Standby",
-      category: "Residential",
-      power: "7.5kW - 26kW",
-      fuel: "Natural Gas/Propane",
-      description: "Reliable backup power for homes and small businesses.",
-      icon: Home,
-      features: ["Automatic Start", "Quiet Operation", "10-Year Warranty", "Mobile App Monitoring"],
-      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      badge: "Premium",
-      rating: 4.6,
-      price: "$3,000 - $12,000"
-    },
-    {
-      id: 3,
-      name: "Portable Power Pro",
-      category: "Portable",
-      power: "2kW - 15kW",
-      fuel: "Gasoline/Propane",
-      description: "Versatile and mobile generators for on-the-go power needs.",
-      icon: Zap,
-      features: ["Ultra Portable", "Multi-Fuel", "Parallel Capable", "Inverter Technology"],
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      badge: "Versatile",
-      rating: 4.4,
-      price: "$500 - $3,000"
-    },
-    {
-      id: 4,
-      name: "Natural Gas Solutions",
-      category: "Eco-Friendly",
-      power: "10kW - 150kW",
-      fuel: "Natural Gas",
-      description: "Clean and efficient generators for environmentally conscious users.",
-      icon: Fuel,
-      features: ["Clean Burning", "Cost Effective", "Low Maintenance", "Low Emissions"],
-      image: "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      badge: "Eco-Smart",
-      rating: 4.7,
-      price: "$8,000 - $80,000"
-    },
-    {
-      id: 5,
-      name: "Mobile Generator Units",
-      category: "Commercial",
-      power: "20kW - 500kW",
-      fuel: "Diesel",
-      description: "Trailer-mounted generators for construction sites and events.",
-      icon: Truck,
-      features: ["Easy Transport", "Quick Setup", "Weather Protection", "Sound Attenuation"],
-      image: "https://images.unsplash.com/photo-1617196009584-98c946894597?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      badge: "On-Site Power",
-      rating: 4.5,
-      price: "$12,000 - $120,000"
-    }
-  ];
-
-  const categories = [
-    { id: 'all', name: 'All Products', icon: Shield },
-    { id: 'residential', name: 'Residential', icon: Home },
-    { id: 'commercial', name: 'Commercial', icon: Building },
-    { id: 'portable', name: 'Portable', icon: Zap },
-    { id: 'eco-friendly', name: 'Eco-Friendly', icon: Fuel }
-  ];
-
-  const specifications = [
-    { model: 'HG2500i', power: '2500W', fuel: 'Gasoline', runtime: '11 hrs', noise: '52 dB', warranty: '3 Years' },
-    { model: 'HG5500', power: '5500W', fuel: 'Gasoline', runtime: '10 hrs', noise: '68 dB', warranty: '2 Years' },
-    { model: 'HG7500', power: '7500W', fuel: 'Gasoline/Propane', runtime: '8/7 hrs', noise: '72 dB', warranty: '2 Years' },
-    { model: 'HG12000', power: '12000W', fuel: 'Gasoline', runtime: '8 hrs', noise: '74 dB', warranty: '1 Year' },
-    { model: 'HGD15', power: '15kW', fuel: 'Diesel', runtime: '24 hrs', noise: '65 dB', warranty: '3 Years' },
-    { model: 'HGN20', power: '20kW', fuel: 'Natural Gas', runtime: 'Continuous', noise: '62 dB', warranty: '5 Years' }
-  ];
-
-  const filteredProducts = activeCategory === 'all' 
-    ? products 
-    : products.filter(product => product.category === activeCategory);
-
-  return (
-    <div className="min-h-screen bg-white">
+  const products = [{
+    id: 1,
+    name: "Industrial Diesel Series",
+    category: "Commercial",
+    power: "50kW - 2MW",
+    fuel: "Diesel",
+    description: "Heavy-duty generators for industrial applications.",
+    icon: Building,
+    features: ["Continuous Power", "Weather Resistant", "Remote Monitoring", "Automatic Transfer Switch"],
+    image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    badge: "Most Popular",
+    rating: 4.8,
+    price: "$15,000 - $150,000"
+  }, {
+    id: 2,
+    name: "Residential Standby",
+    category: "Residential",
+    power: "7.5kW - 26kW",
+    fuel: "Natural Gas/Propane",
+    description: "Reliable backup power for homes and small businesses.",
+    icon: Home,
+    features: ["Automatic Start", "Quiet Operation", "10-Year Warranty", "Mobile App Monitoring"],
+    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    badge: "Premium",
+    rating: 4.6,
+    price: "$3,000 - $12,000"
+  }, {
+    id: 3,
+    name: "Portable Power Pro",
+    category: "Portable",
+    power: "2kW - 15kW",
+    fuel: "Gasoline/Propane",
+    description: "Versatile and mobile generators for on-the-go power needs.",
+    icon: Zap,
+    features: ["Ultra Portable", "Multi-Fuel", "Parallel Capable", "Inverter Technology"],
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    badge: "Versatile",
+    rating: 4.4,
+    price: "$500 - $3,000"
+  }, {
+    id: 4,
+    name: "Natural Gas Solutions",
+    category: "Eco-Friendly",
+    power: "10kW - 150kW",
+    fuel: "Natural Gas",
+    description: "Clean and efficient generators for environmentally conscious users.",
+    icon: Fuel,
+    features: ["Clean Burning", "Cost Effective", "Low Maintenance", "Low Emissions"],
+    image: "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    badge: "Eco-Smart",
+    rating: 4.7,
+    price: "$8,000 - $80,000"
+  }, {
+    id: 5,
+    name: "Mobile Generator Units",
+    category: "Commercial",
+    power: "20kW - 500kW",
+    fuel: "Diesel",
+    description: "Trailer-mounted generators for construction sites and events.",
+    icon: Truck,
+    features: ["Easy Transport", "Quick Setup", "Weather Protection", "Sound Attenuation"],
+    image: "https://images.unsplash.com/photo-1617196009584-98c946894597?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    badge: "On-Site Power",
+    rating: 4.5,
+    price: "$12,000 - $120,000"
+  }];
+  const categories = [{
+    id: 'all',
+    name: 'All Products',
+    icon: Shield
+  }, {
+    id: 'residential',
+    name: 'Residential',
+    icon: Home
+  }, {
+    id: 'commercial',
+    name: 'Commercial',
+    icon: Building
+  }, {
+    id: 'portable',
+    name: 'Portable',
+    icon: Zap
+  }, {
+    id: 'eco-friendly',
+    name: 'Eco-Friendly',
+    icon: Fuel
+  }];
+  const specifications = [{
+    model: 'HG2500i',
+    power: '2500W',
+    fuel: 'Gasoline',
+    runtime: '11 hrs',
+    noise: '52 dB',
+    warranty: '3 Years'
+  }, {
+    model: 'HG5500',
+    power: '5500W',
+    fuel: 'Gasoline',
+    runtime: '10 hrs',
+    noise: '68 dB',
+    warranty: '2 Years'
+  }, {
+    model: 'HG7500',
+    power: '7500W',
+    fuel: 'Gasoline/Propane',
+    runtime: '8/7 hrs',
+    noise: '72 dB',
+    warranty: '2 Years'
+  }, {
+    model: 'HG12000',
+    power: '12000W',
+    fuel: 'Gasoline',
+    runtime: '8 hrs',
+    noise: '74 dB',
+    warranty: '1 Year'
+  }, {
+    model: 'HGD15',
+    power: '15kW',
+    fuel: 'Diesel',
+    runtime: '24 hrs',
+    noise: '65 dB',
+    warranty: '3 Years'
+  }, {
+    model: 'HGN20',
+    power: '20kW',
+    fuel: 'Natural Gas',
+    runtime: 'Continuous',
+    noise: '62 dB',
+    warranty: '5 Years'
+  }];
+  const filteredProducts = activeCategory === 'all' ? products : products.filter(product => product.category === activeCategory);
+  return <div className="min-h-screen bg-white">
       <Header />
       
       {/* Hero Section - Added more top padding */}
@@ -143,7 +162,7 @@ const Products = () => {
                 <Phone className="w-5 h-5 mr-2" />
                 Get Quote Today
               </Button>
-              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-primary px-8 py-4">
+              <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-4 text-slate-900">
                 <Download className="w-5 h-5 mr-2" />
                 Product Catalog
               </Button>
@@ -164,36 +183,22 @@ const Products = () => {
 
           <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full">
             <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 mb-12 h-auto">
-              {categories.map((category) => {
-                const IconComponent = category.icon;
-                return (
-                  <TabsTrigger 
-                    key={category.id} 
-                    value={category.id}
-                    className="flex items-center gap-2 text-sm p-4"
-                  >
+              {categories.map(category => {
+              const IconComponent = category.icon;
+              return <TabsTrigger key={category.id} value={category.id} className="flex items-center gap-2 text-sm p-4">
                     <IconComponent className="w-4 h-4" />
                     {category.name}
-                  </TabsTrigger>
-                );
-              })}
+                  </TabsTrigger>;
+            })}
             </TabsList>
 
             <TabsContent value={activeCategory} className="mt-8">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredProducts.map((product, index) => {
-                  const IconComponent = product.icon;
-                  return (
-                    <Card 
-                      key={product.id} 
-                      className="group hover:shadow-xl transition-all duration-300 border-steel-200 hover:border-accent/30 overflow-hidden"
-                    >
+                const IconComponent = product.icon;
+                return <Card key={product.id} className="group hover:shadow-xl transition-all duration-300 border-steel-200 hover:border-accent/30 overflow-hidden">
                       <div className="relative h-48 bg-gradient-to-br from-steel-100 to-steel-200 overflow-hidden">
-                        <img 
-                          src={product.image} 
-                          alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        />
+                        <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                         <div className="absolute top-4 left-4">
                           <Badge className="bg-accent hover:bg-accent text-white">
                             {product.badge}
@@ -225,12 +230,10 @@ const Products = () => {
                         <p className="text-steel-600 mb-4 text-sm">{product.description}</p>
                         
                         <ul className="space-y-2 mb-6">
-                          {product.features.slice(0, 3).map((feature, idx) => (
-                            <li key={idx} className="text-sm text-steel-600 flex items-center">
+                          {product.features.slice(0, 3).map((feature, idx) => <li key={idx} className="text-sm text-steel-600 flex items-center">
                               <CheckCircle className="w-4 h-4 text-accent mr-3 flex-shrink-0" />
                               {feature}
-                            </li>
-                          ))}
+                            </li>)}
                         </ul>
                         
                         <div className="space-y-3">
@@ -247,9 +250,8 @@ const Products = () => {
                           </div>
                         </div>
                       </CardContent>
-                    </Card>
-                  );
-                })}
+                    </Card>;
+              })}
               </div>
             </TabsContent>
           </Tabs>
@@ -279,16 +281,14 @@ const Products = () => {
                 </tr>
               </thead>
               <tbody>
-                {specifications.map((spec, index) => (
-                  <tr key={index} className="border-b border-steel-100 hover:bg-steel-50">
+                {specifications.map((spec, index) => <tr key={index} className="border-b border-steel-100 hover:bg-steel-50">
                     <td className="px-6 py-4 font-medium text-primary">{spec.model}</td>
                     <td className="px-6 py-4 text-steel-700">{spec.power}</td>
                     <td className="px-6 py-4 text-steel-700">{spec.fuel}</td>
                     <td className="px-6 py-4 text-steel-700">{spec.runtime}</td>
                     <td className="px-6 py-4 text-steel-700">{spec.noise}</td>
                     <td className="px-6 py-4 text-steel-700">{spec.warranty}</td>
-                  </tr>
-                ))}
+                  </tr>)}
               </tbody>
             </table>
           </div>
@@ -354,8 +354,6 @@ const Products = () => {
       </section>
 
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Products;
