@@ -17,7 +17,8 @@ import {
   Clock,
   Users,
   Building,
-  Stethoscope
+  Stethoscope,
+  TrendingUp
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -27,7 +28,7 @@ const Industries = () => {
     {
       id: 'healthcare',
       name: 'Healthcare & Medical',
-      icon: Hospital,
+      icon: Stethoscope,
       description: 'Mission-critical power solutions for hospitals, clinics, and medical facilities.',
       requirements: [
         'UPS and battery backup systems',
