@@ -1,108 +1,90 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  ArrowRight, 
-  Phone, 
-  MessageSquare,
-  Users,
-  Award,
-  MapPin,
-  Calendar,
-  CheckCircle,
-  Shield,
-  Wrench,
-  Clock,
-  Star,
-  Building,
-  Target,
-  Heart
-} from 'lucide-react';
+import { ArrowRight, Phone, MessageSquare, Users, Award, MapPin, Calendar, CheckCircle, Shield, Wrench, Clock, Star, Building, Target, Heart } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-
 const About = () => {
-  const stats = [
-    { number: '15+', label: 'Years in Business' },
-    { number: '500+', label: 'Projects Completed' },
-    { number: '99.9%', label: 'Uptime Guarantee' },
-    { number: '24/7', label: 'Emergency Support' }
-  ];
-
-  const team = [
-    {
-      name: 'Michael Brown',
-      position: 'CEO & Founder',
-      image: 'https://images.unsplash.com/photo-1534528741702-a0cfae58c947?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=4&w=300&h=300&q=80',
-      bio: 'Experienced entrepreneur with a passion for power solutions and a commitment to customer satisfaction.',
-      experience: '15 years'
-    },
-    {
-      name: 'Jessica Davis',
-      position: 'Service Manager',
-      image: 'https://images.unsplash.com/photo-1599566150163-29194dca953c?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=4&w=300&h=300&q=80',
-      bio: 'Dedicated service professional ensuring every client receives prompt, reliable, and expert support.',
-      experience: '10 years'
-    },
-    {
-      name: 'David Wilson',
-      position: 'Lead Technician',
-      image: 'https://images.unsplash.com/photo-1580489944761-15a19d674x?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=4&w=300&h=300&q=80',
-      bio: 'Certified technician with extensive experience in generator installation, maintenance, and emergency repair.',
-      experience: '12 years'
-    }
-  ];
-
-  const values = [
-    {
-      title: 'Reliability',
-      description: 'We deliver dependable power solutions and responsive service you can count on, day or night.',
-      icon: Shield
-    },
-    {
-      title: 'Expertise',
-      description: 'Our certified technicians bring years of experience and specialized knowledge to every project.',
-      icon: Wrench
-    },
-    {
-      title: 'Commitment',
-      description: 'We are dedicated to exceeding customer expectations and building long-term partnerships.',
-      icon: Heart
-    }
-  ];
-
-  const timeline = [
-    { year: '2008', title: 'Company Founded', description: 'HOU GEN PROS was established with a vision to provide reliable power solutions to Houston businesses.' },
-    { year: '2012', title: 'Expanded Services', description: 'Introduced comprehensive maintenance programs and 24/7 emergency support services.' },
-    { year: '2018', title: 'New Headquarters', description: 'Opened a state-of-the-art headquarters and service center in Northwest Houston.' },
-    { year: '2023', title: 'Industry Leader', description: 'Recognized as Houston\'s premier generator service company with hundreds of satisfied clients.' }
-  ];
-
-  const certifications = [
-    {
-      name: 'Licensed Electrical Contractor',
-      description: 'Fully licensed, bonded, and insured for all electrical and generator services.',
-      icon: Award
-    },
-    {
-      name: 'EGSA Certified',
-      description: 'Certified by the Electrical Generating Systems Association for quality and safety.',
-      icon: Star
-    },
-    {
-      name: 'Generac Power Pro Dealer',
-      description: 'Authorized dealer and service provider for Generac generators.',
-      icon: Building
-    },
-    {
-      name: 'BBB Accredited',
-      description: 'Accredited by the Better Business Bureau with an A+ rating.',
-      icon: Shield
-    }
-  ];
-
-  return (
-    <div className="min-h-screen bg-white">
+  const stats = [{
+    number: '15+',
+    label: 'Years in Business'
+  }, {
+    number: '500+',
+    label: 'Projects Completed'
+  }, {
+    number: '99.9%',
+    label: 'Uptime Guarantee'
+  }, {
+    number: '24/7',
+    label: 'Emergency Support'
+  }];
+  const team = [{
+    name: 'Michael Brown',
+    position: 'CEO & Founder',
+    image: 'https://images.unsplash.com/photo-1534528741702-a0cfae58c947?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=4&w=300&h=300&q=80',
+    bio: 'Experienced entrepreneur with a passion for power solutions and a commitment to customer satisfaction.',
+    experience: '15 years'
+  }, {
+    name: 'Jessica Davis',
+    position: 'Service Manager',
+    image: 'https://images.unsplash.com/photo-1599566150163-29194dca953c?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=4&w=300&h=300&q=80',
+    bio: 'Dedicated service professional ensuring every client receives prompt, reliable, and expert support.',
+    experience: '10 years'
+  }, {
+    name: 'David Wilson',
+    position: 'Lead Technician',
+    image: 'https://images.unsplash.com/photo-1580489944761-15a19d674x?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=4&w=300&h=300&q=80',
+    bio: 'Certified technician with extensive experience in generator installation, maintenance, and emergency repair.',
+    experience: '12 years'
+  }];
+  const values = [{
+    title: 'Reliability',
+    description: 'We deliver dependable power solutions and responsive service you can count on, day or night.',
+    icon: Shield
+  }, {
+    title: 'Expertise',
+    description: 'Our certified technicians bring years of experience and specialized knowledge to every project.',
+    icon: Wrench
+  }, {
+    title: 'Commitment',
+    description: 'We are dedicated to exceeding customer expectations and building long-term partnerships.',
+    icon: Heart
+  }];
+  const timeline = [{
+    year: '2008',
+    title: 'Company Founded',
+    description: 'HOU GEN PROS was established with a vision to provide reliable power solutions to Houston businesses.'
+  }, {
+    year: '2012',
+    title: 'Expanded Services',
+    description: 'Introduced comprehensive maintenance programs and 24/7 emergency support services.'
+  }, {
+    year: '2018',
+    title: 'New Headquarters',
+    description: 'Opened a state-of-the-art headquarters and service center in Northwest Houston.'
+  }, {
+    year: '2023',
+    title: 'Industry Leader',
+    description: 'Recognized as Houston\'s premier generator service company with hundreds of satisfied clients.'
+  }];
+  const certifications = [{
+    name: 'Licensed Electrical Contractor',
+    description: 'Fully licensed, bonded, and insured for all electrical and generator services.',
+    icon: Award
+  }, {
+    name: 'EGSA Certified',
+    description: 'Certified by the Electrical Generating Systems Association for quality and safety.',
+    icon: Star
+  }, {
+    name: 'Generac Power Pro Dealer',
+    description: 'Authorized dealer and service provider for Generac generators.',
+    icon: Building
+  }, {
+    name: 'BBB Accredited',
+    description: 'Accredited by the Better Business Bureau with an A+ rating.',
+    icon: Shield
+  }];
+  return <div className="min-h-screen bg-white">
       <Header />
       
       {/* Hero Section - Added more top padding */}
@@ -125,7 +107,7 @@ const About = () => {
                 <Phone className="w-5 h-5 mr-2" />
                 Meet Our Team
               </Button>
-              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-primary px-8 py-4">
+              <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-4 text-slate-950">
                 <MessageSquare className="w-5 h-5 mr-2" />
                 Our Story
               </Button>
@@ -138,12 +120,10 @@ const About = () => {
       <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
+            {stats.map((stat, index) => <div key={index} className="text-center">
                 <div className="text-4xl md:text-5xl font-bold text-accent mb-2">{stat.number}</div>
                 <div className="text-steel-600 font-medium">{stat.label}</div>
-              </div>
-            ))}
+              </div>)}
           </div>
         </div>
       </section>
@@ -159,14 +139,9 @@ const About = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {team.map((member, index) => (
-              <Card key={index} className="overflow-hidden hover:shadow-xl transition-shadow duration-300 border-0 shadow-md">
+            {team.map((member, index) => <Card key={index} className="overflow-hidden hover:shadow-xl transition-shadow duration-300 border-0 shadow-md">
                 <div className="relative h-80 bg-gradient-to-br from-steel-100 to-steel-200">
-                  <img 
-                    src={member.image} 
-                    alt={member.name}
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
                     <h3 className="text-xl font-bold text-white mb-1">{member.name}</h3>
                     <p className="text-accent font-medium">{member.position}</p>
@@ -179,8 +154,7 @@ const About = () => {
                     {member.experience} with company
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -197,9 +171,8 @@ const About = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {values.map((value, index) => {
-              const IconComponent = value.icon;
-              return (
-                <Card key={index} className="text-center hover:shadow-lg transition-shadow duration-300 border-steel-200">
+            const IconComponent = value.icon;
+            return <Card key={index} className="text-center hover:shadow-lg transition-shadow duration-300 border-steel-200">
                   <CardContent className="p-8">
                     <div className="w-16 h-16 bg-accent rounded-lg flex items-center justify-center mx-auto mb-6">
                       <IconComponent className="w-8 h-8 text-white" />
@@ -207,9 +180,8 @@ const About = () => {
                     <h3 className="font-bold text-primary mb-4 text-xl">{value.title}</h3>
                     <p className="text-steel-600">{value.description}</p>
                   </CardContent>
-                </Card>
-              );
-            })}
+                </Card>;
+          })}
           </div>
         </div>
       </section>
@@ -226,8 +198,7 @@ const About = () => {
           
           <div className="max-w-4xl mx-auto">
             <div className="space-y-8">
-              {timeline.map((event, index) => (
-                <div key={index} className="flex items-start">
+              {timeline.map((event, index) => <div key={index} className="flex items-start">
                   <div className="flex-shrink-0 w-24 text-right mr-8">
                     <div className="text-2xl font-bold text-accent">{event.year}</div>
                   </div>
@@ -236,8 +207,7 @@ const About = () => {
                     <h3 className="text-xl font-bold text-primary mb-2">{event.title}</h3>
                     <p className="text-steel-600">{event.description}</p>
                   </div>
-                </div>
-              ))}
+                </div>)}
             </div>
           </div>
         </div>
@@ -254,15 +224,13 @@ const About = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {certifications.map((cert, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-shadow duration-300 border-0 shadow-md">
+            {certifications.map((cert, index) => <Card key={index} className="text-center hover:shadow-lg transition-shadow duration-300 border-0 shadow-md">
                 <CardContent className="p-8">
                   <Award className="w-16 h-16 text-accent mx-auto mb-6" />
                   <h3 className="font-bold text-primary mb-3 text-lg">{cert.name}</h3>
                   <p className="text-steel-600 text-sm">{cert.description}</p>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -288,8 +256,6 @@ const About = () => {
       </section>
 
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default About;
