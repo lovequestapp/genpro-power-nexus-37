@@ -74,7 +74,6 @@
 
   html {
     scroll-behavior: smooth;
-    /* Prevent horizontal scroll on mobile */
     overflow-x: hidden;
   }
 
@@ -82,16 +81,12 @@
     @apply bg-background text-foreground font-sans antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     font-variant-ligatures: common-ligatures;
-    /* Prevent horizontal scroll on mobile */
     overflow-x: hidden;
-    /* Improve touch scrolling on iOS */
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Improved typography hierarchy with responsive scaling */
   h1, h2, h3, h4, h5, h6 {
     @apply font-display font-semibold tracking-tight;
-    /* Prevent text overflow on mobile */
     word-wrap: break-word;
     hyphens: auto;
   }
@@ -108,12 +103,10 @@
     @apply text-xl sm:text-2xl md:text-3xl font-semibold leading-snug;
   }
 
-  /* Improve touch targets for mobile */
   button, a, input, select, textarea {
     @apply touch-manipulation;
   }
 
-  /* Ensure proper viewport handling */
   img, video {
     @apply max-w-full h-auto;
   }
@@ -121,7 +114,7 @@
 
 @layer components {
   .glass-effect {
-    @apply bg-white/80 backdrop-blur-md border border-white/20;
+    @apply bg-white/90 backdrop-blur-md border border-white/20 shadow-lg;
   }
 
   .premium-gradient {
@@ -138,9 +131,9 @@
 
   .premium-shadow {
     box-shadow: 
-      0 1px 3px 0 rgba(0, 0, 0, 0.1),
-      0 4px 6px -2px rgba(0, 0, 0, 0.05),
-      0 10px 20px -5px rgba(0, 0, 0, 0.1);
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 20px 25px -5px rgba(0, 0, 0, 0.1);
   }
 
   .premium-border {
@@ -151,24 +144,42 @@
     @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-premium;
   }
 
-  /* Responsive section padding */
   .section-padding {
     @apply py-12 sm:py-16 lg:py-20 xl:py-32;
   }
 
-  /* Responsive container padding */
   .container-padding {
     @apply px-4 sm:px-6 lg:px-8;
   }
 
-  /* Mobile-optimized touch targets */
   .touch-target {
     @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
   }
 
-  /* Improved focus states for accessibility */
   .focus-visible {
     @apply focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2;
+  }
+
+  /* Enhanced button styles */
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-steel-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl;
+  }
+
+  .btn-accent {
+    @apply accent-gradient text-white hover:shadow-glow transition-all duration-300 font-semibold;
+  }
+
+  .btn-outline {
+    @apply border-2 border-steel-300 text-steel-700 hover:bg-steel-50 hover:border-steel-400 bg-white transition-all duration-300 font-medium;
+  }
+
+  /* Enhanced card styles */
+  .card-premium {
+    @apply bg-white border border-steel-200 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300;
+  }
+
+  .card-glass {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300;
   }
 }
 
@@ -177,12 +188,10 @@
     text-wrap: balance;
   }
 
-  /* Mobile-specific utilities */
   .touch-manipulation {
     touch-action: manipulation;
   }
 
-  /* Prevent text selection on UI elements */
   .select-none {
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -190,22 +199,82 @@
     user-select: none;
   }
 
-  /* Safe area padding for mobile devices */
   .safe-area-padding {
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
   }
 
-  /* Optimized scrolling */
   .scroll-smooth {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
   }
+
+  /* Improved contrast utilities */
+  .text-high-contrast {
+    @apply text-steel-900;
+  }
+
+  .text-medium-contrast {
+    @apply text-steel-700;
+  }
+
+  .text-low-contrast {
+    @apply text-steel-500;
+  }
+
+  .bg-high-contrast {
+    @apply bg-steel-900 text-white;
+  }
+
+  .bg-medium-contrast {
+    @apply bg-steel-100 text-steel-900;
+  }
 }
 
-/* Mobile-specific optimizations */
+/* Enhanced animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px); 
+  }
+  50% { 
+    transform: translateY(-10px); 
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.3); 
+  }
+  50% { 
+    box-shadow: 0 0 40px rgba(249, 115, 22, 0.6); 
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Mobile optimizations */
 @media (max-width: 640px) {
-  /* Reduce motion for better performance on mobile */
   .animate-fade-in {
     animation-duration: 0.4s;
   }
@@ -214,12 +283,10 @@
     animation-duration: 8s;
   }
   
-  /* Optimize hover effects for touch devices */
   .hover-lift:hover {
     transform: none;
   }
   
-  /* Better touch feedback */
   button:active, .touch-target:active {
     transform: scale(0.98);
     transition: transform 0.1s ease;
@@ -228,7 +295,6 @@
 
 /* Tablet optimizations */
 @media (min-width: 641px) and (max-width: 1024px) {
-  /* Tablet-specific adjustments */
   .section-padding {
     @apply py-16 lg:py-24;
   }
@@ -238,8 +304,8 @@
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .premium-shadow {
     box-shadow: 
-      0 0.5px 1.5px 0 rgba(0, 0, 0, 0.1),
-      0 2px 3px -1px rgba(0, 0, 0, 0.05),
-      0 5px 10px -2.5px rgba(0, 0, 0, 0.1);
+      0 2px 4px -1px rgba(0, 0, 0, 0.1),
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 10px 15px -3px rgba(0, 0, 0, 0.1);
   }
 }

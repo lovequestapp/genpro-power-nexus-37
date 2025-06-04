@@ -12,7 +12,7 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 glass-effect border-b border-steel-200/60 transition-all duration-300">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-steel-200/60 transition-all duration-300 shadow-sm">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-4">
         <div className="flex items-center justify-between">
           {/* Enhanced Mobile-First Logo */}
@@ -55,7 +55,7 @@ const Header = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="border-steel-300 text-steel-700 hover:bg-steel-50 hover:border-steel-400 transition-all duration-300 font-medium"
+              className="border-steel-300 text-steel-700 hover:bg-steel-50 hover:border-steel-400 transition-all duration-300 font-medium bg-white"
             >
               <Phone className="w-4 h-4 mr-2" />
               <span className="hidden xl:inline">(832) 555-POWER</span>
@@ -81,7 +81,7 @@ const Header = () => {
 
         {/* Enhanced Mobile/Tablet Menu */}
         {isMobileMenuOpen && (
-          <div className="xl:hidden mt-4 sm:mt-6 pb-4 sm:pb-6 border-t border-steel-200/60 animate-fade-in">
+          <div className="xl:hidden mt-4 sm:mt-6 pb-4 sm:pb-6 border-t border-steel-200/60 animate-fade-in bg-white/95 backdrop-blur-md rounded-lg">
             <nav className="flex flex-col space-y-1 mt-4 sm:mt-6">
               {[
                 { to: '/', label: 'Home' },
@@ -104,7 +104,7 @@ const Header = () => {
                 <Button 
                   variant="outline" 
                   size="lg"
-                  className="justify-center border-steel-300 text-steel-700 hover:bg-steel-50 font-medium touch-manipulation h-12 sm:h-auto"
+                  className="justify-center border-steel-300 text-steel-700 hover:bg-steel-50 font-medium touch-manipulation h-12 sm:h-auto bg-white"
                 >
                   <Phone className="w-5 h-5 mr-2" />
                   (832) 555-POWER
