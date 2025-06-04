@@ -9,7 +9,10 @@ import {
   Phone, 
   CheckCircle, 
   Clock,
-  ArrowRight 
+  ArrowRight,
+  Wifi,
+  Battery,
+  Zap
 } from 'lucide-react';
 
 const ServicesOverview = () => {
@@ -17,29 +20,29 @@ const ServicesOverview = () => {
     {
       icon: ShoppingCart,
       title: "Generator Sales",
-      description: "Premium new and certified pre-owned generators from leading manufacturers.",
-      features: ["Expert Consultation", "Custom Configuration", "Competitive Pricing", "Financing Options"],
+      description: "Brand new Generac generators in stock - not refurbished. Complete inventory ready for immediate delivery.",
+      features: ["18KW, 22KW, 24KW, 26KW Models", "Equipment-Only Pricing", "Immediate Availability", "5-Year Warranty"],
       color: "from-blue-500 to-blue-600"
     },
     {
-      icon: Calendar,
-      title: "Rental Solutions",
-      description: "Flexible rental options for temporary power needs, events, and emergency situations.",
-      features: ["24-48hr Delivery", "Setup & Pickup", "Fuel Management", "Technical Support"],
-      color: "from-green-500 to-green-600"
-    },
-    {
       icon: Wrench,
-      title: "Installation & Service",
-      description: "Professional installation and comprehensive maintenance programs.",
-      features: ["Licensed Technicians", "Code Compliance", "Preventive Maintenance", "Emergency Repairs"],
+      title: "Professional Installation",
+      description: "Licensed & insured installation completed in just 3-5 hours by certified Houston Generator Pros technicians.",
+      features: ["200 Amp Transfer Switch", "15ft Gas & Electric Lines", "Generator Pad & Battery", "WiFi Setup & Demo"],
       color: "from-accent to-orange-600"
     },
     {
+      icon: Calendar,
+      title: "Complete Packages",
+      description: "Everything included packages with installation, transfer switch, and all necessary components for whole home power.",
+      features: ["Summer Special: $10,250", "Above Ground Installation", "Same-Day Service Available", "Professional Setup"],
+      color: "from-green-500 to-green-600"
+    },
+    {
       icon: Phone,
-      title: "Emergency Support",
-      description: "Round-the-clock emergency response when power failures threaten your operations.",
-      features: ["24/7 Hotline", "Rapid Response", "Mobile Service Units", "Priority Support"],
+      title: "Local Houston Service",
+      description: "Serving Houston & surrounding areas with delivery, installation, and ongoing maintenance support.",
+      features: ["Houston & Surrounding Areas", "Cost Varies by Location", "Licensed & Insured", "Local Experts"],
       color: "from-red-500 to-red-600"
     }
   ];
@@ -50,14 +53,14 @@ const ServicesOverview = () => {
         {/* Section Header */}
         <div className="text-center mb-16">
           <Badge variant="outline" className="mb-4 text-primary border-primary">
-            Complete Power Solutions
+            Houston Generator Pros Services
           </Badge>
           <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">
-            Your Power, Our Commitment
+            Your Complete Generator Solution
           </h2>
           <p className="text-xl text-steel-600 max-w-3xl mx-auto">
-            From initial consultation to ongoing maintenance, we provide comprehensive 
-            generator solutions tailored to your specific power requirements.
+            From sales to installation to ongoing support - everything you need for reliable 
+            whole home backup power in Houston and surrounding areas.
           </p>
         </div>
 
@@ -105,7 +108,7 @@ const ServicesOverview = () => {
                       variant="outline" 
                       className="w-full group-hover:bg-accent group-hover:text-white group-hover:border-accent transition-all duration-300"
                     >
-                      Learn More
+                      Get Free Quote
                       <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                     </Button>
                   </div>
@@ -115,30 +118,52 @@ const ServicesOverview = () => {
           })}
         </div>
 
-        {/* Emergency CTA */}
-        <div className="bg-gradient-to-r from-red-500 to-red-600 rounded-2xl p-8 md:p-12 text-white text-center">
-          <div className="max-w-3xl mx-auto">
-            <div className="flex justify-center mb-6">
-              <div className="bg-white/20 p-4 rounded-full">
-                <Phone className="w-8 h-8" />
+        {/* Installation Features */}
+        <div className="bg-gradient-to-r from-primary to-steel-700 rounded-2xl p-8 md:p-12 text-white">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-8">
+              <h3 className="text-3xl md:text-4xl font-bold mb-4">
+                Professional Installation Included
+              </h3>
+              <p className="text-xl text-steel-200">
+                Licensed & insured Houston Generator Pros technicians handle everything from permits to WiFi setup
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="text-center">
+                <Clock className="w-12 h-12 text-accent mx-auto mb-4" />
+                <h4 className="font-bold text-lg mb-2">3-5 Hour Installation</h4>
+                <p className="text-steel-200 text-sm">Fast professional setup with same-day completion</p>
+              </div>
+              
+              <div className="text-center">
+                <Wifi className="w-12 h-12 text-accent mx-auto mb-4" />
+                <h4 className="font-bold text-lg mb-2">WiFi Setup & Demo</h4>
+                <p className="text-steel-200 text-sm">Complete system setup with app configuration and training</p>
+              </div>
+              
+              <div className="text-center">
+                <Battery className="w-12 h-12 text-accent mx-auto mb-4" />
+                <h4 className="font-bold text-lg mb-2">Everything Included</h4>
+                <p className="text-steel-200 text-sm">Generator pad, battery, transfer switch, and all connections</p>
               </div>
             </div>
-            <h3 className="text-3xl md:text-4xl font-bold mb-4">
-              Power Emergency? We're Here 24/7
-            </h3>
-            <p className="text-xl text-red-100 mb-8">
-              When power failure threatens your operations, our emergency response team 
-              is ready to deploy immediately. Don't wait – power problems won't.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" variant="outline" className="bg-white text-red-600 hover:bg-red-50 border-white">
-                <Phone className="w-5 h-5 mr-2" />
-                Call Emergency Line
-              </Button>
-              <Button size="lg" className="bg-red-700 hover:bg-red-800 text-white border-red-700">
-                <Clock className="w-5 h-5 mr-2" />
-                Request Callback
-              </Button>
+
+            <div className="text-center">
+              <p className="text-steel-300 text-sm mb-6">
+                * Permit fees not included. Delivery & installation available (cost varies by location)
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button size="lg" className="bg-accent hover:bg-orange-600 text-white">
+                  <Phone className="w-5 h-5 mr-2" />
+                  Message for Free Quote
+                </Button>
+                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
+                  <Zap className="w-5 h-5 mr-2" />
+                  View Summer Special
+                </Button>
+              </div>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Shield, Zap, Clock } from 'lucide-react';
+import { ArrowRight, Shield, Zap, Clock, Phone } from 'lucide-react';
 
 const HeroSection = () => {
   return (
@@ -13,51 +13,51 @@ const HeroSection = () => {
           {/* Badge */}
           <div className="inline-flex items-center px-4 py-2 bg-accent/10 border border-accent/20 rounded-full mb-8 animate-fade-in">
             <Shield className="w-4 h-4 text-accent mr-2" />
-            <span className="text-sm font-medium text-accent">Fortune 500-Level Power Solutions</span>
+            <span className="text-sm font-medium text-accent">Houston Generator Pros - Your Trusted Generator Experts</span>
           </div>
 
           {/* Main Headline */}
           <h1 className="text-5xl md:text-7xl font-bold text-primary mb-6 leading-tight animate-fade-in">
-            Powering Progress.
+            Whole Home Backup Power.
             <br />
-            <span className="text-accent">Protecting Performance.</span>
+            <span className="text-accent">Houston & Surrounding Areas.</span>
           </h1>
 
           {/* Subheadline */}
           <p className="text-xl md:text-2xl text-steel-600 mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in">
-            Premium generator solutions for commercial and residential clients. From emergency power to planned installations, 
-            we deliver reliability when it matters most.
+            Brand new Generac generators in stock now! Professional installation in 3-5 hours. 
+            Licensed, insured, and trusted by Houston homeowners.
           </p>
 
           {/* Main CTAs */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 animate-fade-in">
             <Button size="lg" className="bg-accent hover:bg-orange-600 text-white px-8 py-6 text-lg font-semibold">
-              Explore Products
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <Phone className="w-5 h-5 mr-2" />
+              Call for Free Quote
             </Button>
             <Button size="lg" variant="outline" className="border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-6 text-lg font-semibold">
-              Emergency Power
-              <Zap className="w-5 h-5 ml-2" />
+              View Summer Special
+              <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
             <Button size="lg" variant="outline" className="border-2 border-steel-400 text-steel-700 hover:bg-steel-100 px-8 py-6 text-lg font-semibold">
-              Get Quote
-              <Clock className="w-5 h-5 ml-2" />
+              <Zap className="w-5 h-5 mr-2" />
+              Emergency Power
             </Button>
           </div>
 
           {/* Trust Indicators */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div className="text-center animate-slide-in">
-              <div className="text-3xl font-bold text-accent mb-2">24/7</div>
-              <div className="text-steel-600 font-medium">Emergency Support</div>
+              <div className="text-3xl font-bold text-accent mb-2">3-5 Hours</div>
+              <div className="text-steel-600 font-medium">Fast Installation</div>
             </div>
             <div className="text-center animate-slide-in">
-              <div className="text-3xl font-bold text-accent mb-2">500+</div>
-              <div className="text-steel-600 font-medium">Projects Completed</div>
+              <div className="text-3xl font-bold text-accent mb-2">In Stock</div>
+              <div className="text-steel-600 font-medium">Brand New Generac Units</div>
             </div>
             <div className="text-center animate-slide-in">
-              <div className="text-3xl font-bold text-accent mb-2">99.9%</div>
-              <div className="text-steel-600 font-medium">Uptime Reliability</div>
+              <div className="text-3xl font-bold text-accent mb-2">5-Year</div>
+              <div className="text-steel-600 font-medium">Manufacturer Warranty</div>
             </div>
           </div>
         </div>
