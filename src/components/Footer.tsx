@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Phone, Mail, MapPin, Clock, Facebook, Instagram, Youtube, Award, Shield, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -83,7 +82,7 @@ const Footer = () => {
 
           {/* Enhanced Quick Links */}
           <div className="text-center sm:text-left">
-            <h4 className="text-lg sm:text-xl font-bold mb-6 sm:mb-8 text-gradient">Solutions</h4>
+            <h4 className="text-lg sm:text-xl font-bold mb-6 sm:mb-8 text-white">Solutions</h4>
             <ul className="space-y-3 sm:space-y-4">
               {[
                 { to: "/products", label: "Generator Sales" },
@@ -106,7 +105,7 @@ const Footer = () => {
 
           {/* Enhanced Industries */}
           <div className="text-center sm:text-left">
-            <h4 className="text-lg sm:text-xl font-bold mb-6 sm:mb-8 text-gradient">Industries</h4>
+            <h4 className="text-lg sm:text-xl font-bold mb-6 sm:mb-8 text-white">Industries</h4>
             <ul className="space-y-3 sm:space-y-4">
               {[
                 { to: "/industries", label: "Construction" },
@@ -129,7 +128,7 @@ const Footer = () => {
 
           {/* Enhanced Contact Info */}
           <div className="text-center sm:text-left">
-            <h4 className="text-lg sm:text-xl font-bold mb-6 sm:mb-8 text-gradient">Contact Us</h4>
+            <h4 className="text-lg sm:text-xl font-bold mb-6 sm:mb-8 text-white">Contact Us</h4>
             <div className="space-y-4 sm:space-y-6">
               {[
                 {
