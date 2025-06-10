@@ -19,9 +19,9 @@ export interface TicketFiltersProps {
 
 export const TicketFilters = ({ onFilterChange, onSortChange, onSearch }: TicketFiltersProps) => {
   const [filters, setFilters] = useState({
-    status: '',
-    priority: '',
-    type: '',
+    status: 'all',
+    priority: 'all',
+    type: 'all',
     search: '',
   });
 
@@ -38,12 +38,16 @@ export const TicketFilters = ({ onFilterChange, onSortChange, onSearch }: Ticket
 
   const handleClearFilters = () => {
     setFilters({
-      status: '',
-      priority: '',
-      type: '',
+      status: 'all',
+      priority: 'all',
+      type: 'all',
       search: '',
     });
-    onFilterChange({});
+    onFilterChange({
+      status: 'all',
+      priority: 'all',
+      type: 'all',
+    });
   };
 
   return (
@@ -73,7 +77,7 @@ export const TicketFilters = ({ onFilterChange, onSortChange, onSearch }: Ticket
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Statuses</SelectItem>
+            <SelectItem value="all">All Statuses</SelectItem>
             <SelectItem value="open">Open</SelectItem>
             <SelectItem value="in_progress">In Progress</SelectItem>
             <SelectItem value="resolved">Resolved</SelectItem>
@@ -89,7 +93,7 @@ export const TicketFilters = ({ onFilterChange, onSortChange, onSearch }: Ticket
             <SelectValue placeholder="Priority" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Priorities</SelectItem>
+            <SelectItem value="all">All Priorities</SelectItem>
             <SelectItem value="low">Low</SelectItem>
             <SelectItem value="medium">Medium</SelectItem>
             <SelectItem value="high">High</SelectItem>
@@ -105,7 +109,7 @@ export const TicketFilters = ({ onFilterChange, onSortChange, onSearch }: Ticket
             <SelectValue placeholder="Type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Types</SelectItem>
+            <SelectItem value="all">All Types</SelectItem>
             <SelectItem value="technical">Technical</SelectItem>
             <SelectItem value="billing">Billing</SelectItem>
             <SelectItem value="general">General</SelectItem>

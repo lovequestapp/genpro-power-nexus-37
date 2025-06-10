@@ -6,7 +6,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -17,10 +17,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // Convert username to email format
-      const email = `${username}@admin.local`;
-
-      // Sign in with the email
+      // Sign in with email and password
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -71,15 +68,16 @@ export default function Login() {
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div className="space-y-2">
-            <label htmlFor="username" className="text-sm font-medium text-steel-700">
-              Username
+            <label htmlFor="email" className="text-sm font-medium text-steel-700">
+              Email
             </label>
             <Input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username"
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              autoComplete="email"
               required
             />
           </div>
@@ -94,6 +92,7 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
+              autoComplete="current-password"
               required
             />
           </div>

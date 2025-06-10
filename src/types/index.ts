@@ -1,23 +1,57 @@
+export interface GeneratorReading {
+  id: string;
+  timestamp: string;
+  powerOutput: number;
+  fuelLevel: number;
+  temperature: number;
+  status: 'normal' | 'warning' | 'error';
+}
+
 export interface Generator {
   id: string;
   name: string;
-  type: string;
-  status: 'active' | 'inactive' | 'maintenance';
+  type: 'residential' | 'commercial';
+  status: 'active' | 'maintenance' | 'offline';
   location: string;
   lastMaintenance: string;
   nextMaintenance: string;
   readings: GeneratorReading[];
+  model: string;
+  powerRating: number;
+  fuelType: 'gasoline' | 'diesel' | 'propane';
+  runtime: number;
+  installationDate: string;
+  warrantyExpiry: string;
 }
 
 export interface Customer {
   id: string;
   name: string;
   email: string;
-  phone?: string;
-  address?: string;
-  tickets: Service[];
+  phone: string;
+  address: string;
+  type: 'residential' | 'commercial';
+  serviceLevel: 'basic' | 'premium' | 'enterprise';
   createdAt: string;
   updatedAt: string;
+  tickets: string[];
+  subscriptionStatus: 'active' | 'inactive';
+  lastLogin: string;
+}
+
+export interface ServiceComment {
+  id: string;
+  text: string;
+  author: string;
+  timestamp: string;
+}
+
+export interface ServiceAttachment {
+  id: string;
+  name: string;
+  url: string;
+  type: string;
+  size: number;
 }
 
 export interface Service {
@@ -29,29 +63,19 @@ export interface Service {
   type: 'technical' | 'billing' | 'general';
   customerId: string;
   customerName: string;
-  generatorId?: string;
   assignedTo?: string;
   createdAt: string;
   updatedAt: string;
-  comments: Comment[];
-  attachments: Attachment[];
+  comments: ServiceComment[];
+  attachments: ServiceAttachment[];
 }
 
-export interface Comment {
+export interface BillItem {
   id: string;
-  content: string;
-  author: string;
-  createdAt: string;
-  attachments: Attachment[];
-}
-
-export interface Attachment {
-  id: string;
-  name: string;
-  url: string;
-  type: string;
-  size: number;
-  uploadedAt: string;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
 }
 
 export interface Bill {
@@ -62,14 +86,6 @@ export interface Bill {
   dueDate: string;
   paidAt?: string;
   items: BillItem[];
-}
-
-export interface BillItem {
-  id: string;
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  total: number;
 }
 
 export interface Alert {
@@ -86,24 +102,16 @@ export interface StaffMember {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'support' | 'agent';
+  role: 'admin' | 'support' | 'technician';
   status: 'active' | 'inactive';
   assignedTickets: string[];
-  lastActive?: string;
+  lastActive: string;
+  department: 'field_service' | 'customer_support';
+  expertise: string[];
 }
 
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
-  message?: string;
-  error?: string;
-}
-
-export interface GeneratorReading {
-  id: string;
-  timestamp: string;
-  powerOutput: number;
-  fuelLevel: number;
-  temperature: number;
-  status: string;
+  message: string;
 } 

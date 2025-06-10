@@ -16,6 +16,6 @@ fi
 
 # Create admin user
 echo "Creating admin user..."
-supabase functions invoke create-admin --body '{"email":"jeff@admin.local","password":"3469710121","full_name":"Jeff Admin"}'
+supabase functions invoke create-admin --body '{"email":"hunainm.qureshi@gmail.com","password":"3469710121","full_name":"Hunain Qureshi"}'
 
 echo "Admin account created successfully!" 

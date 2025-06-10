@@ -13,7 +13,8 @@ import {
   Clock,
   Battery,
   Activity,
-  Plus
+  Plus,
+  BarChart
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -27,7 +28,7 @@ import { ApiResponse } from '@/types';
 import { CreateTicketModal } from '@/components/tickets/CreateTicketModal';
 import { TicketList } from '@/components/tickets/TicketList';
 import { TicketDetails } from '@/components/tickets/TicketDetails';
-import { TicketComments } from '@/components/tickets/TicketComments';
+import { TicketStats } from '@/components/tickets/TicketStats';
 import { useNavigate } from 'react-router-dom';
 
 interface GeneratorStatus {
@@ -40,10 +41,12 @@ interface GeneratorStatus {
   oilLevel: number;
 }
 
-interface Comment {
-  author: string;
-  content: string;
-  timestamp: string;
+interface Stats {
+  total: number;
+  open: number;
+  inProgress: number;
+  resolved: number;
+  closed: number;
 }
 
 export default function Dashboard() {
@@ -58,6 +61,13 @@ export default function Dashboard() {
   const [tickets, setTickets] = useState<Service[]>([]);
   const [selectedTicket, setSelectedTicket] = useState<Service | null>(null);
   const [showCreateTicket, setShowCreateTicket] = useState(false);
+  const [stats, setStats] = useState<Stats>({
+    total: 0,
+    open: 0,
+    inProgress: 0,
+    resolved: 0,
+    closed: 0
+  });
 
   useEffect(() => {
     checkAuth();
@@ -82,7 +92,7 @@ export default function Dashboard() {
         .eq('id', user.id)
         .single();
 
-      if (!profile || profile.role !== 'customer') {
+      if (!profile || (profile.role !== 'customer' && profile.role !== 'admin')) {
         toast({
           title: 'Authorization Error',
           description: 'You do not have permission to access this page',
@@ -110,10 +120,10 @@ export default function Dashboard() {
       setLoading(true);
       setError(null);
 
-      const [generatorsResponse, billsResponse, servicesResponse] = await Promise.all([
+      const [generatorsResponse, billsResponse, ticketsResponse] = await Promise.all([
         generatorService.getAll(),
         billingService.getAll(),
-        serviceService.getAll()
+        supportService.getAll()
       ]);
 
       if (generatorsResponse.success) {
@@ -122,8 +132,9 @@ export default function Dashboard() {
       if (billsResponse.success) {
         setBills(billsResponse.data);
       }
-      if (servicesResponse.success) {
-        setServices(servicesResponse.data);
+      if (ticketsResponse.success) {
+        setTickets(ticketsResponse.data);
+        updateStats(ticketsResponse.data);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch dashboard data';
@@ -138,26 +149,24 @@ export default function Dashboard() {
     }
   };
 
-  const handleCreateTicket = async (ticketData: {
-    title: string;
-    description: string;
-    type: 'technical' | 'billing' | 'general';
-  }) => {
-    try {
-      const response = await supportService.create({
-        ...ticketData,
-        status: 'open',
-        priority: 'medium',
-      });
+  const updateStats = (tickets: Service[]) => {
+    setStats({
+      total: tickets.length,
+      open: tickets.filter(t => t.status === 'open').length,
+      inProgress: tickets.filter(t => t.status === 'in_progress').length,
+      resolved: tickets.filter(t => t.status === 'resolved').length,
+      closed: tickets.filter(t => t.status === 'closed').length
+    });
+  };
 
-      if (response.success) {
-        setTickets([...tickets, response.data]);
-        setShowCreateTicket(false);
-        toast({
-          title: 'Success',
-          description: 'Ticket created successfully',
-        });
-      }
+  const handleCreateTicket = async () => {
+    try {
+      await fetchDashboardData();
+      setShowCreateTicket(false);
+      toast({
+        title: 'Success',
+        description: 'Ticket created successfully',
+      });
     } catch (err) {
       console.error('Error creating ticket:', err);
       toast({
@@ -172,9 +181,11 @@ export default function Dashboard() {
     try {
       const response = await supportService.update(ticketId, updates);
       if (response.success) {
-        setTickets(tickets.map(ticket => 
+        const updatedTickets = tickets.map(ticket => 
           ticket.id === ticketId ? response.data : ticket
-        ));
+        );
+        setTickets(updatedTickets);
+        updateStats(updatedTickets);
         toast({
           title: 'Success',
           description: 'Ticket updated successfully',
@@ -197,9 +208,10 @@ export default function Dashboard() {
         author: 'Customer',
       });
       if (response.success) {
-        setTickets(tickets.map(ticket => 
+        const updatedTickets = tickets.map(ticket => 
           ticket.id === ticketId ? response.data : ticket
-        ));
+        );
+        setTickets(updatedTickets);
         toast({
           title: 'Success',
           description: 'Comment added successfully',
@@ -217,176 +229,201 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-lg">Loading...</div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-steel-500"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-lg text-red-500">Error: {error}</div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-red-500">{error}</div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-8">Customer Dashboard</h1>
+    <div className="min-h-screen bg-steel-50">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-steel-900">Customer Dashboard</h1>
+          <div className="flex items-center space-x-4">
+            <Button variant="outline" size="icon">
+              <Bell className="h-5 w-5" />
+            </Button>
+            <Button variant="outline" size="icon">
+              <Settings className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
 
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="generators">Generators</TabsTrigger>
-          <TabsTrigger value="billing">Billing</TabsTrigger>
-          <TabsTrigger value="services">Services</TabsTrigger>
-        </TabsList>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <TabsList className="grid grid-cols-5 gap-4">
+            <TabsTrigger value="overview" className="flex items-center space-x-2">
+              <BarChart className="h-4 w-4" />
+              <span>Overview</span>
+            </TabsTrigger>
+            <TabsTrigger value="generators" className="flex items-center space-x-2">
+              <Power className="h-4 w-4" />
+              <span>Generators</span>
+            </TabsTrigger>
+            <TabsTrigger value="tickets" className="flex items-center space-x-2">
+              <MessageSquare className="h-4 w-4" />
+              <span>Tickets</span>
+            </TabsTrigger>
+            <TabsTrigger value="billing" className="flex items-center space-x-2">
+              <DollarSign className="h-4 w-4" />
+              <span>Billing</span>
+            </TabsTrigger>
+            <TabsTrigger value="services" className="flex items-center space-x-2">
+              <Wrench className="h-4 w-4" />
+              <span>Services</span>
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="overview">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Generator Status */}
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Generator Status</h3>
-              <div className="space-y-4">
-                {generators.map(generator => (
-                  <div key={generator.id} className="flex justify-between items-center">
-                    <div>
-                      <p className="font-medium">{generator.name}</p>
-                      <p className="text-sm text-steel-600">{generator.type}</p>
-                    </div>
-                    <Badge variant={generator.status === 'active' ? 'default' : 'destructive'}>
-                      {generator.status}
-                    </Badge>
-                  </div>
-                ))}
+          <TabsContent value="overview" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-2">Active Generators</h3>
+                <p className="text-3xl font-bold">
+                  {generators.filter(g => g.status === 'active').length}
+                </p>
+              </Card>
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-2">Pending Bills</h3>
+                <p className="text-3xl font-bold">
+                  {bills.filter(b => b.status === 'pending').length}
+                </p>
+              </Card>
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-2">Open Tickets</h3>
+                <p className="text-3xl font-bold">{stats.open}</p>
+              </Card>
+            </div>
+            <TicketStats stats={stats} />
+          </TabsContent>
+
+          <TabsContent value="generators">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">My Generators</h2>
               </div>
-            </Card>
-
-            {/* Recent Bills */}
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Recent Bills</h3>
-              <div className="space-y-4">
-                {bills.slice(0, 3).map(bill => (
-                  <div key={bill.id} className="flex justify-between items-center">
-                    <div>
-                      <p className="font-medium">${bill.amount}</p>
-                      <p className="text-sm text-steel-600">{new Date(bill.dueDate).toLocaleDateString()}</p>
-                    </div>
-                    <Badge variant={bill.status === 'paid' ? 'default' : 'destructive'}>
-                      {bill.status}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </Card>
-
-            {/* Upcoming Services */}
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Upcoming Services</h3>
-              <div className="space-y-4">
-                {services
-                  .filter(service => service.status === 'open')
-                  .slice(0, 3)
-                  .map(service => (
-                    <div key={service.id} className="flex justify-between items-center">
-                      <div>
-                        <p className="font-medium">{service.title}</p>
-                        <p className="text-sm text-steel-600">{new Date(service.createdAt).toLocaleDateString()}</p>
-                      </div>
-                      <Badge variant="secondary">
-                        {service.type}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {generators.map((generator) => (
+                  <Card key={generator.id} className="p-4">
+                    <h3 className="font-semibold">{generator.name}</h3>
+                    <p className="text-sm text-steel-500">{generator.type}</p>
+                    <div className="mt-2">
+                      <Badge variant={generator.status === 'active' ? 'default' : 'secondary'}>
+                        {generator.status}
                       </Badge>
                     </div>
-                  ))}
+                    <div className="mt-4 space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Fuel Level</span>
+                        <span>{generator.readings[0]?.fuelLevel || 0}%</span>
+                      </div>
+                      <Progress value={generator.readings[0]?.fuelLevel || 0} />
+                    </div>
+                  </Card>
+                ))}
               </div>
-            </Card>
-          </div>
-        </TabsContent>
+            </div>
+          </TabsContent>
 
-        <TabsContent value="generators">
-          <div className="space-y-6">
-            {generators.map(generator => (
-              <Card key={generator.id} className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-lg font-semibold">{generator.name}</h3>
-                    <p className="text-sm text-steel-600">{generator.type}</p>
-                  </div>
-                  <Badge variant={generator.status === 'active' ? 'default' : 'destructive'}>
-                    {generator.status}
-                  </Badge>
+          <TabsContent value="tickets">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">Support Tickets</h2>
+                <Button onClick={() => setShowCreateTicket(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Ticket
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="lg:col-span-2">
+                  <TicketList
+                    tickets={tickets}
+                    onTicketSelect={setSelectedTicket}
+                    selectedTicketId={selectedTicket?.id}
+                  />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <p className="text-sm text-steel-600">Location</p>
-                    <p className="font-medium">{generator.location}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-steel-600">Last Maintenance</p>
-                    <p className="font-medium">{new Date(generator.lastMaintenance).toLocaleDateString()}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-steel-600">Next Maintenance</p>
-                    <p className="font-medium">{new Date(generator.nextMaintenance).toLocaleDateString()}</p>
-                  </div>
+                <div>
+                  {selectedTicket && (
+                    <TicketDetails
+                      ticket={selectedTicket}
+                      onStatusChange={(status) => handleUpdateTicket(selectedTicket.id, { status })}
+                      onAssign={() => {}}
+                      onUnassign={() => {}}
+                      onAddComment={(content) => handleAddComment(selectedTicket.id, content)}
+                      staff={[]}
+                    />
+                  )}
                 </div>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
+              </div>
+            </div>
+          </TabsContent>
 
-        <TabsContent value="billing">
-          <div className="space-y-6">
-            {bills.map(bill => (
-              <Card key={bill.id} className="p-6">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-lg font-semibold">${bill.amount}</h3>
-                    <p className="text-sm text-steel-600">Due: {new Date(bill.dueDate).toLocaleDateString()}</p>
-                  </div>
-                  <Badge variant={bill.status === 'paid' ? 'default' : 'destructive'}>
-                    {bill.status}
-                  </Badge>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
+          <TabsContent value="billing">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">Billing History</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {bills.map((bill) => (
+                  <Card key={bill.id} className="p-4">
+                    <h3 className="font-semibold">Bill #{bill.id}</h3>
+                    <p className="text-sm text-steel-500">${bill.amount}</p>
+                    <div className="mt-2">
+                      <Badge variant={bill.status === 'paid' ? 'default' : 'secondary'}>
+                        {bill.status}
+                      </Badge>
+                    </div>
+                    <div className="mt-4">
+                      <p className="text-sm text-steel-500">Due: {new Date(bill.dueDate).toLocaleDateString()}</p>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </TabsContent>
 
-        <TabsContent value="services">
-          <div className="space-y-6">
-            {services.map(service => (
-              <Card key={service.id} className="p-6">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-lg font-semibold">{service.title}</h3>
-                    <p className="text-sm text-steel-600">{new Date(service.createdAt).toLocaleDateString()}</p>
-                  </div>
-                  <Badge variant="secondary">
-                    {service.type}
-                  </Badge>
-                </div>
-                <p className="mt-4">{service.description}</p>
-                <div className="mt-4 flex gap-2">
-                  <Badge variant={service.status === 'open' ? 'default' : 'secondary'}>
-                    {service.status}
-                  </Badge>
-                  <Badge variant={service.priority === 'high' ? 'destructive' : 'secondary'}>
-                    {service.priority}
-                  </Badge>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="services">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">Service History</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {services.map((service) => (
+                  <Card key={service.id} className="p-4">
+                    <h3 className="font-semibold">{service.title}</h3>
+                    <p className="text-sm text-steel-500">{service.description}</p>
+                    <div className="mt-2">
+                      <Badge variant={service.status === 'resolved' ? 'default' : 'secondary'}>
+                        {service.status}
+                      </Badge>
+                    </div>
+                    <div className="mt-4">
+                      <p className="text-sm text-steel-500">
+                        {new Date(service.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
 
-      <CreateTicketModal
-        open={showCreateTicket}
-        onOpenChange={setShowCreateTicket}
-        onTicketCreated={fetchDashboardData}
-      />
+        {showCreateTicket && (
+          <CreateTicketModal
+            open={showCreateTicket}
+            onOpenChange={setShowCreateTicket}
+            onTicketCreated={handleCreateTicket}
+          />
+        )}
+      </div>
     </div>
   );
 } 

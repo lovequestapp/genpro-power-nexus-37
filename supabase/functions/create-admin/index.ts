@@ -22,7 +22,7 @@ serve(async (req) => {
     const { data: existingAdmin } = await supabaseClient
       .from('profiles')
       .select('id')
-      .eq('email', 'jeff@admin.local')
+      .eq('email', 'hunainm.qureshi@gmail.com')
       .single()
 
     if (existingAdmin) {
@@ -37,7 +37,7 @@ serve(async (req) => {
 
     // Create user
     const { data: user, error: userError } = await supabaseClient.auth.admin.createUser({
-      email: 'jeff@admin.local',
+      email: 'hunainm.qureshi@gmail.com',
       password: '3469710121',
       email_confirm: true,
     })
@@ -49,10 +49,11 @@ serve(async (req) => {
       .from('profiles')
       .insert({
         id: user.user.id,
-        email: 'jeff@admin.local',
-        full_name: 'Jeff Admin',
+        email: 'hunainm.qureshi@gmail.com',
+        full_name: 'Hunain Qureshi',
         role: 'admin',
         is_active: true,
+        username: 'hunain'
       })
 
     if (profileError) throw profileError
