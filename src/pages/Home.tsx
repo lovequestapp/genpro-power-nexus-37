@@ -1,18 +1,21 @@
+
+import { Suspense } from 'react';
 import HeroSection from '../components/HeroSection';
 import ProductShowcase from '../components/ProductShowcase';
-// import HomeContent from '../components/HomeContent';
 import QualityGuarantee from '../components/QualityGuarantee';
 import WhyChooseUs from '../components/WhyChooseUs';
 
 const Home = () => {
   return (
     <div>
-      <HeroSection />
-      <ProductShowcase />
-      <QualityGuarantee />
-      <WhyChooseUs />
+      <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+        <HeroSection />
+        <ProductShowcase />
+        <QualityGuarantee />
+        <WhyChooseUs />
+      </Suspense>
     </div>
   );
 };
 
-export default Home; 
+export default Home;

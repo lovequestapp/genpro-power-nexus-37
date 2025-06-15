@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/components/ThemeProvider';
@@ -37,7 +38,14 @@ import InventoryGenerators from '@/pages/admin/InventoryGenerators';
 import InventoryParts from '@/pages/admin/InventoryParts';
 import InventoryOrders from '@/pages/admin/InventoryOrders';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
+    },
+  },
+});
 
 function App() {
   return (
