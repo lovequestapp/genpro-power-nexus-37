@@ -1,13 +1,16 @@
 import HeroSection from '../components/HeroSection';
 import ProductShowcase from '../components/ProductShowcase';
-import HomeContent from '../components/HomeContent';
+// import HomeContent from '../components/HomeContent';
+import QualityGuarantee from '../components/QualityGuarantee';
+import WhyChooseUs from '../components/WhyChooseUs';
 
 const Home = () => {
   return (
     <div>
       <HeroSection />
       <ProductShowcase />
-      <HomeContent />
+      <QualityGuarantee />
+      <WhyChooseUs />
     </div>
   );
 };

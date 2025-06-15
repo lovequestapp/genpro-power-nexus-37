@@ -48,14 +48,16 @@ const HeroSection = () => {
                 Get Free Estimate
               </Button>
             </Link>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="border-2 border-primary text-primary hover:bg-primary hover:text-white px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-semibold premium-border hover-lift transition-all duration-300 w-full sm:w-auto touch-manipulation bg-white"
-            >
-              View Generators
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
+            <Link to="/products" className="w-full sm:w-auto">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="border-2 border-primary text-primary hover:bg-primary hover:text-white px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-semibold premium-border hover-lift transition-all duration-300 w-full sm:w-auto touch-manipulation bg-white"
+              >
+                View Generators
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
           </div>
 
           {/* Enhanced Value Props */}

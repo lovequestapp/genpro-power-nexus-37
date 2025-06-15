@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <footer className="bg-primary text-white relative overflow-hidden">
+    <footer className="bg-steel-900 text-white relative overflow-hidden">
       {/* Premium Background Elements */}
       <div className="absolute inset-0">
         <div className="absolute top-0 left-0 w-64 h-64 sm:w-96 sm:h-96 bg-accent/5 rounded-full blur-3xl"></div>
@@ -18,11 +18,11 @@ const Footer = () => {
             <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6">
               <div className="flex items-center space-x-2">
                 <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
-                <span className="text-steel-300 font-medium text-sm sm:text-base">Licensed & Insured</span>
+                <span className="text-white font-medium text-sm sm:text-base">Licensed & Insured</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Award className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
-                <span className="text-steel-300 font-medium text-sm sm:text-base">Generac Authorized</span>
+                <span className="text-white font-medium text-sm sm:text-base">Generac Authorized</span>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="flex space-x-1">
@@ -30,10 +30,10 @@ const Footer = () => {
                     <Star key={i} className="w-3 h-3 sm:w-4 sm:h-4 fill-yellow-400 text-yellow-400" />
                   ))}
                 </div>
-                <span className="text-steel-300 font-medium text-sm sm:text-base">500+ Happy Customers</span>
+                <span className="text-white font-medium text-sm sm:text-base">500+ Happy Customers</span>
               </div>
             </div>
-            <div className="text-steel-300 font-medium text-sm sm:text-base">
+            <div className="text-white font-medium text-sm sm:text-base">
               24/7 Emergency Service Available
             </div>
           </div>
@@ -53,11 +53,11 @@ const Footer = () => {
                 <div className="absolute inset-0 w-10 h-10 sm:w-12 sm:h-12 accent-gradient rounded-xl opacity-30 blur"></div>
               </div>
               <div className="flex flex-col">
-                <span className="text-xl sm:text-2xl font-bold">HOU GEN PROS</span>
-                <span className="text-xs text-steel-300 font-medium tracking-widest">PREMIUM POWER SOLUTIONS</span>
+                <span className="text-xl sm:text-2xl font-bold text-white">HOU GEN PROS</span>
+                <span className="text-xs text-white font-medium tracking-widest">PREMIUM POWER SOLUTIONS</span>
               </div>
             </div>
-            <p className="text-steel-300 mb-6 sm:mb-8 leading-relaxed font-medium text-sm sm:text-base">
+            <p className="text-white mb-6 sm:mb-8 leading-relaxed font-medium text-sm sm:text-base">
               Delivering Fortune 500-level generator solutions with unmatched reliability, 
               expert service, and 24/7 support for all your power needs.
             </p>
@@ -94,7 +94,7 @@ const Footer = () => {
                 <li key={index}>
                   <Link 
                     to={link.to} 
-                    className="text-steel-300 hover:text-white transition-colors duration-300 font-medium hover:translate-x-1 inline-block text-sm sm:text-base touch-manipulation"
+                    className="text-white hover:text-accent transition-colors duration-300 font-medium hover:translate-x-1 inline-block text-sm sm:text-base touch-manipulation"
                   >
                     {link.label}
                   </Link>
@@ -117,7 +117,7 @@ const Footer = () => {
                 <li key={index}>
                   <Link 
                     to={link.to} 
-                    className="text-steel-300 hover:text-white transition-colors duration-300 font-medium hover:translate-x-1 inline-block text-sm sm:text-base touch-manipulation"
+                    className="text-white hover:text-accent transition-colors duration-300 font-medium hover:translate-x-1 inline-block text-sm sm:text-base touch-manipulation"
                   >
                     {link.label}
                   </Link>
@@ -161,7 +161,7 @@ const Footer = () => {
                     <div className={`font-semibold text-sm sm:text-base ${contact.primary ? 'text-accent' : 'text-white'}`}>
                       {contact.title}
                     </div>
-                    <div className="text-steel-300 text-xs sm:text-sm font-medium">{contact.subtitle}</div>
+                    <div className="text-white text-xs sm:text-sm font-medium">{contact.subtitle}</div>
                   </div>
                 </div>
               ))}
@@ -174,10 +174,10 @@ const Footer = () => {
       <div className="border-t border-steel-600/30 py-6 sm:py-8 relative z-10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
-            <div className="text-steel-300 text-xs sm:text-sm font-medium text-center sm:text-left">
+            <div className="text-white text-xs sm:text-sm font-medium text-center sm:text-left">
               © 2024 HOU GEN PROS. All rights reserved. | Licensed & Insured | TECL License #12345
             </div>
-            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-8 text-steel-300 text-xs sm:text-sm">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-8 text-white text-xs sm:text-sm">
               {[
                 { to: "/privacy", label: "Privacy Policy" },
                 { to: "/terms", label: "Terms of Service" },
@@ -186,7 +186,7 @@ const Footer = () => {
                 <Link 
                   key={index}
                   to={link.to} 
-                  className="hover:text-white transition-colors duration-300 font-medium text-center touch-manipulation"
+                  className="hover:text-accent transition-colors duration-300 font-medium text-center touch-manipulation text-white"
                 >
                   {link.label}
                 </Link>

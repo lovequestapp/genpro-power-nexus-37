@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Phone, MessageSquare, ChevronDown } from 'lucide-react';
+import { Menu, X, Phone, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Header = () => {
@@ -54,7 +54,6 @@ const Header = () => {
               >
                 {item.label}
                 <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-accent to-orange-600 transition-all duration-500 group-hover:w-3/4 transform -translate-x-1/2"></span>
-                <ChevronDown className="w-4 h-4 absolute -right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </Link>
             ))}
           </nav>

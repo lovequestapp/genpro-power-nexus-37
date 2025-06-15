@@ -1,4 +1,3 @@
-
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import ProductShowcase from '@/components/ProductShowcase';
@@ -6,15 +5,17 @@ import ServicesOverview from '@/components/ServicesOverview';
 import TrustIndicators from '@/components/TrustIndicators';
 import Footer from '@/components/Footer';
 import PromotionSection from '@/components/PromotionSection';
+import QualityGuarantee from '@/components/QualityGuarantee';
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       <Header />
       <HeroSection />
       <PromotionSection />
       <ProductShowcase />
       <ServicesOverview />
+      <QualityGuarantee />
       <TrustIndicators />
       <Footer />
     </div>

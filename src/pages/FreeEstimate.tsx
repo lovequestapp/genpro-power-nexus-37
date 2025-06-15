@@ -39,10 +39,14 @@ export default function FreeEstimate() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-xl mt-10 mb-10 animate-in fade-in duration-700">
+    <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-xl mt-24 mb-10 animate-in fade-in duration-700">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold text-primary">Get Your Free Estimate</h1>
+        <p className="text-steel-600 mt-2">Fill out the form below to receive a detailed quote for your generator needs.</p>
+      </div>
       <div className="flex items-center mb-6">
         <Zap className="text-accent mr-2" />
-        <h1 className="text-3xl font-bold text-primary">Free Estimate</h1>
+        <h2 className="text-3xl font-bold text-primary">Free Estimate</h2>
       </div>
       <Progress value={((step + 1) / steps.length) * 100} className="mb-6" />
       <div className="flex justify-between mb-8">

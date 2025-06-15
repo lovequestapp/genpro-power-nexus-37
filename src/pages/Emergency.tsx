@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Phone, MessageSquare, AlertTriangle, Clock, MapPin, Shield, Zap, Truck, Users, CheckCircle, Star, Calendar, Fuel, Wrench, Timer } from 'lucide-react';
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+
 const Emergency = () => {
   const emergencyServices = [{
     title: 'Generator Repair',
@@ -71,53 +71,44 @@ const Emergency = () => {
     description: 'Emergency fuel delivery',
     priority: 'medium'
   }];
-  const preparationSteps = [{
-    step: '1',
-    title: 'Pre-Storm Inspection',
-    description: 'Conduct a thorough inspection of your generator system to identify any potential issues.',
-    timeframe: '1-2 weeks before storm season'
-  }, {
-    step: '2',
-    title: 'Fuel and Oil Changes',
-    description: "Change your generator's fuel and oil to ensure optimal performance during storms.",
-    timeframe: '1-2 weeks before storm season'
-  }, {
-    step: '3',
-    title: 'Battery Maintenance',
-    description: "Check and replace your generator's battery to ensure it can provide power during a storm.",
-    timeframe: '1-2 weeks before storm season'
-  }, {
-    step: '4',
-    title: 'Generator Testing',
-    description: 'Perform a load test on your generator to ensure it can handle the expected load during a storm.',
-    timeframe: '1-2 weeks before storm season'
-  }, {
-    step: '5',
-    title: 'Backup Generator Setup',
-    description: 'Ensure your backup generator is properly connected and ready to use during a storm.',
-    timeframe: '1-2 weeks before storm season'
-  }, {
-    step: '6',
-    title: 'Emergency Contact Information',
-    description: 'Keep your emergency contact information up-to-date and easily accessible.',
-    timeframe: '1-2 weeks before storm season'
-  }];
-  const testimonials = [{
-    name: 'Dr. Sarah Mitchell',
-    company: 'Houston Methodist Hospital',
-    text: 'When our backup generator failed during Hurricane Harvey, HOU GEN PROS had a team on-site within 90 minutes. Their rapid response saved our critical operations.',
-    rating: 5
-  }, {
-    name: 'Mike Rodriguez',
-    company: 'ExxonMobil Baytown',
-    text: 'Outstanding emergency service. Their 24/7 response team has consistently delivered when we needed them most. True professionals.',
-    rating: 5
-  }, {
-    name: 'Jennifer Chen',
-    company: 'Memorial Hermann',
-    text: 'Reliable, fast, and professional. HOU GEN PROS is our trusted partner for all emergency power needs. Highly recommended.',
-    rating: 5
-  }];
+  const preparationSteps = [
+    {
+      step: '1',
+      title: 'System Inspection',
+      description: 'Complete generator system inspection and testing before storm season.',
+      timeframe: '2-3 hours',
+    },
+    {
+      step: '2',
+      title: 'Fuel Management',
+      description: 'Top off fuel tanks and test fuel quality to ensure reliability.',
+      timeframe: '1-2 hours',
+    },
+    {
+      step: '3',
+      title: 'Battery Check',
+      description: 'Test and replace batteries if needed for reliable startup.',
+      timeframe: '1 hour',
+    },
+    {
+      step: '4',
+      title: 'Load Testing',
+      description: 'Verify generator performance under expected load conditions.',
+      timeframe: '2-4 hours',
+    },
+    {
+      step: '5',
+      title: 'Transfer Switch Test',
+      description: 'Ensure automatic transfer switches are functioning properly.',
+      timeframe: '1-2 hours',
+    },
+    {
+      step: '6',
+      title: 'Response Plan Review',
+      description: 'Update emergency response plans and contact information.',
+      timeframe: '1 hour',
+    }
+  ];
   return <div className="min-h-screen bg-white">
       <Header />
       
@@ -151,7 +142,7 @@ const Emergency = () => {
       </section>
 
       {/* Emergency Services */}
-      <section className="py-20">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-primary mb-6">Emergency Generator Services</h2>
@@ -191,18 +182,18 @@ const Emergency = () => {
       </section>
 
       {/* Response Coverage */}
-      <section className="py-20 bg-steel-50">
+      <section className="py-20 bg-gradient-to-br from-red-800 via-red-700 to-red-900 text-white">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-primary mb-6">Emergency Response Coverage</h2>
-            <p className="text-xl text-steel-600 max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold text-white mb-6">Emergency Response Coverage</h2>
+            <p className="text-xl text-white max-w-3xl mx-auto">
               Rapid emergency response across Greater Houston with strategically positioned service teams and equipment.
             </p>
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h3 className="text-2xl font-bold text-primary mb-8">Service Areas & Response Times</h3>
+              <h3 className="text-2xl font-bold text-white mb-8">Service Areas & Response Times</h3>
               <div className="grid grid-cols-2 gap-4">
                 {responseAreas.map((area, index) => <div key={index} className="bg-white p-4 rounded-lg shadow-sm border border-steel-200 text-center hover:shadow-md transition-shadow duration-300">
                     <MapPin className="w-5 h-5 text-red-600 mx-auto mb-2" />
@@ -273,7 +264,7 @@ const Emergency = () => {
       </section>
 
       {/* Emergency Contact */}
-      <section className="py-20 bg-gradient-to-r from-red-600 to-red-800 text-white">
+      <section className="py-20 bg-gradient-to-br from-red-800 via-red-700 to-red-900 text-white">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-4xl font-bold mb-6">Power Emergency? Don't Wait.</h2>
@@ -305,7 +296,7 @@ const Emergency = () => {
                 <Phone className="w-6 h-6 mr-3" />
                 CALL NOW: (832) 555-POWER
               </Button>
-              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-red-800 px-8 py-6">
+              <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-6 text-steel-800">
                 <MessageSquare className="w-5 h-5 mr-2" />
                 Text Emergency Request
               </Button>
@@ -328,15 +319,13 @@ const Emergency = () => {
               <Phone className="w-5 h-5 mr-2" />
               Emergency: (832) 555-POWER
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-red-900">
+            <Button size="lg" variant="outline" className="border-white hover:bg-white px-8 py-6 text-steel-800">
               <Calendar className="w-5 h-5 mr-2" />
               Schedule Preventive Service
             </Button>
           </div>
         </div>
       </section>
-
-      <Footer />
     </div>;
 };
 export default Emergency;

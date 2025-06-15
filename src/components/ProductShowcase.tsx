@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,7 +14,7 @@ const ProductShowcase = () => {
       priceNote: "Equipment Only",
       icon: Home,
       features: ["Automatic Start", "Quiet Operation", "10-Year Warranty", "WiFi Monitoring"],
-      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      image: "/1.jpg",
       badge: "In Stock",
       popular: false
     },
@@ -28,7 +27,7 @@ const ProductShowcase = () => {
       priceNote: "Equipment Only",
       icon: Home,
       features: ["Whole Home Power", "Natural Gas/Propane", "Mobile App Control", "Weather Resistant"],
-      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      image: "/2.jpg",
       badge: "Popular",
       popular: true
     },
@@ -41,7 +40,7 @@ const ProductShowcase = () => {
       priceNote: "Equipment Only",
       icon: Home,
       features: ["Extended Coverage", "Automatic Transfer", "5-Year Warranty", "Professional Install"],
-      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      image: "/1.jpg",
       badge: "New",
       popular: false
     },
@@ -54,7 +53,7 @@ const ProductShowcase = () => {
       priceNote: "Equipment Only",
       icon: Home,
       features: ["Maximum Coverage", "200 Amp Ready", "Premium Features", "Best Value"],
-      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+      image: "/2.jpg",
       badge: "Summer Special",
       popular: false,
       specialPrice: "$10,250",
@@ -86,10 +85,10 @@ const ProductShowcase = () => {
             return (
               <Card 
                 key={product.id} 
-                className={`group hover:shadow-xl transition-all duration-300 border-steel-200 hover:border-accent/30 animate-fade-in overflow-hidden ${product.popular ? 'ring-2 ring-accent' : ''}`}
+                className={`bg-white border border-steel-200 shadow-md rounded-xl group hover:shadow-lg transition-all duration-300 animate-fade-in overflow-hidden ${product.popular ? 'ring-2 ring-accent' : ''}`}
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="relative h-40 sm:h-48 bg-gradient-to-br from-steel-100 to-steel-200 overflow-hidden">
+                <div className="relative h-40 sm:h-48 bg-white overflow-hidden">
                   <img 
                     src={product.image} 
                     alt={product.name}
@@ -100,7 +99,7 @@ const ProductShowcase = () => {
                       {product.badge}
                     </Badge>
                   </div>
-                  <div className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-white/90 backdrop-blur-sm p-1.5 sm:p-2 rounded-lg">
+                  <div className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-orange-100 p-1.5 sm:p-2 rounded-lg">
                     <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
                   </div>
                   {product.popular && (
@@ -115,16 +114,16 @@ const ProductShowcase = () => {
                 
                 <CardContent className="p-4 sm:p-6">
                   <div className="mb-3">
-                    <Badge variant="outline" className="text-xs mb-2">
+                    <Badge variant="outline" className="text-xs mb-2 text-steel-700">
                       {product.category}
                     </Badge>
-                    <h3 className="text-lg sm:text-xl font-bold text-primary mb-2">{product.name}</h3>
+                    <h3 className="text-lg sm:text-xl font-bold text-steel-900 mb-2">{product.name}</h3>
                     <p className="text-accent font-semibold text-base sm:text-lg">{product.power}</p>
                   </div>
                   
                   <div className="mb-4">
-                    <div className="text-xl sm:text-2xl font-bold text-primary">{product.price}</div>
-                    <div className="text-xs sm:text-sm text-steel-500">{product.priceNote}</div>
+                    <div className="text-xl sm:text-2xl font-bold text-steel-800">{product.price}</div>
+                    <div className="text-xs sm:text-sm text-steel-700">{product.priceNote}</div>
                     {product.specialPrice && (
                       <div className="mt-2 p-2 bg-red-50 rounded border border-red-200">
                         <div className="text-base sm:text-lg font-bold text-red-600">{product.specialPrice}</div>
@@ -135,7 +134,7 @@ const ProductShowcase = () => {
                   
                   <ul className="space-y-1.5 sm:space-y-2 mb-4 sm:mb-6">
                     {product.features.map((feature, idx) => (
-                      <li key={idx} className="text-xs sm:text-sm text-steel-600 flex items-center">
+                      <li key={idx} className="text-xs sm:text-sm text-steel-800 flex items-center">
                         <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-accent mr-2 sm:mr-3 flex-shrink-0" />
                         {feature}
                       </li>
@@ -158,27 +157,27 @@ const ProductShowcase = () => {
         {/* Features Section - Mobile Optimized */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mb-8 sm:mb-12">
           <div className="text-center p-4 sm:p-6 bg-steel-50 rounded-lg">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 text-lg sm:text-xl">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 text-accent rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 text-lg sm:text-xl">
               ✅
             </div>
-            <h3 className="font-bold text-primary mb-2 text-base sm:text-lg">Brand New Units</h3>
-            <p className="text-steel-600 text-sm">Not refurbished - genuine Generac generators with full warranty</p>
+            <h3 className="font-bold text-steel-900 mb-2 text-base sm:text-lg">Brand New Units</h3>
+            <p className="text-steel-800 text-sm">Not refurbished - genuine Generac generators with full warranty</p>
           </div>
           
           <div className="text-center p-4 sm:p-6 bg-steel-50 rounded-lg">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 text-lg sm:text-xl">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 text-accent rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 text-lg sm:text-xl">
               🛠️
             </div>
-            <h3 className="font-bold text-primary mb-2 text-base sm:text-lg">Licensed & Insured</h3>
-            <p className="text-steel-600 text-sm">Professional installation by certified Houston Generator Pros</p>
+            <h3 className="font-bold text-steel-900 mb-2 text-base sm:text-lg">Licensed & Insured</h3>
+            <p className="text-steel-800 text-sm">Professional installation by certified Houston Generator Pros</p>
           </div>
           
           <div className="text-center p-4 sm:p-6 bg-steel-50 rounded-lg">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 text-lg sm:text-xl">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 text-accent rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 text-lg sm:text-xl">
               ⚡
             </div>
-            <h3 className="font-bold text-primary mb-2 text-base sm:text-lg">Fast Setup</h3>
-            <p className="text-steel-600 text-sm">Complete installation in just 3 to 5 hours</p>
+            <h3 className="font-bold text-steel-900 mb-2 text-base sm:text-lg">Fast Setup</h3>
+            <p className="text-steel-800 text-sm">Complete installation in just 3 to 5 hours</p>
           </div>
         </div>
 

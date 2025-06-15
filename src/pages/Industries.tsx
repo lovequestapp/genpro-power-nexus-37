@@ -192,9 +192,8 @@ const Industries = () => {
               Powering Houston's
               <span className="block text-accent">Critical Industries</span>
             </h1>
-            <p className="text-xl text-steel-200 mb-10 leading-relaxed max-w-3xl mx-auto">
-              Specialized generator solutions tailored for Houston's diverse business landscape. 
-              From healthcare facilities to manufacturing plants, we ensure uninterrupted power when it matters most.
+            <p className="text-xl text-white mb-10 max-w-3xl mx-auto">
+              Specialized generator solutions tailored for Houston's diverse business landscape. From healthcare facilities to manufacturing plants, we ensure uninterrupted power when it matters most.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Button size="lg" className="bg-accent hover:bg-orange-600 text-white px-8 py-4">
@@ -361,15 +360,15 @@ const Industries = () => {
       <section className="py-20 bg-primary text-white">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-6">Protect Your Houston Business</h2>
-          <p className="text-xl text-steel-200 mb-10 max-w-3xl mx-auto">
-            Don't let power outages disrupt your operations. Get a custom power solution designed for your industry's specific needs.
+          <p className="text-xl text-white mb-10 max-w-3xl mx-auto">
+            Get expert advice and a custom power solution for your industry. Schedule a free consultation with our team today.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Button size="lg" className="bg-accent hover:bg-orange-600 text-white px-8 py-4">
               <Phone className="w-5 h-5 mr-2" />
               Call (832) 555-POWER
             </Button>
-            <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-primary px-8 py-4">
+            <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-4 text-steel-800">
               <MessageSquare className="w-5 h-5 mr-2" />
               Industry Assessment
             </Button>

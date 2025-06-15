@@ -81,6 +81,7 @@ export interface BillItem {
 export interface Bill {
   id: string;
   customerId: string;
+  customerName: string;
   amount: number;
   status: 'pending' | 'paid' | 'overdue';
   dueDate: string;

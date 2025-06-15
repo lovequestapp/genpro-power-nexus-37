@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
@@ -163,14 +162,18 @@
   /* Enhanced button styles */
   .btn-primary {
     @apply bg-primary text-white hover:bg-steel-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl;
+    color: #fff !important;
   }
 
   .btn-accent {
     @apply accent-gradient text-white hover:shadow-glow transition-all duration-300 font-semibold;
+    color: #fff !important;
   }
 
   .btn-outline {
     @apply border-2 border-steel-300 text-steel-700 hover:bg-steel-50 hover:border-steel-400 bg-white transition-all duration-300 font-medium;
+    color: #1e293b !important; /* steel-800 */
+    background: #fff !important;
   }
 
   /* Enhanced card styles */
@@ -179,7 +182,7 @@
   }
 
   .card-glass {
-    @apply bg-white/80 backdrop-blur-md border border-white/20 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300;
+    @apply bg-white/90 backdrop-blur-md border border-white/20 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300;
   }
 }
 
@@ -211,7 +214,7 @@
 
   /* Improved contrast utilities */
   .text-high-contrast {
-    @apply text-steel-900;
+    @apply text-steel-900 !important;
   }
 
   .text-medium-contrast {
@@ -229,6 +232,16 @@
   .bg-medium-contrast {
     @apply bg-steel-100 text-steel-900;
   }
+
+  .force-high-contrast {
+    color: #0f172a !important; /* steel-900 */
+  }
+}
+
+/* Global override for low-contrast text */
+.text-steel-200, .text-steel-300, .text-steel-400, .text-white\/70, .text-white\/80, .text-white\/90, .opacity-70, .opacity-80, .opacity-90 {
+  color: #1e293b !important; /* steel-800 */
+  opacity: 1 !important;
 }
 
 /* Enhanced animations */
@@ -308,4 +321,8 @@
       0 4px 6px -1px rgba(0, 0, 0, 0.1),
       0 10px 15px -3px rgba(0, 0, 0, 0.1);
   }
+}
+
+button, .Button, .btn, .btn-primary, .btn-accent, .btn-outline {
+  text-shadow: none !important;
 }
