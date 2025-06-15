@@ -126,7 +126,7 @@ const ProductCard = ({ product }: { product: GeneratorProduct }) => {
           <Badge variant="outline" className="mb-2">
             {product.type}
           </Badge>
-          <h3 className="text-2xl font-bold text-steel-800 dark:text-steel-200">
+          <h3 className="text-2xl font-bold text-steel-800">
             {product.model}
           </h3>
           <div className="text-xl font-semibold text-accent mt-1">
@@ -135,18 +135,18 @@ const ProductCard = ({ product }: { product: GeneratorProduct }) => {
         </div>
 
         <div className="mb-6">
-          <div className="text-3xl font-bold text-steel-800 dark:text-steel-200">
+          <div className="text-3xl font-bold text-steel-800">
             ${product.price.toLocaleString()}
           </div>
           <div className="text-steel-500 text-sm">
             Equipment Only
           </div>
           {product.installedPrice && (
-            <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/10 rounded-lg border border-red-100 dark:border-red-900/20">
-              <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+            <div className="mt-3 p-3 bg-red-50 rounded-lg border border-red-100">
+              <div className="text-2xl font-bold text-red-600">
                 ${product.installedPrice.toLocaleString()}
               </div>
-              <div className="text-red-600 dark:text-red-400 text-sm">
+              <div className="text-red-600 text-sm">
                 Installed Package
               </div>
             </div>
@@ -155,7 +155,7 @@ const ProductCard = ({ product }: { product: GeneratorProduct }) => {
 
         <div className="space-y-3 mb-6">
           {product.features.map((feature, index) => (
-            <div key={index} className="flex items-center gap-2 text-steel-600 dark:text-steel-400">
+            <div key={index} className="flex items-center gap-2 text-steel-600">
               <Check className="w-5 h-5 text-accent flex-shrink-0" />
               <span>{feature}</span>
             </div>
@@ -176,7 +176,7 @@ const ProductCard = ({ product }: { product: GeneratorProduct }) => {
 
 const Products = () => {
   return (
-    <div className="section-padding bg-white dark:bg-steel-900">
+    <div className="section-padding bg-white">
       <div className="container mx-auto container-padding">
         <div className="max-w-3xl mx-auto text-center mb-16">
           <motion.div
@@ -190,7 +190,7 @@ const Products = () => {
             <h1 className="text-gradient mb-6">
               Brand New Generac Generators
             </h1>
-            <p className="text-xl text-steel-600 dark:text-steel-400">
+            <p className="text-xl text-steel-600">
               Whole home backup power for Houston & surrounding areas. Professional installation available with 3-5 hour setup and 5-year manufacturer warranty.
             </p>
           </motion.div>
@@ -209,10 +209,10 @@ const Products = () => {
           className="mt-16 text-center"
         >
           <div className="max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold text-steel-800 dark:text-steel-200 mb-4">
+            <h3 className="text-2xl font-bold text-steel-800 mb-4">
               Need Help Choosing?
             </h3>
-            <p className="text-steel-600 dark:text-steel-400 mb-8">
+            <p className="text-steel-600 mb-8">
               Our experts are here to help you select the perfect generator for your home. Contact us for a free consultation.
             </p>
             <Button 

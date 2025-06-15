@@ -129,7 +129,7 @@ interface Project {
 
 const StatCard = ({ title, value, change, icon, trend, subtitle }: StatCardProps) => {
   return (
-    <Card className="p-8 bg-white rounded-xl shadow-lg border-none text-steel-800 hover:shadow-xl transition-shadow">
+    <Card className="p-8 bg-white rounded-xl shadow-lg border-none text-steel-900 hover:shadow-xl transition-shadow">
       <div className="flex items-center justify-between mb-4">
         <div className="text-steel-500">{icon}</div>
         {typeof change !== 'undefined' && (
@@ -157,7 +157,7 @@ const StatCard = ({ title, value, change, icon, trend, subtitle }: StatCardProps
         )}
       </div>
       <div className="space-y-1">
-        <h3 className="text-2xl font-bold text-steel-800 dark:text-steel-200">
+        <h3 className="text-2xl font-bold text-steel-900">
           {typeof value === 'number' ? value.toLocaleString() : value}
         </h3>
         <p className="text-sm text-steel-600">{title}</p>
@@ -171,16 +171,16 @@ const StatCard = ({ title, value, change, icon, trend, subtitle }: StatCardProps
 
 const ProjectCard = ({ project }: { project: Project }) => {
   const statusColors = {
-    'pending': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
-    'in-progress': 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
-    'completed': 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
+    'pending': 'bg-yellow-100 text-yellow-800',
+    'in-progress': 'bg-blue-100 text-blue-800',
+    'completed': 'bg-green-100 text-green-800',
   };
 
   return (
-    <Card className="p-8 bg-white rounded-xl shadow-lg border-none text-steel-800 hover:shadow-xl transition-shadow">
+    <Card className="p-8 bg-white rounded-xl shadow-lg border-none text-steel-900 hover:shadow-xl transition-shadow">
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h3 className="font-semibold text-steel-800 dark:text-steel-200">
+          <h3 className="font-semibold text-steel-900">
             {project.title}
           </h3>
           <p className="text-sm text-steel-500">{project.customer}</p>
@@ -200,7 +200,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
           <span className="text-steel-500">Progress</span>
-          <span className="font-medium text-steel-700 dark:text-steel-300">
+          <span className="font-medium text-steel-700">
             {project.progress}%
           </span>
         </div>
@@ -214,7 +214,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
             {project.technicians.map((tech, index) => (
               <div
                 key={index}
-                className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center text-xs font-medium text-accent ring-2 ring-white dark:ring-steel-950"
+                className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center text-xs font-medium text-accent ring-2 ring-white"
                 title={tech}
               >
                 {tech.charAt(0)}
@@ -647,7 +647,7 @@ const AdminDashboard: React.FC = () => {
     <div className="min-h-screen bg-white">
       <AnimatedCircuitBackground />
       {/* Main Content */}
-      <main className="min-h-screen transition-all duration-300 ease-in-out bg-white lg:pl-[280px] pt-10">
+      <main className="min-h-screen transition-all duration-300 ease-in-out bg-white lg:pl-0 pt-10">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-4xl font-extrabold text-primary mb-8">Admin Dashboard</h1>
           {/* Dashboard Widgets Grid */}
@@ -666,7 +666,7 @@ const AdminDashboard: React.FC = () => {
             {/* Main Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {stats.map((stat, index) => (
-                <div key={index} className="bg-white rounded-xl p-8 shadow-lg border-none text-steel-800 hover:shadow-xl transition-shadow">
+                <div key={index} className="bg-white rounded-xl p-8 shadow-lg border-none text-steel-900 hover:shadow-xl transition-shadow">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-steel-600 mb-1">{stat.title}</p>
@@ -689,7 +689,7 @@ const AdminDashboard: React.FC = () => {
               {/* Left Column */}
               <div className="space-y-6">
                 {/* New Clients Widget */}
-                <div className="bg-white rounded-xl p-8 shadow-lg border-none text-steel-800">
+                <div className="bg-white rounded-xl p-8 shadow-lg border-none text-steel-900">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-xl font-bold text-primary mb-4">New Clients</h3>
                     <Button variant="text" size="small">View All</Button>
@@ -713,7 +713,7 @@ const AdminDashboard: React.FC = () => {
                 </div>
 
                 {/* Website Analytics Widget */}
-                <div className="bg-white rounded-xl p-8 shadow-lg border-none text-steel-800">
+                <div className="bg-white rounded-xl p-8 shadow-lg border-none text-steel-900">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-bold text-primary">Website Analytics</h3>
                     <Button variant="text" size="small">Details</Button>
@@ -742,7 +742,7 @@ const AdminDashboard: React.FC = () => {
               {/* Middle Column */}
               <div className="space-y-6">
                 {/* Active Projects Widget */}
-                <div className="bg-white rounded-xl p-8 shadow-lg border-none text-steel-800">
+                <div className="bg-white rounded-xl p-8 shadow-lg border-none text-steel-900">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-bold text-primary">Active Projects</h3>
                     <Button variant="text" size="small">View All</Button>
@@ -778,7 +778,7 @@ const AdminDashboard: React.FC = () => {
                 </div>
 
                 {/* Email Management Widget */}
-                <div className="bg-white rounded-xl p-8 shadow-lg border-none text-steel-800">
+                <div className="bg-white rounded-xl p-8 shadow-lg border-none text-steel-900">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-bold text-primary">Email Management</h3>
                     <Button variant="text" size="small">Compose</Button>
@@ -821,7 +821,7 @@ const AdminDashboard: React.FC = () => {
               {/* Right Column */}
               <div className="space-y-6">
                 {/* Ticket Management Widget */}
-                <div className="bg-white rounded-xl p-8 shadow-lg border-none text-steel-800">
+                <div className="bg-white rounded-xl p-8 shadow-lg border-none text-steel-900">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-bold text-primary">Support Tickets</h3>
                     <Button variant="text" size="small">New Ticket</Button>
@@ -862,7 +862,7 @@ const AdminDashboard: React.FC = () => {
                 </div>
 
                 {/* Invoicing Widget */}
-                <div className="bg-white rounded-xl p-8 shadow-lg border-none text-steel-800">
+                <div className="bg-white rounded-xl p-8 shadow-lg border-none text-steel-900">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-bold text-primary">Invoicing</h3>
                     <Button variant="text" size="small">Create Invoice</Button>

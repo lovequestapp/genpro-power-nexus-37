@@ -61,7 +61,7 @@ const WhyChooseUs = () => {
   const { theme } = useTheme();
   
   return (
-    <section className="section-padding premium-gradient dark:bg-steel-900/50">
+    <section className="section-padding premium-gradient">
       <div className="container mx-auto container-padding relative">
         <div className="max-w-3xl mx-auto text-center mb-16">
           <motion.h2
@@ -77,7 +77,7 @@ const WhyChooseUs = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-xl text-steel-600 dark:text-steel-400"
+            className="text-xl text-steel-600"
           >
             Experience unmatched expertise and reliability with Houston's leading generator solutions provider
           </motion.p>

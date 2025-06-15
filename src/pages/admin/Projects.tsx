@@ -371,10 +371,10 @@ const Projects = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-steel-800 dark:text-steel-200">
+          <h1 className="text-3xl font-bold text-steel-900">
             Projects
           </h1>
-          <p className="text-steel-500 mt-1">
+          <p className="text-steel-700 mt-1">
             Manage installations, maintenance, and repairs
           </p>
         </div>
@@ -392,8 +392,8 @@ const Projects = () => {
               <WrenchIcon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <p className="text-sm text-steel-500">Total Projects</p>
-              <h3 className="text-2xl font-bold text-steel-800 dark:text-steel-200">
+              <p className="text-sm text-steel-700">Total Projects</p>
+              <h3 className="text-2xl font-bold text-steel-900">
                 {stats.total}
               </h3>
             </div>
@@ -405,8 +405,8 @@ const Projects = () => {
               <ClockIcon className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
             </div>
             <div>
-              <p className="text-sm text-steel-500">In Progress</p>
-              <h3 className="text-2xl font-bold text-steel-800 dark:text-steel-200">
+              <p className="text-sm text-steel-700">In Progress</p>
+              <h3 className="text-2xl font-bold text-steel-900">
                 {stats.inProgress}
               </h3>
             </div>
@@ -418,8 +418,8 @@ const Projects = () => {
               <DollarSignIcon className="w-6 h-6 text-green-600 dark:text-green-400" />
             </div>
             <div>
-              <p className="text-sm text-steel-500">Total Revenue</p>
-              <h3 className="text-2xl font-bold text-steel-800 dark:text-steel-200">
+              <p className="text-sm text-steel-700">Total Revenue</p>
+              <h3 className="text-2xl font-bold text-steel-900">
                 ${stats.totalRevenue.toLocaleString()}
               </h3>
             </div>
@@ -431,8 +431,8 @@ const Projects = () => {
               <CheckCircleIcon className="w-6 h-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
-              <p className="text-sm text-steel-500">Completed</p>
-              <h3 className="text-2xl font-bold text-steel-800 dark:text-steel-200">
+              <p className="text-sm text-steel-700">Completed</p>
+              <h3 className="text-2xl font-bold text-steel-900">
                 {stats.completed}
               </h3>
             </div>
@@ -510,7 +510,7 @@ const Projects = () => {
               <TableRow key={project.id}>
                 <TableCell>
                   <div>
-                    <div className="font-medium text-steel-800 dark:text-steel-200">
+                    <div className="font-medium text-steel-900">
                       {project.title}
                     </div>
                     <div className="text-sm text-steel-500">
@@ -520,7 +520,7 @@ const Projects = () => {
                 </TableCell>
                 <TableCell>
                   <div className="flex flex-col">
-                    <span className="text-steel-800 dark:text-steel-200">
+                    <span className="text-steel-900">
                       {project.customerName}
                     </span>
                     <span className="text-sm text-steel-500">
@@ -547,7 +547,7 @@ const Projects = () => {
                   <div className="w-32">
                     <div className="flex justify-between text-sm mb-1">
                       <span className="text-steel-500">Progress</span>
-                      <span className="font-medium text-steel-700 dark:text-steel-300">
+                      <span className="font-medium text-steel-700">
                         {project.progress}%
                       </span>
                     </div>
@@ -565,7 +565,7 @@ const Projects = () => {
                     {project.assignedTechnicians.map((tech) => (
                       <div
                         key={tech.id}
-                        className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-sm font-medium text-accent ring-2 ring-white dark:ring-steel-950"
+                        className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-sm font-medium text-accent ring-2 ring-white"
                         title={tech.name}
                       >
                         {tech.name.split(' ').map(n => n[0]).join('')}
@@ -709,7 +709,7 @@ const Projects = () => {
                         <div key={event.id} className="flex gap-4">
                           <div className="flex flex-col items-center">
                             <div className="w-2 h-2 rounded-full bg-accent" />
-                            <div className="w-0.5 h-full bg-steel-200 dark:bg-steel-800" />
+                            <div className="w-0.5 h-full bg-steel-200" />
                           </div>
                           <div>
                             <div className="font-medium">{event.title}</div>
@@ -742,7 +742,7 @@ const Projects = () => {
                   <Card className="p-4">
                     <div className="space-y-4">
                       {selectedProject.notes.map((note) => (
-                        <div key={note.id} className="border-b border-steel-200 dark:border-steel-800 pb-4 last:border-0">
+                        <div key={note.id} className="border-b border-steel-200 pb-4 last:border-0">
                           <div className="flex justify-between items-start">
                             <div>
                               <div className="font-medium">{note.author}</div>
