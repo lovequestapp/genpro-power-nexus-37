@@ -1,20 +1,16 @@
+import React from 'react';
+import { Outlet } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
-interface Props {
-  children: React.ReactNode;
-}
-
-const PublicLayout = ({ children }: Props) => {
+export default function PublicLayout() {
   return (
-    <div className="min-h-screen bg-steel-50 flex flex-col">
+    <div className="min-h-screen bg-background">
       <Header />
-      <main className="flex-grow">
-        {children}
+      <main>
+        <Outlet />
       </main>
       <Footer />
     </div>
   );
-};
-
-export default PublicLayout; 
+} 

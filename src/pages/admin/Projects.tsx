@@ -56,314 +56,82 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabaseService } from '@/services/supabase';
+import { toast } from '@/components/ui/use-toast';
+import type { Ticket } from '@/lib/supabase';
 
-// Simulated data
-const projects: Project[] = [
-  {
-    id: '1',
-    title: 'Generac 22KW Installation',
-    customerId: 'CUST001',
-    customerName: 'John & Sarah Miller',
-    status: 'in-progress',
-    type: 'installation',
-    progress: 65,
-    startDate: '2024-06-10',
-    dueDate: '2024-06-15',
-    budget: 12500,
-    cost: 8000,
-    profit: 4500,
-    assignedTechnicians: [
-      {
-        id: 'TECH001',
-        name: 'Mike Johnson',
-        email: 'mike@hougenpros.com',
-        phone: '555-0101',
-        role: 'lead',
-        specializations: ['Installation', 'Repair'],
-        availability: 'assigned',
-        completedProjects: 156,
-        rating: 4.9,
-        certifications: [],
-      },
-      {
-        id: 'TECH002',
-        name: 'David Chen',
-        email: 'david@hougenpros.com',
-        phone: '555-0102',
-        role: 'assistant',
-        specializations: ['Installation'],
-        availability: 'assigned',
-        completedProjects: 89,
-        rating: 4.7,
-        certifications: [],
-      },
-    ],
-    equipmentUsed: [
-      {
-        id: 'EQ001',
-        name: 'Generac 22KW Generator',
-        category: 'generator',
-        model: '22KW',
-        manufacturer: 'Generac',
-        quantity: 1,
-        minQuantity: 1,
-        price: 8000,
-        cost: 6000,
-        location: 'Warehouse A',
-        status: 'in-stock',
-        lastRestocked: '2024-06-01',
-        supplier: {
-          id: 'SUP001',
-          name: 'Generac Direct',
-          contact: {
-            name: 'John Smith',
-            email: 'john@generac.com',
-            phone: '555-0001',
-          },
-          address: '123 Generator St, Houston, TX',
-          items: [],
-          rating: 4.8,
-          terms: 'Net 30',
-          lastOrderDate: '2024-06-01',
-          totalOrders: 45,
-        },
-      },
-      {
-        id: 'EQ002',
-        name: 'Transfer Switch Kit',
-        category: 'part',
-        model: 'TS-200',
-        manufacturer: 'Generac',
-        quantity: 1,
-        minQuantity: 2,
-        price: 1200,
-        cost: 900,
-        location: 'Warehouse B',
-        status: 'in-stock',
-        lastRestocked: '2024-06-01',
-        supplier: {
-          id: 'SUP001',
-          name: 'Generac Direct',
-          contact: {
-            name: 'John Smith',
-            email: 'john@generac.com',
-            phone: '555-0001',
-          },
-          address: '123 Generator St, Houston, TX',
-          items: [],
-          rating: 4.8,
-          terms: 'Net 30',
-          lastOrderDate: '2024-06-01',
-          totalOrders: 45,
-        },
-      },
-    ],
-    notes: [
-      {
-        id: 'NOTE001',
-        projectId: '1',
-        author: 'Mike Johnson',
-        content: 'Customer requested additional surge protection',
-        timestamp: '2024-06-11T10:00:00Z',
-        type: 'customer',
-      },
-    ],
-    documents: [
-      {
-        id: 'DOC001',
-        name: 'Installation Quote.pdf',
-        type: 'contract',
-        url: '#',
-        uploadedBy: 'Mike Johnson',
-        uploadDate: '2024-06-10',
-        size: 1024,
-        tags: ['quote', 'installation'],
-      },
-    ],
-    permits: [
-      {
-        id: 'PERM001',
-        projectId: '1',
-        type: 'electrical',
-        status: 'approved',
-        submissionDate: '2024-06-01',
-        approvalDate: '2024-06-05',
-        expirationDate: '2024-12-05',
-        authority: 'City of Houston',
-        documents: [],
-        notes: ['Standard electrical permit for residential installation'],
-      },
-    ],
-    timeline: [
-      {
-        id: 'TIMELINE001',
-        projectId: '1',
-        type: 'milestone',
-        title: 'Project Started',
-        description: 'Initial site survey completed',
-        timestamp: '2024-06-10T09:00:00Z',
-        status: 'completed',
-      },
-      {
-        id: 'TIMELINE002',
-        projectId: '1',
-        type: 'milestone',
-        title: 'Equipment Delivered',
-        description: 'Generator and accessories arrived on site',
-        timestamp: '2024-06-11T14:00:00Z',
-        status: 'completed',
-      },
-    ],
-  },
-  {
-    id: '2',
-    title: 'Emergency Repair - Power Outage',
-    customerId: 'CUST002',
-    customerName: 'Robert Wilson',
-    status: 'pending',
-    type: 'repair',
-    progress: 0,
-    startDate: '2024-06-12',
-    dueDate: '2024-06-13',
-    budget: 3500,
-    cost: 0,
-    profit: 0,
-    assignedTechnicians: [
-      {
-        id: 'TECH003',
-        name: 'Alex Thompson',
-        email: 'alex@hougenpros.com',
-        phone: '555-0103',
-        role: 'lead',
-        specializations: ['Repair', 'Emergency'],
-        availability: 'available',
-        completedProjects: 112,
-        rating: 4.8,
-        certifications: [],
-      },
-    ],
-    equipmentUsed: [],
-    notes: [
-      {
-        id: 'NOTE002',
-        projectId: '2',
-        author: 'Alex Thompson',
-        content: 'Customer reported complete power loss',
-        timestamp: '2024-06-12T08:00:00Z',
-        type: 'technical',
-      },
-    ],
-    documents: [],
-    permits: [],
-    timeline: [
-      {
-        id: 'TIMELINE003',
-        projectId: '2',
-        type: 'milestone',
-        title: 'Emergency Reported',
-        description: 'Customer reported power outage',
-        timestamp: '2024-06-12T08:00:00Z',
-        status: 'pending',
-      },
-    ],
-  },
-  {
-    id: '3',
-    title: 'Annual Maintenance Check',
-    customerId: 'CUST003',
-    customerName: 'Emily Thompson',
-    status: 'completed',
-    type: 'maintenance',
-    progress: 100,
-    startDate: '2024-06-05',
-    dueDate: '2024-06-05',
-    budget: 1200,
-    cost: 950,
-    profit: 250,
-    assignedTechnicians: [
-      {
-        id: 'TECH004',
-        name: 'Chris Martinez',
-        email: 'chris@hougenpros.com',
-        phone: '555-0104',
-        role: 'lead',
-        specializations: ['Maintenance'],
-        availability: 'available',
-        completedProjects: 203,
-        rating: 4.9,
-        certifications: [],
-      },
-    ],
-    equipmentUsed: [],
-    notes: [
-      {
-        id: 'NOTE003',
-        projectId: '3',
-        author: 'Chris Martinez',
-        content: 'All systems functioning properly',
-        timestamp: '2024-06-05T15:00:00Z',
-        type: 'technical',
-      },
-    ],
-    documents: [
-      {
-        id: 'DOC002',
-        name: 'Maintenance Report.pdf',
-        type: 'manual',
-        url: '#',
-        uploadedBy: 'Chris Martinez',
-        uploadDate: '2024-06-05',
-        size: 2048,
-        tags: ['maintenance', 'report'],
-      },
-    ],
-    permits: [],
-    timeline: [
-      {
-        id: 'TIMELINE004',
-        projectId: '3',
-        type: 'milestone',
-        title: 'Maintenance Started',
-        description: 'Annual maintenance check initiated',
-        timestamp: '2024-06-05T09:00:00Z',
-        status: 'completed',
-      },
-      {
-        id: 'TIMELINE005',
-        projectId: '3',
-        type: 'milestone',
-        title: 'Maintenance Completed',
-        description: 'All systems checked and maintained',
-        timestamp: '2024-06-05T15:00:00Z',
-        status: 'completed',
-      },
-    ],
-  },
-];
+// Fix type and status enums for Ticket
+const allowedTypes = ['feature', 'support', 'bug', 'other'] as const;
+const allowedStatuses = ['open', 'in_progress', 'resolved', 'closed'] as const;
 
 const Projects = () => {
+  const queryClient = useQueryClient();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editProject, setEditProject] = useState<Ticket | null>(null);
+  const [selectedProject, setSelectedProject] = useState<Ticket | null>(null);
+  const [form, setForm] = useState<Omit<Ticket, 'id' | 'created_at' | 'updated_at'>>({
+    title: '',
+    description: '',
+    status: 'open',
+    priority: 'medium',
+    type: 'feature',
+    customer_id: '',
+    assigned_to: '',
+    due_date: null,
+    resolution: null,
+    metadata: null,
+  });
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-  const filteredProjects = projects.filter((project) => {
+  // Fetch projects (tickets)
+  const { data: projects = [], isLoading } = useQuery<Ticket[]>({ queryKey: ['projects'], queryFn: () => supabaseService.getTickets() });
+
+  // Add or update project
+  const mutation = useMutation({
+    mutationFn: async (project: Partial<Ticket>) => {
+      if (project.id) {
+        return supabaseService.updateTicket(project.id, project);
+      } else {
+        return supabaseService.createTicket(project as Omit<Ticket, 'id' | 'created_at' | 'updated_at'>);
+      }
+    },
+    onSuccess: () => {
+      toast({ title: 'Project saved!' });
+      setModalOpen(false);
+      setEditProject(null);
+      setForm({
+        title: '',
+        description: '',
+        status: 'open',
+        priority: 'medium',
+        type: 'feature',
+        customer_id: '',
+        assigned_to: '',
+        due_date: null,
+        resolution: null,
+        metadata: null,
+      });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+    },
+    onError: (error: any) => toast({ title: 'Error', description: error.message, variant: 'destructive' })
+  });
+
+  const filteredProjects = Array.isArray(projects) ? projects.filter((project) => {
     const matchesStatus = selectedStatus === 'all' || project.status === selectedStatus;
     const matchesType = selectedType === 'all' || project.type === selectedType;
-    const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.customerName.toLowerCase().includes(searchQuery.toLowerCase());
-    
+    const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesStatus && matchesType && matchesSearch;
-  });
+  }) : [];
 
   // Calculate project statistics
   const stats = {
-    total: projects.length,
-    inProgress: projects.filter(p => p.status === 'in-progress').length,
-    completed: projects.filter(p => p.status === 'completed').length,
-    pending: projects.filter(p => p.status === 'pending').length,
-    totalRevenue: projects.reduce((sum, p) => sum + p.budget, 0),
-    totalProfit: projects.reduce((sum, p) => sum + p.profit, 0),
+    total: filteredProjects.length,
+    inProgress: filteredProjects.filter(p => p.status === 'in_progress').length,
+    completed: filteredProjects.filter(p => p.status === 'resolved').length,
+    pending: filteredProjects.filter(p => p.status === 'open').length,
   };
 
   return (
@@ -576,15 +344,13 @@ const Projects = () => {
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
+                      <Button variant="ghost" className="h-8 w-8 p-0" onClick={() => setSelectedProject(project)}>
                         <MoreVerticalIcon className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem onClick={() => setSelectedProject(project)}>
-                        View Details
-                      </DropdownMenuItem>
+                      <DropdownMenuItem>View Details</DropdownMenuItem>
                       <DropdownMenuItem>Edit Project</DropdownMenuItem>
                       <DropdownMenuItem>Update Progress</DropdownMenuItem>
                       <DropdownMenuSeparator />

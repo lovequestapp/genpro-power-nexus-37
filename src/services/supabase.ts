@@ -232,5 +232,136 @@ export const supabaseService = {
       console.error('Error fetching staff:', error);
       throw error;
     }
-  }
+  },
+
+  // Project management methods
+  async getProjects(filters?: { status?: string; search?: string }) {
+    let query = supabase.from('projects').select('*').order('created_at', { ascending: false });
+    if (filters?.status) query = query.eq('status', filters.status);
+    if (filters?.search) query = query.ilike('name', `%${filters.search}%`);
+    const { data, error } = await query;
+    if (error) throw error;
+    return data;
+  },
+
+  async getProject(id: string) {
+    const { data, error } = await supabase.from('projects').select('*').eq('id', id).single();
+    if (error) throw error;
+    return data;
+  },
+
+  async createProject(project: any) {
+    const { data, error } = await supabase.from('projects').insert(project).select().single();
+    if (error) throw error;
+    return data;
+  },
+
+  async updateProject(id: string, updates: any) {
+    const { data, error } = await supabase.from('projects').update(updates).eq('id', id).select().single();
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteProject(id: string) {
+    const { error } = await supabase.from('projects').delete().eq('id', id);
+    if (error) throw error;
+    return true;
+  },
+
+  async getProjectNotes(projectId: string) {
+    const { data, error } = await supabase
+      .from('project_notes')
+      .select('*')
+      .eq('project_id', projectId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data;
+  },
+
+  async createProjectNote(projectId: string, note: { content: string; type: string }) {
+    const user = await supabase.auth.getUser();
+    const { data, error } = await supabase
+      .from('project_notes')
+      .insert({
+        project_id: projectId,
+        content: note.content,
+        type: note.type,
+        is_internal: true,
+        author_id: user.data.user?.id || null,
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async getProjectComments(projectId: string) {
+    const { data, error } = await supabase
+      .from('project_comments')
+      .select('*')
+      .eq('project_id', projectId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data;
+  },
+
+  async createProjectComment(projectId: string, comment: { content: string }) {
+    const user = await supabase.auth.getUser();
+    const { data, error } = await supabase
+      .from('project_comments')
+      .insert({
+        project_id: projectId,
+        content: comment.content,
+        is_internal: true,
+        author_id: user.data.user?.id || null,
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async getProjectAttachments(projectId: string) {
+    const { data, error } = await supabase
+      .from('project_attachments')
+      .select('*')
+      .eq('project_id', projectId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data;
+  },
+
+  async uploadProjectAttachment(file: File, projectId: string) {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random()}.${fileExt}`;
+    const filePath = `project-attachments/${projectId}/${fileName}`;
+    const { error: uploadError } = await supabase.storage
+      .from('attachments')
+      .upload(filePath, file);
+    if (uploadError) throw uploadError;
+    const { data: { publicUrl } } = supabase.storage
+      .from('attachments')
+      .getPublicUrl(filePath);
+    const user = await supabase.auth.getUser();
+    const { data, error } = await supabase
+      .from('project_attachments')
+      .insert({
+        project_id: projectId,
+        file_name: file.name,
+        file_type: file.type,
+        file_size: file.size,
+        url: publicUrl,
+        uploaded_by: user.data.user?.id || null,
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteProjectAttachment(attachmentId: string) {
+    const { error } = await supabase.from('project_attachments').delete().eq('id', attachmentId);
+    if (error) throw error;
+    return true;
+  },
 }; 
