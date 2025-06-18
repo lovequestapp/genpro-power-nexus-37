@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -148,7 +149,7 @@ function generateNotifications(ticket: Service): Notification[] {
   const notifications: Notification[] = [];
 
   // Add status change notification
-  if (ticket.status !== 'pending') {
+  if (ticket.status !== 'open') {
     notifications.push({
       id: '1',
       type: 'status_change',

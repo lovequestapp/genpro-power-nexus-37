@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,11 +26,7 @@ export function TicketComments({ ticket, onCommentAdded, currentUser }: TicketCo
 
     try {
       setLoading(true);
-      await supportService.addComment(ticket.id, {
-        author: currentUser,
-        message: newComment,
-        attachments,
-      });
+      await supportService.addComment(ticket.id, newComment);
       setNewComment('');
       setAttachments([]);
       onCommentAdded();
@@ -87,7 +84,7 @@ export function TicketComments({ ticket, onCommentAdded, currentUser }: TicketCo
                 </p>
               </div>
             </div>
-            <p className="mt-2 whitespace-pre-wrap">{comment.message}</p>
+            <p className="mt-2 whitespace-pre-wrap">{comment.content || comment.message}</p>
             
             {comment.attachments && comment.attachments.length > 0 && (
               <div className="mt-3 space-y-2">

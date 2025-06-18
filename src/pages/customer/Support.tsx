@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -27,10 +28,14 @@ export default function CustomerSupport() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    subject: string;
+    description: string;
+    priority: 'low' | 'medium' | 'high';
+  }>({
     subject: '',
     description: '',
-    priority: 'medium' as const,
+    priority: 'medium',
   });
 
   const { data: tickets, isLoading } = useQuery({
