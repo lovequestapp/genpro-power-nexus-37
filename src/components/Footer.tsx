@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { Phone, Mail, MapPin, Clock, Facebook, Instagram, Youtube, Award, Shield, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -133,7 +134,7 @@ const Footer = () => {
               {[
                 {
                   icon: Phone,
-                  title: "(832) 555-POWER",
+                  title: "(915) 800-7767",
                   subtitle: "24/7 Emergency Line",
                   primary: true
                 },

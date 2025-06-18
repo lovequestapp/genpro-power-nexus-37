@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Phone, MessageSquare } from 'lucide-react';
@@ -66,7 +67,7 @@ const Header = () => {
               className="border-steel-300 text-steel-700 hover:bg-steel-50 hover:border-steel-400 transition-all duration-500 font-medium bg-white hover:scale-105 transform"
             >
               <Phone className="w-4 h-4 mr-2" />
-              <span className="hidden xl:inline">(832) 555-POWER</span>
+              <span className="hidden xl:inline">(915) 800-7767</span>
               <span className="xl:hidden">Call</span>
             </Button>
             <Button 
@@ -118,7 +119,7 @@ const Header = () => {
                   className="justify-center border-steel-300 text-steel-700 hover:bg-steel-50 font-medium touch-manipulation h-12 sm:h-auto bg-white hover:scale-105 transform transition-all duration-500"
                 >
                   <Phone className="w-5 h-5 mr-2" />
-                  (832) 555-POWER
+                  (915) 800-7767
                 </Button>
                 <Button 
                   size="lg"

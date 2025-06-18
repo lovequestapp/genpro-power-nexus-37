@@ -57,17 +57,17 @@ const Emergency = () => {
   }];
   const emergencyContacts = [{
     title: 'Primary Emergency Line',
-    number: '(832) 555-POWER',
+    number: '(915) 800-7767',
     description: '24/7 emergency dispatch',
     priority: 'high'
   }, {
     title: 'Storm Preparation Hotline',
-    number: '(832) 555-STORM',
+    number: '(915) 800-7767',
     description: 'Hurricane & severe weather prep',
     priority: 'medium'
   }, {
     title: 'Fuel Emergency Line',
-    number: '(832) 555-FUEL',
+    number: '(915) 800-7767',
     description: 'Emergency fuel delivery',
     priority: 'medium'
   }];
@@ -130,7 +130,7 @@ const Emergency = () => {
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-12 py-6 text-xl">
                 <Phone className="w-6 h-6 mr-3" />
-                EMERGENCY: (832) 555-POWER
+                EMERGENCY: (915) 800-7767
               </Button>
               <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-6 text-slate-950">
                 <Clock className="w-5 h-5 mr-2" />
@@ -294,7 +294,7 @@ const Emergency = () => {
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-12 py-6 text-xl">
                 <Phone className="w-6 h-6 mr-3" />
-                CALL NOW: (832) 555-POWER
+                CALL NOW: (915) 800-7767
               </Button>
               <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-6 text-steel-800">
                 <MessageSquare className="w-5 h-5 mr-2" />
@@ -317,7 +317,7 @@ const Emergency = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white">
               <Phone className="w-5 h-5 mr-2" />
-              Emergency: (832) 555-POWER
+              Emergency: (915) 800-7767
             </Button>
             <Button size="lg" variant="outline" className="border-white hover:bg-white px-8 py-6 text-steel-800">
               <Calendar className="w-5 h-5 mr-2" />
