@@ -29,9 +29,13 @@ const QualityGuarantee = () => {
     hidden: { pathLength: 0, opacity: 0 },
     visible: { 
       pathLength: 1, 
-      opacity: 1, 
-      transition: { duration: 1, ease: "easeInOut" } 
-    },
+      opacity: 1
+    }
+  };
+
+  const pathTransition = { 
+    duration: 1, 
+    ease: [0.4, 0.0, 0.2, 1] as const
   };
 
   const powerPulse: { animate: TargetAndTransition; transition: Transition } = {
@@ -41,7 +45,7 @@ const QualityGuarantee = () => {
     },
     transition: {
       duration: 1.5,
-      ease: "easeInOut",
+      ease: [0.4, 0.0, 0.6, 1] as const,
       repeat: Infinity,
       repeatType: "loop" as const
     }
@@ -55,7 +59,7 @@ const QualityGuarantee = () => {
       transition: {
         duration: 0.8,
         repeat: Infinity,
-        ease: "easeInOut",
+        ease: [0.4, 0.0, 0.6, 1] as const,
         repeatType: "loop" as const
       }
     }
@@ -75,7 +79,7 @@ const QualityGuarantee = () => {
           transition={{
             duration: 8,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: [0.4, 0.0, 0.6, 1] as const
           }}
         />
         <motion.div
@@ -87,7 +91,7 @@ const QualityGuarantee = () => {
           transition={{
             duration: 8,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: [0.4, 0.0, 0.6, 1] as const,
             delay: 1
           }}
         />
@@ -140,6 +144,7 @@ const QualityGuarantee = () => {
               variants={pathVariants}
               initial="visible"
               animate={isHovered ? "hidden" : "visible"}
+              transition={pathTransition}
             />
 
             {/* Generator */}
@@ -219,6 +224,7 @@ const QualityGuarantee = () => {
               variants={pathVariants}
               initial="hidden"
               animate={isHovered ? "visible" : "hidden"}
+              transition={pathTransition}
             />
             {isHovered && (
               <motion.path 
