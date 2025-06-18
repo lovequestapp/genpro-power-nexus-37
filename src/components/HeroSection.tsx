@@ -39,7 +39,7 @@ const HeroSection = () => {
 
           {/* Enhanced CTAs */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-12 sm:mb-20 animate-fade-in px-4 sm:px-0" style={{ animationDelay: '0.4s' }}>
-            <Link to="/get-quote" className="w-full sm:w-auto">
+            <Link to="/free-estimate" className="w-full sm:w-auto">
               <Button 
                 size="lg" 
                 className="accent-gradient text-white px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg font-semibold shadow-premium hover:shadow-glow transition-all duration-300 hover-lift w-full sm:w-auto touch-manipulation hover:scale-105"

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Phone, MessageSquare } from 'lucide-react';
@@ -69,14 +70,12 @@ const Header = () => {
               <span className="hidden xl:inline">(915) 800-7767</span>
               <span className="xl:hidden">Call</span>
             </Button>
-            <Link to="/get-quote">
-              <Button 
-                className="accent-gradient text-white hover:shadow-glow transition-all duration-500 font-semibold px-4 xl:px-6 hover:scale-105 transform"
-              >
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Get Quote
-              </Button>
-            </Link>
+            <Button 
+              className="accent-gradient text-white hover:shadow-glow transition-all duration-500 font-semibold px-4 xl:px-6 hover:scale-105 transform"
+            >
+              <MessageSquare className="w-4 h-4 mr-2" />
+              Get Quote
+            </Button>
           </div>
 
           {/* Enhanced Mobile Menu Button */}
@@ -122,15 +121,13 @@ const Header = () => {
                   <Phone className="w-5 h-5 mr-2" />
                   (915) 800-7767
                 </Button>
-                <Link to="/get-quote" onClick={toggleMobileMenu}>
-                  <Button 
-                    size="lg"
-                    className="accent-gradient text-white justify-center font-semibold shadow-lg touch-manipulation h-12 sm:h-auto hover:scale-105 transform transition-all duration-500 w-full"
-                  >
-                    <MessageSquare className="w-5 h-5 mr-2" />
-                    Get Free Quote
-                  </Button>
-                </Link>
+                <Button 
+                  size="lg"
+                  className="accent-gradient text-white justify-center font-semibold shadow-lg touch-manipulation h-12 sm:h-auto hover:scale-105 transform transition-all duration-500"
+                >
+                  <MessageSquare className="w-5 h-5 mr-2" />
+                  Get Free Quote
+                </Button>
               </div>
             </nav>
           </div>
