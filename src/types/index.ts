@@ -1,3 +1,4 @@
+
 export interface GeneratorReading {
   id: string;
   timestamp: string;
@@ -41,9 +42,9 @@ export interface Customer {
 
 export interface ServiceComment {
   id: string;
-  text: string;
+  message: string;
   author: string;
-  timestamp: string;
+  date: string;
 }
 
 export interface ServiceAttachment {
@@ -66,8 +67,9 @@ export interface Service {
   assignedTo?: string;
   createdAt: string;
   updatedAt: string;
-  comments: ServiceComment[];
-  attachments: ServiceAttachment[];
+  date: string;
+  comments?: ServiceComment[];
+  attachments?: ServiceAttachment[];
 }
 
 export interface BillItem {
@@ -115,4 +117,4 @@ export interface ApiResponse<T> {
   success: boolean;
   data: T;
   message: string;
-} 
+}

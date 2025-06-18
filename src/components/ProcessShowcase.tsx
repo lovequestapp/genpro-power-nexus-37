@@ -159,7 +159,7 @@ const featureIcons = [
 ];
 
 // Helper to get point on SVG path at t (0-1)
-function getPointOnPath(path, t) {
+function getPointOnPath(path: string, t: number) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   const tempPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   tempPath.setAttribute('d', path);
@@ -171,7 +171,7 @@ function getPointOnPath(path, t) {
   return pt;
 }
 
-const AnimatedBackground = ({ mouse }) => (
+const AnimatedBackground = ({ mouse }: { mouse: { x: number; y: number } }) => (
   <div className="absolute inset-0 -z-10 overflow-hidden">
     {/* Energy grid */}
     <svg className="absolute inset-0 w-full h-full" style={{ pointerEvents: 'none' }}>
@@ -207,9 +207,9 @@ const AnimatedBackground = ({ mouse }) => (
 // Throttled mouse movement
 const useThrottledMouse = () => {
   const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 });
-  const frame = useRef();
+  const frame = useRef<number | null>(null);
   useEffect(() => {
-    const handle = (e) => {
+    const handle = (e: MouseEvent) => {
       if (frame.current) return;
       frame.current = requestAnimationFrame(() => {
         setMouse({

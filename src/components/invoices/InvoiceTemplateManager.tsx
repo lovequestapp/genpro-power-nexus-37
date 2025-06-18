@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -17,7 +18,6 @@ import {
   Tab,
   Alert
 } from '@mui/material';
-import type { GridProps } from '@mui/material/Grid';
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -428,4 +428,4 @@ export const InvoiceTemplateManager: React.FC = () => {
       </Dialog>
     </Box>
   );
-}; 
+};

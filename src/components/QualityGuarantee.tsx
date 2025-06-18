@@ -30,7 +30,7 @@ const QualityGuarantee = () => {
     visible: { 
       pathLength: 1, 
       opacity: 1, 
-      transition: { duration: 1, ease: [0.4, 0, 0.2, 1] } 
+      transition: { duration: 1, ease: "easeInOut" } 
     },
   };
 
@@ -41,7 +41,7 @@ const QualityGuarantee = () => {
     },
     transition: {
       duration: 1.5,
-      ease: [0.4, 0, 0.6, 1] as const,
+      ease: "easeInOut",
       repeat: Infinity,
       repeatType: "loop" as const
     }
@@ -55,7 +55,7 @@ const QualityGuarantee = () => {
       transition: {
         duration: 0.8,
         repeat: Infinity,
-        ease: [0.4, 0, 0.6, 1] as const,
+        ease: "easeInOut",
         repeatType: "loop" as const
       }
     }
@@ -65,7 +65,7 @@ const QualityGuarantee = () => {
     <section className="relative py-24 overflow-hidden bg-gradient-to-br from-steel-900 via-primary to-steel-800">
       {/* Animated background elements */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZ2c+PC9zdmc+')] opacity-20"></div>
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L3N2Zz4=')] opacity-20"></div>
         <motion.div
           className="absolute top-0 left-0 w-96 h-96 bg-orange-600/10 rounded-full blur-3xl"
           animate={{
