@@ -565,36 +565,139 @@ export const supabaseService = {
 
   // Project management methods
   async getProjects(filters?: { status?: string; search?: string }) {
-    let query = supabase.from('projects').select('*').order('created_at', { ascending: false });
-    if (filters?.status) query = query.eq('status', filters.status);
-    if (filters?.search) query = query.ilike('name', `%${filters.search}%`);
-    const { data, error } = await query;
-    if (error) throw error;
-    return data;
+    try {
+      console.log('Getting projects with filters:', filters);
+      let query = supabase
+        .from('projects')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (filters?.status && filters.status !== 'all') {
+        query = query.eq('status', filters.status);
+      }
+      
+      if (filters?.search) {
+        query = query.or(`name.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
+      }
+      
+      const { data, error } = await query;
+      if (error) {
+        console.error('Error in getProjects:', error);
+        throw error;
+      }
+      console.log('Projects fetched successfully:', data?.length || 0);
+      return data;
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      throw error;
+    }
   },
 
   async getProject(id: string) {
-    const { data, error } = await supabase.from('projects').select('*').eq('id', id).single();
-    if (error) throw error;
-    return data;
+    try {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching project:', error);
+        throw error;
+      }
+      return data;
+    } catch (error) {
+      console.error('Error fetching project:', error);
+      throw error;
+    }
   },
 
-  async createProject(project: any) {
-    const { data, error } = await supabase.from('projects').insert(project).select().single();
-    if (error) throw error;
-    return data;
+  async createProject(project: {
+    name: string;
+    description?: string | null;
+    status?: 'in_progress' | 'completed' | 'cancelled' | 'archived';
+    start_date?: string | null;
+    end_date?: string | null;
+    budget?: number | null;
+  }) {
+    try {
+      console.log('Creating project with data:', project);
+      
+      const projectData = {
+        name: project.name,
+        description: project.description || null,
+        status: project.status || 'in_progress',
+        start_date: project.start_date || null,
+        end_date: project.end_date || null,
+        budget: project.budget || null,
+      };
+
+      const { data, error } = await supabase
+        .from('projects')
+        .insert(projectData)
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error in createProject:', error);
+        throw error;
+      }
+      console.log('Project created successfully:', data);
+      return data;
+    } catch (error) {
+      console.error('Error creating project:', error);
+      throw error;
+    }
   },
 
-  async updateProject(id: string, updates: any) {
-    const { data, error } = await supabase.from('projects').update(updates).eq('id', id).select().single();
-    if (error) throw error;
-    return data;
+  async updateProject(id: string, updates: {
+    name?: string;
+    description?: string | null;
+    status?: 'in_progress' | 'completed' | 'cancelled' | 'archived';
+    start_date?: string | null;
+    end_date?: string | null;
+    budget?: number | null;
+  }) {
+    try {
+      console.log('Updating project:', id, 'with data:', updates);
+      
+      const { data, error } = await supabase
+        .from('projects')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error in updateProject:', error);
+        throw error;
+      }
+      console.log('Project updated successfully:', data);
+      return data;
+    } catch (error) {
+      console.error('Error updating project:', error);
+      throw error;
+    }
   },
 
   async deleteProject(id: string) {
-    const { error } = await supabase.from('projects').delete().eq('id', id);
-    if (error) throw error;
-    return true;
+    try {
+      console.log('Deleting project:', id);
+      const { error } = await supabase
+        .from('projects')
+        .delete()
+        .eq('id', id);
+      
+      if (error) {
+        console.error('Error in deleteProject:', error);
+        throw error;
+      }
+      console.log('Project deleted successfully');
+      return true;
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      throw error;
+    }
   },
 
   async getProjectNotes(projectId: string) {

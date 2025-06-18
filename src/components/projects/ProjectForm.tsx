@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
-import { supabaseService } from '@/services/supabase';
+import { supabase } from '@/lib/supabase';
 import type { Project } from '@/lib/supabase';
 
 interface ProjectFormProps {
@@ -41,29 +41,82 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!formData.name.trim()) {
-      toast({ title: 'Error', description: 'Project name is required', variant: 'destructive' });
+      toast({ 
+        title: 'Error', 
+        description: 'Project name is required', 
+        variant: 'destructive' 
+      });
       return;
     }
 
     setLoading(true);
+    
     try {
+      // Get the current authenticated user
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError || !user) {
+        console.error('Authentication error:', authError);
+        toast({
+          title: 'Authentication Error',
+          description: 'You must be logged in to create projects',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      console.log('Authenticated user:', user.id);
+
       const projectData = {
         name: formData.name.trim(),
-        description: formData.description.trim(),
+        description: formData.description.trim() || null,
         status: formData.status,
-        owner_id: 'temp-user-id', // This should come from auth context
         start_date: formData.start_date || null,
         end_date: formData.end_date || null,
         budget: formData.budget ? Number(formData.budget) : null,
       };
 
+      console.log('Project data to save:', projectData);
+
       if (project) {
-        await supabaseService.updateProject(project.id, projectData);
-        toast({ title: 'Success', description: 'Project updated successfully' });
+        // Update existing project
+        const { data, error } = await supabase
+          .from('projects')
+          .update(projectData)
+          .eq('id', project.id)
+          .select()
+          .single();
+
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
+        
+        console.log('Project updated successfully:', data);
+        toast({ 
+          title: 'Success', 
+          description: 'Project updated successfully' 
+        });
       } else {
-        await supabaseService.createProject(projectData);
-        toast({ title: 'Success', description: 'Project created successfully' });
+        // Create new project - we don't need owner_id since it's not in the current schema
+        const { data, error } = await supabase
+          .from('projects')
+          .insert(projectData)
+          .select()
+          .single();
+
+        if (error) {
+          console.error('Create error:', error);
+          throw error;
+        }
+        
+        console.log('Project created successfully:', data);
+        toast({ 
+          title: 'Success', 
+          description: 'Project created successfully' 
+        });
       }
       
       onSuccess();
@@ -71,7 +124,7 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
       console.error('Error saving project:', error);
       toast({
         title: 'Error',
-        description: error.message || 'Failed to save project',
+        description: error.message || 'Failed to save project. Please try again.',
         variant: 'destructive'
       });
     } finally {
@@ -93,6 +146,7 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
             placeholder="Enter project name"
             required
             className="mt-1"
+            disabled={loading}
           />
         </div>
 
@@ -107,6 +161,7 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
             placeholder="Enter project description"
             rows={3}
             className="mt-1"
+            disabled={loading}
           />
         </div>
 
@@ -114,7 +169,11 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
           <Label htmlFor="status" className="text-sm font-medium">
             Status
           </Label>
-          <Select value={formData.status} onValueChange={(value) => handleChange('status', value)}>
+          <Select 
+            value={formData.status} 
+            onValueChange={(value) => handleChange('status', value)}
+            disabled={loading}
+          >
             <SelectTrigger className="mt-1">
               <SelectValue />
             </SelectTrigger>
@@ -138,6 +197,7 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
               value={formData.start_date}
               onChange={(e) => handleChange('start_date', e.target.value)}
               className="mt-1"
+              disabled={loading}
             />
           </div>
           <div>
@@ -150,31 +210,43 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
               value={formData.end_date}
               onChange={(e) => handleChange('end_date', e.target.value)}
               className="mt-1"
+              disabled={loading}
             />
           </div>
         </div>
 
         <div>
           <Label htmlFor="budget" className="text-sm font-medium">
-            Budget
+            Budget ($)
           </Label>
           <Input
             id="budget"
             type="number"
             step="0.01"
+            min="0"
             value={formData.budget}
             onChange={(e) => handleChange('budget', e.target.value)}
             placeholder="0.00"
             className="mt-1"
+            disabled={loading}
           />
         </div>
       </div>
 
       <div className="flex justify-end gap-3 pt-4 border-t">
-        <Button type="button" variant="outline" onClick={onCancel}>
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={onCancel}
+          disabled={loading}
+        >
           Cancel
         </Button>
-        <Button type="submit" disabled={loading} className="bg-orange-600 hover:bg-orange-700">
+        <Button 
+          type="submit" 
+          disabled={loading} 
+          className="bg-orange-600 hover:bg-orange-700"
+        >
           {loading ? 'Saving...' : project ? 'Update Project' : 'Create Project'}
         </Button>
       </div>
