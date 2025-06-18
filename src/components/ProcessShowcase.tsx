@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import {
@@ -249,4 +250,135 @@ interface PortalCircle {
 const MatrixGlyphs: React.FC<MouseProps> = React.memo(({ mouse }) => {
   const columns = 16; // reduced for perf
   const rows = 8;
-  const glyphs = '01⎇⎈⎊⎋⎌⎍⎎⎏⎐⎑
+  const glyphs = '01⎇⎈⎊⎋⎌⎍⎎⎏⎐⎑⎒⎓⎔⎕⎖⎗⎘⎙⎚⎛⎜⎝⎞⎟⎠⎡⎢⎣⎤⎥⎦⎧⎨⎩⎪⎫⎬⎭⎮⎯⎰⎱⎲⎳⎴⎵⎶⎷⎸⎹⎺⎻⎼⎽⎾⎿⏀⏁⏂⏃⏄⏅⏆⏇⏈⏉⏊⏋⏌⏍⏎⏏⏐⏑⏒⏓⏔⏕⏖⏗⏘⏙⏚⏛⏜⏝⏞⏟⏠⏡⏢⏣⏤⏥⏦⏧⏨⏩⏪⏫⏬⏭⏮⏯⏰⏱⏲⏳⏴⏵⏶⏷⏸⏹⏺⏻⏼⏽⏾⏿';
+  
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
+      {[...Array(columns)].map((_, col) => (
+        <div
+          key={col}
+          className="absolute text-orange-500 font-mono text-sm"
+          style={{
+            left: `${(col / columns) * 100}%`,
+            transform: `translateX(${(mouse.x - 0.5) * 20}px)`
+          }}
+        >
+          {[...Array(rows)].map((_, row) => (
+            <motion.span
+              key={row}
+              className="block h-6"
+              animate={{
+                opacity: [0, 1, 0],
+                y: [0, 400]
+              }}
+              transition={{
+                duration: 3 + Math.random() * 2,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+                ease: 'linear'
+              }}
+            >
+              {glyphs[Math.floor(Math.random() * glyphs.length)]}
+            </motion.span>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+});
+
+MatrixGlyphs.displayName = 'MatrixGlyphs';
+
+const ProcessShowcase = () => {
+  const mouse = useThrottledMouse();
+  const [activeStep, setActiveStep] = useState(0);
+  const [formData, setFormData] = useState({});
+
+  return (
+    <section className="relative min-h-screen bg-gradient-to-br from-steel-900 via-primary to-steel-800 py-20 overflow-hidden">
+      <AnimatedBackground mouse={mouse} />
+      <MatrixGlyphs mouse={mouse} />
+      
+      <div className="container mx-auto px-4 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg mb-6">
+            Our Process
+          </h2>
+          <p className="text-xl text-white/90 max-w-3xl mx-auto">
+            From initial assessment to final installation, we guide you through every step
+          </p>
+        </motion.div>
+
+        <div className="max-w-6xl mx-auto">
+          {/* Process Steps */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            {processSteps.map((step, index) => (
+              <motion.div
+                key={step.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className={`relative p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 
+                  cursor-pointer transition-all duration-300 hover:scale-105 hover:bg-white/15
+                  ${activeStep === index ? 'ring-2 ring-orange-500' : ''}`}
+                onClick={() => setActiveStep(index)}
+              >
+                <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${step.color} 
+                  flex items-center justify-center mb-4`}>
+                  <step.icon className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">{step.title}</h3>
+                <p className="text-white/80 mb-4">{step.description}</p>
+                
+                {/* Features */}
+                <div className="space-y-2">
+                  {step.features.map((feature, featureIndex) => (
+                    <div key={featureIndex} className="flex items-center text-white/70">
+                      <feature.icon className="w-4 h-4 mr-2 text-orange-400" />
+                      <span className="text-sm">{feature.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Why Choose Us */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-center"
+          >
+            <h3 className="text-2xl font-bold text-white mb-8">Why Choose Us?</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {whyChoose.map((item, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="flex flex-col items-center p-4 rounded-xl bg-white/10 backdrop-blur-sm"
+                >
+                  {item.icon}
+                  <span className="text-white text-sm mt-2 text-center">{item.label}</span>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default ProcessShowcase;
