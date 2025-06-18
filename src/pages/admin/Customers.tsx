@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabaseService } from '@/services/supabase';
@@ -13,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from '@/components/ui/use-toast';
 import { Edit, Trash, Plus, Search, Filter, Download, Mail, Phone, Building, Calendar, DollarSign, FileText } from 'lucide-react';
 import { format } from 'date-fns';
+import type { Customer } from '@/lib/supabase';
 
 // Customer type based on the database schema
 interface Customer {
@@ -33,7 +33,17 @@ interface Customer {
   project_history: any[];
 }
 
-type CustomerFormData = Omit<Customer, 'id' | 'created_at' | 'updated_at' | 'last_contact' | 'total_spent' | 'project_history'>;
+type CustomerFormData = {
+  name: string;
+  email: string;
+  phone?: string | null;
+  address?: string | null;
+  company?: string | null;
+  status: 'active' | 'inactive';
+  type: 'residential' | 'commercial';
+  service_level: 'basic' | 'premium' | 'enterprise';
+  notes?: string | null;
+};
 
 export default function CustomersPage() {
   const queryClient = useQueryClient();
@@ -236,16 +246,16 @@ export default function CustomersPage() {
                       <label className="text-sm font-medium">Phone</label>
                       <Input 
                         placeholder="(555) 123-4567" 
-                        value={form.phone} 
-                        onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} 
+                        value={form.phone || ''} 
+                        onChange={e => setForm(f => ({ ...f, phone: e.target.value || null }))} 
                       />
                     </div>
                     <div>
                       <label className="text-sm font-medium">Address</label>
                       <Textarea 
                         placeholder="Full Address" 
-                        value={form.address} 
-                        onChange={e => setForm(f => ({ ...f, address: e.target.value }))} 
+                        value={form.address || ''} 
+                        onChange={e => setForm(f => ({ ...f, address: e.target.value || null }))} 
                         rows={2}
                       />
                     </div>
@@ -255,8 +265,8 @@ export default function CustomersPage() {
                       <label className="text-sm font-medium">Company</label>
                       <Input 
                         placeholder="Company Name" 
-                        value={form.company} 
-                        onChange={e => setForm(f => ({ ...f, company: e.target.value }))} 
+                        value={form.company || ''} 
+                        onChange={e => setForm(f => ({ ...f, company: e.target.value || null }))} 
                       />
                     </div>
                     <div>
@@ -299,8 +309,8 @@ export default function CustomersPage() {
                   <label className="text-sm font-medium">Notes</label>
                   <Textarea 
                     placeholder="Additional notes about this customer..." 
-                    value={form.notes} 
-                    onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} 
+                    value={form.notes || ''} 
+                    onChange={e => setForm(f => ({ ...f, notes: e.target.value || null }))} 
                     rows={3}
                   />
                 </div>

@@ -1,4 +1,5 @@
 
+
 import { createClient } from '@supabase/supabase-js';
 
 // Use the Supabase project configuration directly
@@ -274,3 +275,4 @@ export type Notification = Database['public']['Tables']['notifications']['Row'];
 export type Generator = Database['public']['Tables']['generators']['Row'];
 export type Project = Database['public']['Tables']['projects']['Row'];
 export type Customer = Database['public']['Tables']['customers']['Row'];
+
