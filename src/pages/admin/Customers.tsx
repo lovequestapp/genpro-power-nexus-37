@@ -23,7 +23,6 @@ type CustomerFormData = {
   company?: string | null;
   status: 'active' | 'inactive';
   type: 'residential' | 'commercial';
-  service_level: 'basic' | 'premium' | 'enterprise';
   notes?: string | null;
 };
 
@@ -41,16 +40,23 @@ export default function CustomersPage() {
     company: '',
     status: 'active',
     type: 'residential',
-    service_level: 'basic',
     notes: ''
   });
 
   // Fetch customers with proper filtering
-  const { data: customers, isLoading } = useQuery({
+  const { data: customers, isLoading, error } = useQuery({
     queryKey: ['customers', search, activeTab],
     queryFn: async () => {
       console.log('Fetching customers with search:', search, 'tab:', activeTab);
       return await supabaseService.getCustomers({ search, status: activeTab });
+    },
+    onError: (error: any) => {
+      console.error('Error fetching customers:', error);
+      toast({
+        title: 'Error fetching customers',
+        description: error.message || 'Failed to load customers. Please try again.',
+        variant: 'destructive'
+      });
     }
   });
 
@@ -64,7 +70,7 @@ export default function CustomersPage() {
         const { id, ...updateData } = customerData;
         return await supabaseService.updateCustomer(id, updateData);
       } else {
-        // Create new customer
+        // Create new customer - remove id from data
         const { id, ...createData } = customerData;
         return await supabaseService.createCustomer(createData);
       }
@@ -122,7 +128,6 @@ export default function CustomersPage() {
       company: '',
       status: 'active',
       type: 'residential',
-      service_level: 'basic',
       notes: ''
     });
   };
@@ -138,7 +143,6 @@ export default function CustomersPage() {
       company: customer.company || '',
       status: customer.status,
       type: customer.type,
-      service_level: customer.service_level,
       notes: customer.notes || ''
     });
     setModalOpen(true);
@@ -179,6 +183,21 @@ export default function CustomersPage() {
     }
     return true;
   }) || [];
+
+  // Show error state if there's an error
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="text-center py-8">
+          <h2 className="text-2xl font-bold text-red-600 mb-2">Error Loading Customers</h2>
+          <p className="text-gray-600 mb-4">There was a problem loading the customer data.</p>
+          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['customers'] })}>
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -263,18 +282,6 @@ export default function CustomersPage() {
                       </select>
                     </div>
                     <div>
-                      <label className="text-sm font-medium">Service Level</label>
-                      <select 
-                        className="w-full p-2 border rounded-md bg-white"
-                        value={form.service_level}
-                        onChange={e => setForm(f => ({ ...f, service_level: e.target.value as 'basic' | 'premium' | 'enterprise' }))}
-                      >
-                        <option value="basic">Basic</option>
-                        <option value="premium">Premium</option>
-                        <option value="enterprise">Enterprise</option>
-                      </select>
-                    </div>
-                    <div>
                       <label className="text-sm font-medium">Status</label>
                       <select 
                         className="w-full p-2 border rounded-md bg-white"
@@ -338,7 +345,6 @@ export default function CustomersPage() {
                   <TableHead>Customer</TableHead>
                   <TableHead>Contact</TableHead>
                   <TableHead>Type</TableHead>
-                  <TableHead>Service Level</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -346,7 +352,7 @@ export default function CustomersPage() {
               </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  <TableRow><TableCell colSpan={7} className="text-center py-8">Loading customers...</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={6} className="text-center py-8">Loading customers...</TableCell></TableRow>
                 ) : filteredCustomers.length ? filteredCustomers.map(customer => (
                   <TableRow key={customer.id}>
                     <TableCell>
@@ -375,15 +381,6 @@ export default function CustomersPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className={
-                        customer.service_level === 'enterprise' ? 'border-purple-500 text-purple-500' :
-                        customer.service_level === 'premium' ? 'border-blue-500 text-blue-500' :
-                        'border-gray-500 text-gray-500'
-                      }>
-                        {customer.service_level}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
                       <Badge variant={customer.status === 'active' ? 'default' : 'destructive'}>
                         {customer.status}
                       </Badge>
@@ -407,7 +404,7 @@ export default function CustomersPage() {
                   </TableRow>
                 )) : (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8">
+                    <TableCell colSpan={6} className="text-center py-8">
                       <div className="flex flex-col items-center gap-2">
                         <FileText className="w-8 h-8 text-muted-foreground" />
                         <p className="text-muted-foreground">No customers found.</p>

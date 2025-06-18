@@ -14,6 +14,7 @@ export const supabaseService = {
   // Customer operations
   async getCustomers(filters?: { search?: string; status?: string }) {
     try {
+      console.log('Getting customers with filters:', filters);
       let query = supabase
         .from('customers')
         .select('*')
@@ -24,11 +25,20 @@ export const supabaseService = {
       }
       
       if (filters?.status && filters.status !== 'all') {
-        query = query.eq('status', filters.status);
+        // Only filter by status if it's not a type filter
+        if (['active', 'inactive'].includes(filters.status)) {
+          query = query.eq('status', filters.status);
+        } else if (['residential', 'commercial'].includes(filters.status)) {
+          query = query.eq('type', filters.status);
+        }
       }
       
       const { data, error } = await query;
-      if (error) throw error;
+      if (error) {
+        console.error('Error in getCustomers:', error);
+        throw error;
+      }
+      console.log('Customers fetched successfully:', data?.length || 0);
       return data;
     } catch (error) {
       console.error('Error fetching customers:', error);
@@ -48,13 +58,31 @@ export const supabaseService = {
     notes?: string | null;
   }) {
     try {
+      console.log('Creating customer with data:', customer);
+      
+      // Prepare the customer data with proper defaults
+      const customerData = {
+        name: customer.name,
+        email: customer.email,
+        phone: customer.phone || null,
+        address: customer.address || null,
+        company: customer.company || null,
+        status: customer.status || 'active',
+        type: customer.type || 'residential',
+        notes: customer.notes || null,
+      };
+
       const { data, error } = await supabase
         .from('customers')
-        .insert(customer)
+        .insert(customerData)
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error in createCustomer:', error);
+        throw error;
+      }
+      console.log('Customer created successfully:', data);
       return data;
     } catch (error) {
       console.error('Error creating customer:', error);
@@ -74,14 +102,23 @@ export const supabaseService = {
     notes?: string | null;
   }) {
     try {
+      console.log('Updating customer:', id, 'with data:', updates);
+      
+      // Remove service_level from updates since it's not in the database schema
+      const { service_level, ...customerUpdates } = updates;
+      
       const { data, error } = await supabase
         .from('customers')
-        .update(updates)
+        .update(customerUpdates)
         .eq('id', id)
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error in updateCustomer:', error);
+        throw error;
+      }
+      console.log('Customer updated successfully:', data);
       return data;
     } catch (error) {
       console.error('Error updating customer:', error);
