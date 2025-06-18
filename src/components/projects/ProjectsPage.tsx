@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { toast } from '@/components/ui/use-toast';
+import { supabase } from '@/lib/supabase';
 import { supabaseService } from '@/services/supabase';
 import { ProjectHeader } from './ProjectHeader';
 import { ProjectFilters } from './ProjectFilters';
@@ -25,11 +26,35 @@ const ProjectsPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // Test Supabase connection
+  const testSupabaseConnection = async () => {
+    try {
+      console.log('Testing Supabase connection...');
+      const { data, error } = await supabase.from('projects').select('count', { count: 'exact' });
+      if (error) {
+        console.error('Supabase connection test failed:', error);
+        toast({
+          title: 'Connection Error',
+          description: 'Failed to connect to database. Please refresh the page.',
+          variant: 'destructive'
+        });
+      } else {
+        console.log('Supabase connection successful. Project count:', data);
+      }
+    } catch (error) {
+      console.error('Supabase connection test error:', error);
+    }
+  };
+
   // Fetch projects
   const fetchProjects = async () => {
     try {
       setLoading(true);
       console.log('Fetching projects...');
+      
+      // Test connection first
+      await testSupabaseConnection();
+      
       const data = await supabaseService.getProjects();
       console.log('Projects fetched:', data?.length || 0);
       setProjects(data || []);
@@ -37,7 +62,7 @@ const ProjectsPage: React.FC = () => {
       console.error('Error fetching projects:', error);
       toast({
         title: 'Error',
-        description: 'Failed to load projects',
+        description: 'Failed to load projects. Please refresh the page.',
         variant: 'destructive'
       });
     } finally {

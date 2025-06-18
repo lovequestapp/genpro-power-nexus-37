@@ -54,21 +54,8 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
     setLoading(true);
     
     try {
-      // Get the current authenticated user
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      console.log('Starting project save process...');
       
-      if (authError || !user) {
-        console.error('Authentication error:', authError);
-        toast({
-          title: 'Authentication Error',
-          description: 'You must be logged in to create projects',
-          variant: 'destructive'
-        });
-        return;
-      }
-
-      console.log('Authenticated user:', user.id);
-
       const projectData = {
         name: formData.name.trim(),
         description: formData.description.trim() || null,
@@ -80,51 +67,56 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
 
       console.log('Project data to save:', projectData);
 
+      let result;
       if (project) {
         // Update existing project
-        const { data, error } = await supabase
+        console.log('Updating project with ID:', project.id);
+        result = await supabase
           .from('projects')
           .update(projectData)
           .eq('id', project.id)
           .select()
           .single();
-
-        if (error) {
-          console.error('Update error:', error);
-          throw error;
-        }
-        
-        console.log('Project updated successfully:', data);
-        toast({ 
-          title: 'Success', 
-          description: 'Project updated successfully' 
-        });
       } else {
-        // Create new project - we don't need owner_id since it's not in the current schema
-        const { data, error } = await supabase
+        // Create new project
+        console.log('Creating new project...');
+        result = await supabase
           .from('projects')
           .insert(projectData)
           .select()
           .single();
-
-        if (error) {
-          console.error('Create error:', error);
-          throw error;
-        }
-        
-        console.log('Project created successfully:', data);
-        toast({ 
-          title: 'Success', 
-          description: 'Project created successfully' 
-        });
       }
+
+      const { data, error } = result;
+
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      console.log('Project saved successfully:', data);
+      toast({ 
+        title: 'Success', 
+        description: project ? 'Project updated successfully' : 'Project created successfully'
+      });
       
       onSuccess();
     } catch (error: any) {
       console.error('Error saving project:', error);
+      
+      let errorMessage = 'Failed to save project. Please try again.';
+      
+      if (error?.message?.includes('permission')) {
+        errorMessage = 'You do not have permission to create projects. Please contact an administrator.';
+      } else if (error?.message?.includes('network')) {
+        errorMessage = 'Network error. Please check your internet connection and try again.';
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: 'Error',
-        description: error.message || 'Failed to save project. Please try again.',
+        description: errorMessage,
         variant: 'destructive'
       });
     } finally {
