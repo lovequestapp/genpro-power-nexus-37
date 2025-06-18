@@ -246,39 +246,39 @@ interface PortalCircle {
   opacity: number;
 }
 
-// Matrix-style falling glyphs background (optimized)
+// Simplified matrix-style background with only energy symbols
 const MatrixGlyphs: React.FC<MouseProps> = React.memo(({ mouse }) => {
-  const columns = 16; // reduced for perf
-  const rows = 8;
-  const glyphs = '01⎇⎈⎊⎋⎌⎍⎎⎏⎐⎑⎒⎓⎔⎕⎖⎗⎘⎙⎚⎛⎜⎝⎞⎟⎠⎡⎢⎣⎤⎥⎦⎧⎨⎩⎪⎫⎬⎭⎮⎯⎰⎱⎲⎳⎴⎵⎶⎷⎸⎹⎺⎻⎼⎽⎾⎿⏀⏁⏂⏃⏄⏅⏆⏇⏈⏉⏊⏋⏌⏍⏎⏏⏐⏑⏒⏓⏔⏕⏖⏗⏘⏙⏚⏛⏜⏝⏞⏟⏠⏡⏢⏣⏤⏥⏦⏧⏨⏩⏪⏫⏬⏭⏮⏯⏰⏱⏲⏳⏴⏵⏶⏷⏸⏹⏺⏻⏼⏽⏾⏿';
+  const columns = 12; // reduced for cleaner look
+  const rows = 6;
+  const energySymbols = '⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡⚡'; // Only energy symbols
   
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
+    <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-20">
       {[...Array(columns)].map((_, col) => (
         <div
           key={col}
-          className="absolute text-orange-500 font-mono text-sm"
+          className="absolute text-orange-500 font-mono text-lg"
           style={{
             left: `${(col / columns) * 100}%`,
-            transform: `translateX(${(mouse.x - 0.5) * 20}px)`
+            transform: `translateX(${(mouse.x - 0.5) * 15}px)`
           }}
         >
           {[...Array(rows)].map((_, row) => (
             <motion.span
               key={row}
-              className="block h-6"
+              className="block h-8"
               animate={{
-                opacity: [0, 1, 0],
-                y: [0, 400]
+                opacity: [0, 0.8, 0],
+                y: [0, 300]
               }}
               transition={{
-                duration: 3 + Math.random() * 2,
+                duration: 4 + Math.random() * 3,
                 repeat: Infinity,
-                delay: Math.random() * 2,
+                delay: Math.random() * 3,
                 ease: 'linear'
               }}
             >
-              {glyphs[Math.floor(Math.random() * glyphs.length)]}
+              {energySymbols[Math.floor(Math.random() * energySymbols.length)]}
             </motion.span>
           ))}
         </div>
@@ -310,7 +310,7 @@ const ProcessShowcase = () => {
           <h2 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg mb-6">
             Our Process
           </h2>
-          <p className="text-xl text-white/90 max-w-3xl mx-auto">
+          <p className="text-xl text-white max-w-3xl mx-auto">
             From initial assessment to final installation, we guide you through every step
           </p>
         </motion.div>
@@ -335,7 +335,7 @@ const ProcessShowcase = () => {
                   <step.icon className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">{step.title}</h3>
-                <p className="text-white mb-4">{step.description}</p>
+                <p className="text-white mb-4 leading-relaxed">{step.description}</p>
                 
                 {/* Features */}
                 <div className="space-y-2">
