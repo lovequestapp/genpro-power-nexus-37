@@ -7,10 +7,10 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 import { Edit, Trash, Plus, Search, Filter, Download, Mail, Phone, Building, Calendar, DollarSign, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import type { Customer } from '@/lib/supabase';
@@ -68,18 +68,27 @@ export default function CustomersPage() {
     mutationFn: async (customerData: CustomerFormData & { id?: string }) => {
       console.log('Submitting customer data:', customerData);
       
-      if (customerData.id) {
-        // Update existing customer
-        const { id, ...updateData } = customerData;
-        return await supabaseService.updateCustomer(id, updateData);
-      } else {
-        // Create new customer - remove id from data
-        const { id, ...createData } = customerData;
-        return await supabaseService.createCustomer(createData);
+      try {
+        if (customerData.id) {
+          // Update existing customer
+          const { id, ...updateData } = customerData;
+          const result = await supabaseService.updateCustomer(id, updateData);
+          console.log('Customer updated successfully:', result);
+          return result;
+        } else {
+          // Create new customer - remove id from data
+          const { id, ...createData } = customerData;
+          const result = await supabaseService.createCustomer(createData);
+          console.log('Customer created successfully:', result);
+          return result;
+        }
+      } catch (error: any) {
+        console.error('Customer operation error:', error);
+        throw error;
       }
     },
     onSuccess: (data) => {
-      console.log('Customer operation successful:', data);
+      console.log('Customer mutation successful:', data);
       toast({ 
         title: `Customer ${editCustomer ? 'updated' : 'created'} successfully!`,
         description: `${form.name} has been ${editCustomer ? 'updated' : 'added'} to your customer database.`
@@ -90,7 +99,7 @@ export default function CustomersPage() {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
     },
     onError: (error: any) => {
-      console.error('Customer operation failed:', error);
+      console.error('Customer mutation failed:', error);
       toast({ 
         title: 'Error', 
         description: error.message || 'Failed to save customer. Please try again.',
@@ -157,7 +166,7 @@ export default function CustomersPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form submitted:', form);
     
@@ -171,7 +180,21 @@ export default function CustomersPage() {
       return;
     }
 
-    mutation.mutate(editCustomer ? { ...form, id: editCustomer.id } : form);
+    // Prepare form data - ensure null values are properly handled
+    const formData: CustomerFormData & { id?: string } = {
+      name: form.name.trim(),
+      email: form.email.trim(),
+      phone: form.phone?.trim() || null,
+      address: form.address?.trim() || null,
+      company: form.company?.trim() || null,
+      status: form.status,
+      type: form.type,
+      notes: form.notes?.trim() || null,
+      ...(editCustomer && { id: editCustomer.id })
+    };
+
+    console.log('Prepared form data:', formData);
+    mutation.mutate(formData);
   };
 
   const openAddModal = () => {
@@ -223,6 +246,9 @@ export default function CustomersPage() {
             <DialogContent className="max-w-2xl">
               <DialogHeader>
                 <DialogTitle>{editCustomer ? 'Edit Customer' : 'Add New Customer'}</DialogTitle>
+                <DialogDescription>
+                  {editCustomer ? 'Update customer information below.' : 'Fill in the customer details below to add them to your database.'}
+                </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
