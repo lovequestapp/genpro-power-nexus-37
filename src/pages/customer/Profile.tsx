@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,18 +40,19 @@ export default function CustomerProfile() {
       if (error) throw error;
       return data as CustomerProfile;
     },
-    onSuccess: (data) => {
-      if (data) {
-        setForm({
-          name: data.name,
-          email: data.email,
-          phone: data.phone,
-          address: data.address,
-          company: data.company,
-        });
-      }
-    },
   });
+
+  useEffect(() => {
+    if (profile) {
+      setForm({
+        name: profile.name,
+        email: profile.email,
+        phone: profile.phone,
+        address: profile.address,
+        company: profile.company,
+      });
+    }
+  }, [profile]);
 
   const mutation = useMutation({
     mutationFn: async (data: Omit<CustomerProfile, 'id' | 'userId'>) => {
@@ -161,4 +163,4 @@ export default function CustomerProfile() {
       </Card>
     </div>
   );
-} 
+}

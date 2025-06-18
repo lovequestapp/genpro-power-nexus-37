@@ -100,14 +100,14 @@ function generateActivities(ticket: Service): Activity[] {
   ];
 
   // Add status changes
-  if (ticket.status !== 'pending') {
+  if (ticket.status !== 'open') {
     activities.push({
       id: '2',
       type: 'status_change',
       user: 'System',
       timestamp: new Date(ticket.date),
       details: {
-        from: 'pending',
+        from: 'open',
         to: ticket.status,
       },
     });
@@ -157,4 +157,4 @@ function generateActivities(ticket: Service): Activity[] {
 
   // Sort activities by timestamp
   return activities.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-} 
+}

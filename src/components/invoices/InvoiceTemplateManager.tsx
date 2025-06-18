@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -192,7 +191,7 @@ export const InvoiceTemplateManager: React.FC = () => {
 
       <Grid container spacing={3}>
         {templates.map((template) => (
-          <Grid item xs={12} md={6} lg={4} key={template.id}>
+          <Grid size={{ xs: 12, md: 6, lg: 4 }} key={template.id}>
             <Paper
               elevation={0}
               sx={{
@@ -295,7 +294,7 @@ export const InvoiceTemplateManager: React.FC = () => {
         <DialogContent>
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
             <Grid container spacing={3}>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <TextField
                   label="Template Name"
                   value={formData.name}
@@ -309,7 +308,7 @@ export const InvoiceTemplateManager: React.FC = () => {
                   }}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <TextField
                   label="Description"
                   value={formData.description}
@@ -324,7 +323,7 @@ export const InvoiceTemplateManager: React.FC = () => {
                   }}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <Tabs
                   value={activeTab}
                   onChange={(_, newValue) => setActiveTab(newValue)}

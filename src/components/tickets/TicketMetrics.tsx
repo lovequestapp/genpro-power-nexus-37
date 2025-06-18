@@ -118,8 +118,8 @@ function calculateMetrics(tickets: Service[]): Metrics {
     resolutionTimeScore: 65,
     responseRate: 85,
     resolutionRate: 70,
-    activeTickets: tickets.filter((t) => t.status === 'pending' || t.status === 'in_progress').length,
+    activeTickets: tickets.filter((t) => t.status === 'open' || t.status === 'in_progress').length,
     totalTickets: tickets.length,
     ticketsPerAgent: Math.round(tickets.length / 3), // Assuming 3 agents
   };
-} 
+}

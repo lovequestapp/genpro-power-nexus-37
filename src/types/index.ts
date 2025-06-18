@@ -1,4 +1,3 @@
-
 export interface GeneratorReading {
   id: string;
   timestamp: string;
@@ -42,9 +41,12 @@ export interface Customer {
 
 export interface ServiceComment {
   id: string;
+  content: string;
   message: string;
   author: string;
   date: string;
+  createdAt: string;
+  attachments?: ServiceAttachment[];
 }
 
 export interface ServiceAttachment {
@@ -53,6 +55,7 @@ export interface ServiceAttachment {
   url: string;
   type: string;
   size: number;
+  uploadedAt: string;
 }
 
 export interface Service {
@@ -64,12 +67,15 @@ export interface Service {
   type: 'technical' | 'billing' | 'general';
   customerId: string;
   customerName: string;
+  generatorId?: string;
   assignedTo?: string;
   createdAt: string;
   updatedAt: string;
   date: string;
-  comments?: ServiceComment[];
-  attachments?: ServiceAttachment[];
+  comments: ServiceComment[];
+  attachments: ServiceAttachment[];
+  tags?: string[];
+  category?: string;
 }
 
 export interface BillItem {
