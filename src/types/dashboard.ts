@@ -8,7 +8,7 @@ export interface Customer {
   totalSpent: number;
   status: 'active' | 'inactive';
   lastContact: string;
-}
+} //ded
 
 export type Project = {
   id: string;
