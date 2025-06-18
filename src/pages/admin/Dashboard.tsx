@@ -87,7 +87,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { DashboardStats } from '@/types/dashboard';
+import { DashboardStats, Project as DashboardProject } from '@/types/dashboard';
 import { Badge } from '@/components/ui/badge';
 import { UserIcon } from 'lucide-react';
 import { Avatar } from '@/components/ui/avatar';
@@ -112,12 +112,14 @@ interface StatCardProps {
   subtitle?: string;
 }
 
-interface Project {
+interface LocalProject {
   title: string;
   customer: string;
   status: 'in-progress' | 'pending' | 'completed';
   progress: number;
   dueDate: string;
+  address: string;
+  technicians: string[];
 }
 
 const StatCard = ({ title, value, change, icon, trend, subtitle }: StatCardProps) => {
@@ -162,7 +164,7 @@ const StatCard = ({ title, value, change, icon, trend, subtitle }: StatCardProps
   );
 };
 
-const ProjectCard = ({ project }: { project: Project }) => {
+const ProjectCard = ({ project }: { project: LocalProject }) => {
   const statusColors = {
     'pending': 'bg-yellow-100 text-yellow-800',
     'in-progress': 'bg-blue-100 text-blue-800',
@@ -414,13 +416,15 @@ const AdminDashboard: React.FC = () => {
     }
   ];
 
-  const projects: Project[] = [
+  const projects: LocalProject[] = [
     {
       title: 'Generac 22KW Installation',
       customer: 'John & Sarah Miller',
       status: 'in-progress',
       progress: 65,
       dueDate: 'Jun 15, 2024',
+      address: '123 Main St, Houston, TX',
+      technicians: ['Mike Johnson', 'David Chen'],
     },
     {
       title: 'Maintenance Check',
@@ -428,6 +432,8 @@ const AdminDashboard: React.FC = () => {
       status: 'pending',
       progress: 0,
       dueDate: 'Jun 18, 2024',
+      address: '456 Oak Ave, Houston, TX',
+      technicians: ['Sarah Williams'],
     },
     {
       title: 'Emergency Repair',
@@ -435,6 +441,8 @@ const AdminDashboard: React.FC = () => {
       status: 'completed',
       progress: 100,
       dueDate: 'Jun 10, 2024',
+      address: '789 Pine St, Houston, TX',
+      technicians: ['David Brown', 'Lisa Davis'],
     },
   ];
 
