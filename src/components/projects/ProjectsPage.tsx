@@ -12,7 +12,7 @@ import { ProjectForm } from './ProjectForm';
 import { ProjectDetail } from './ProjectDetail';
 import type { Project } from '@/lib/supabase';
 
-type ProjectStatus = 'in_progress' | 'completed' | 'cancelled' | 'archived';
+type ProjectStatus = 'planned' | 'in_progress' | 'completed' | 'cancelled' | 'archived';
 
 const ProjectsPage: React.FC = () => {
   // State
@@ -25,6 +25,39 @@ const ProjectsPage: React.FC = () => {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+
+  // Check authentication
+  const checkAuth = async () => {
+    try {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error) {
+        console.error('Auth error:', error);
+        toast({
+          title: 'Authentication Error',
+          description: 'Please log in to access projects.',
+          variant: 'destructive'
+        });
+        return false;
+      }
+      
+      if (!user) {
+        toast({
+          title: 'Not Authenticated',
+          description: 'Please log in to access projects.',
+          variant: 'destructive'
+        });
+        return false;
+      }
+      
+      setUser(user);
+      console.log('User authenticated:', user.id);
+      return true;
+    } catch (error) {
+      console.error('Error checking auth:', error);
+      return false;
+    }
+  };
 
   // Test Supabase connection
   const testSupabaseConnection = async () => {
@@ -38,11 +71,14 @@ const ProjectsPage: React.FC = () => {
           description: 'Failed to connect to database. Please refresh the page.',
           variant: 'destructive'
         });
+        return false;
       } else {
         console.log('Supabase connection successful. Project count:', data);
+        return true;
       }
     } catch (error) {
       console.error('Supabase connection test error:', error);
+      return false;
     }
   };
 
@@ -52,11 +88,22 @@ const ProjectsPage: React.FC = () => {
       setLoading(true);
       console.log('Fetching projects...');
       
-      // Test connection first
-      await testSupabaseConnection();
+      // Check authentication first
+      const isAuthenticated = await checkAuth();
+      if (!isAuthenticated) {
+        setLoading(false);
+        return;
+      }
+      
+      // Test connection
+      const connectionOk = await testSupabaseConnection();
+      if (!connectionOk) {
+        setLoading(false);
+        return;
+      }
       
       const data = await supabaseService.getProjects();
-      console.log('Projects fetched:', data?.length || 0);
+      console.log('Projects fetched successfully:', data?.length || 0);
       setProjects(data || []);
     } catch (error: any) {
       console.error('Error fetching projects:', error);
@@ -98,11 +145,27 @@ const ProjectsPage: React.FC = () => {
 
   // Handlers
   const handleCreateNew = () => {
+    if (!user) {
+      toast({
+        title: 'Authentication Required',
+        description: 'Please log in to create projects.',
+        variant: 'destructive'
+      });
+      return;
+    }
     setEditingProject(null);
     setShowForm(true);
   };
 
   const handleEdit = (project: Project) => {
+    if (!user) {
+      toast({
+        title: 'Authentication Required',
+        description: 'Please log in to edit projects.',
+        variant: 'destructive'
+      });
+      return;
+    }
     setEditingProject(project);
     setShowForm(true);
   };
@@ -136,6 +199,15 @@ const ProjectsPage: React.FC = () => {
 
   const handleBulkDelete = async () => {
     if (!selectedIds.length) return;
+    
+    if (!user) {
+      toast({
+        title: 'Authentication Required',
+        description: 'Please log in to delete projects.',
+        variant: 'destructive'
+      });
+      return;
+    }
     
     try {
       setLoading(true);

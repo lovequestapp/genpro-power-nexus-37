@@ -4,7 +4,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { SearchIcon } from 'lucide-react';
 
-type ProjectStatus = 'in_progress' | 'completed' | 'cancelled' | 'archived';
+type ProjectStatus = 'planned' | 'in_progress' | 'completed' | 'cancelled' | 'archived';
 
 interface ProjectFiltersProps {
   status: ProjectStatus | 'all';
@@ -15,6 +15,7 @@ interface ProjectFiltersProps {
 
 const STATUS_TABS = [
   { label: 'All', value: 'all' },
+  { label: 'Planned', value: 'planned' },
   { label: 'In Progress', value: 'in_progress' },
   { label: 'Completed', value: 'completed' },
   { label: 'Cancelled', value: 'cancelled' },
@@ -30,7 +31,7 @@ export function ProjectFilters({
   return (
     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white p-4 rounded-lg border">
       <Tabs value={status} onValueChange={onStatusChange} className="w-full md:w-auto">
-        <TabsList className="grid w-full grid-cols-5 md:w-auto">
+        <TabsList className="grid w-full grid-cols-6 md:w-auto">
           {STATUS_TABS.map((tab) => (
             <TabsTrigger 
               key={tab.value} 

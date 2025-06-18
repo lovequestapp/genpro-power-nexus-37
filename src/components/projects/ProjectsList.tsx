@@ -20,6 +20,7 @@ const getStatusBadgeVariant = (status: string) => {
   switch (status) {
     case 'completed': return 'default';
     case 'in_progress': return 'secondary';
+    case 'planned': return 'outline';
     case 'archived': return 'outline';
     case 'cancelled': return 'destructive';
     default: return 'secondary';
@@ -74,7 +75,7 @@ export function ProjectsList({
             </TableHead>
             <TableHead>Project</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Customer</TableHead>
+            <TableHead>Owner</TableHead>
             <TableHead>Budget</TableHead>
             <TableHead>Start Date</TableHead>
             <TableHead>Created</TableHead>
@@ -120,7 +121,7 @@ export function ProjectsList({
               </TableCell>
               <TableCell>
                 <span className="text-steel-600">
-                  {project.customer_id ? `Customer ${project.customer_id.slice(0, 8)}...` : 'Not assigned'}
+                  {project.owner_id ? `Owner ${project.owner_id.slice(0, 8)}...` : 'Not assigned'}
                 </span>
               </TableCell>
               <TableCell>

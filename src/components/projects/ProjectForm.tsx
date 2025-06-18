@@ -18,7 +18,7 @@ interface ProjectFormProps {
 type ProjectFormData = {
   name: string;
   description: string;
-  status: 'in_progress' | 'completed' | 'cancelled' | 'archived';
+  status: 'planned' | 'in_progress' | 'completed' | 'cancelled' | 'archived';
   start_date: string;
   end_date: string;
   budget: string;
@@ -28,7 +28,7 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
   const [formData, setFormData] = useState<ProjectFormData>({
     name: project?.name || '',
     description: project?.description || '',
-    status: project?.status || 'in_progress',
+    status: project?.status || 'planned',
     start_date: project?.start_date || '',
     end_date: project?.end_date || '',
     budget: project?.budget ? String(project.budget) : '',
@@ -56,6 +56,19 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
     try {
       console.log('Starting project save process...');
       
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError) {
+        console.error('Error getting user:', userError);
+        throw new Error('Unable to verify user authentication');
+      }
+      
+      if (!user) {
+        throw new Error('You must be logged in to create projects');
+      }
+
+      console.log('Current user:', user.id);
+
       const projectData = {
         name: formData.name.trim(),
         description: formData.description.trim() || null,
@@ -63,6 +76,7 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
         start_date: formData.start_date || null,
         end_date: formData.end_date || null,
         budget: formData.budget ? Number(formData.budget) : null,
+        owner_id: user.id, // This is required by the database
       };
 
       console.log('Project data to save:', projectData);
@@ -90,7 +104,7 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
       const { data, error } = result;
 
       if (error) {
-        console.error('Supabase error:', error);
+        console.error('Supabase error details:', error);
         throw error;
       }
       
@@ -110,8 +124,10 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
         errorMessage = 'You do not have permission to create projects. Please contact an administrator.';
       } else if (error?.message?.includes('network')) {
         errorMessage = 'Network error. Please check your internet connection and try again.';
+      } else if (error?.message?.includes('auth')) {
+        errorMessage = 'Authentication error. Please log in and try again.';
       } else if (error?.message) {
-        errorMessage = error.message;
+        errorMessage = `Error: ${error.message}`;
       }
       
       toast({
@@ -170,6 +186,7 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="planned">Planned</SelectItem>
               <SelectItem value="in_progress">In Progress</SelectItem>
               <SelectItem value="completed">Completed</SelectItem>
               <SelectItem value="cancelled">Cancelled</SelectItem>
