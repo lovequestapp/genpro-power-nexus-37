@@ -103,14 +103,14 @@ const GetQuote = () => {
   return (
     <>
       <ScrollToTop />
-      <div className="min-h-screen bg-gradient-to-br from-steel-50 via-white to-steel-100 pt-20 pb-12">
+      <div className="min-h-screen bg-gradient-to-br from-steel-50 via-white to-steel-100 py-32">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="text-center mb-8">
-            <Badge variant="outline" className="mb-4 text-accent border-accent px-4 py-2">
+          <div className="text-center mb-12">
+            <Badge variant="outline" className="mb-6 text-accent border-accent px-6 py-3 text-base">
               Free Generator Quote
             </Badge>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary mb-4">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary mb-6">
               Get Your Custom Generator Quote
             </h1>
             <p className="text-lg text-steel-600 max-w-2xl mx-auto">
@@ -120,7 +120,7 @@ const GetQuote = () => {
           </div>
 
           {/* Progress Steps */}
-          <div className="max-w-4xl mx-auto mb-8">
+          <div className="max-w-4xl mx-auto mb-12">
             <div className="flex items-center justify-between relative">
               <div className="absolute top-1/2 left-0 right-0 h-1 bg-steel-200 -translate-y-1/2 z-0"></div>
               <div 
@@ -159,7 +159,7 @@ const GetQuote = () => {
           </div>
 
           {/* Form Content */}
-          <Card className="max-w-3xl mx-auto shadow-xl border-steel-200">
+          <Card className="max-w-3xl mx-auto shadow-xl border-steel-200 mb-12">
             <CardHeader className="bg-gradient-to-r from-primary to-steel-700 text-white rounded-t-lg">
               <CardTitle className="text-xl sm:text-2xl">
                 Step {currentStep}: {steps[currentStep - 1].title}
@@ -520,7 +520,7 @@ const GetQuote = () => {
           </Card>
 
           {/* Trust Indicators */}
-          <div className="max-w-3xl mx-auto mt-8">
+          <div className="max-w-3xl mx-auto mb-16">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
               <div className="flex items-center justify-center space-x-2 text-steel-600">
                 <Shield className="w-5 h-5 text-green-500" />
