@@ -17,24 +17,87 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       profiles: {
         Row: {
-          id: string
-          created_at: string
-          updated_at: string
-          email: string
-          full_name: string
-          role: 'admin' | 'staff' | 'customer'
-          is_active: boolean
-          last_active: string | null
-          avatar_url: string | null
-        }
-        Insert: Omit<Database['public']['Tables']['profiles']['Row'], 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Database['public']['Tables']['profiles']['Insert']>
-      }
+          id: string;
+          full_name: string;
+          email: string;
+          role: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          full_name: string;
+          email: string;
+          role: string;
+        };
+        Update: {
+          full_name?: string;
+          email?: string;
+          role?: string;
+        };
+      };
+      projects: {
+        Row: {
+          id: string;
+          name: string;
+          description: string;
+          status: 'in_progress' | 'completed' | 'cancelled' | 'archived';
+          owner_id: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          name: string;
+          description: string;
+          status: 'in_progress' | 'completed' | 'cancelled' | 'archived';
+          owner_id: string;
+        };
+        Update: {
+          name?: string;
+          description?: string;
+          status?: 'in_progress' | 'completed' | 'cancelled' | 'archived';
+          owner_id?: string;
+        };
+      };
+      project_notes: {
+        Row: {
+          id: string;
+          project_id: string;
+          actor_id: string;
+          action: string;
+          timestamp: string;
+        };
+        Insert: {
+          project_id: string;
+          actor_id: string;
+          action: string;
+        };
+        Update: {
+          action?: string;
+        };
+      };
+      project_comments: {
+        Row: {
+          id: string;
+          project_id: string;
+          author_id: string;
+          content: string;
+          created_at: string;
+        };
+        Insert: {
+          project_id: string;
+          author_id: string;
+          content: string;
+        };
+        Update: {
+          content?: string;
+        };
+      };
       tickets: {
         Row: {
           id: string

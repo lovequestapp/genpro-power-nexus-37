@@ -17,6 +17,7 @@ import {
   Headphones,
   UserCircle,
   LogOut,
+  CreditCard,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -83,9 +84,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       path: '/admin/schedule',
     },
     {
-      title: 'QuickBooks',
-      icon: <Calculator className="w-5 h-5" />,
-      path: '/admin/quickbooks',
+      title: 'Stripe',
+      icon: <CreditCard className="w-5 h-5" />,
+      path: '/admin/stripe',
+    },
+    {
+      title: 'Invoice Templates',
+      icon: <FileText className="w-5 h-5" />,
+      path: '/admin/invoice-templates',
     },
     {
       title: 'Support',

@@ -1,9 +1,9 @@
-
 import { Suspense } from 'react';
 import HeroSection from '../components/HeroSection';
 import ProductShowcase from '../components/ProductShowcase';
 import QualityGuarantee from '../components/QualityGuarantee';
 import WhyChooseUs from '../components/WhyChooseUs';
+import ProcessShowcase from '../components/ProcessShowcase';
 
 const Home = () => {
   return (
@@ -13,6 +13,7 @@ const Home = () => {
         <ProductShowcase />
         <QualityGuarantee />
         <WhyChooseUs />
+        <ProcessShowcase />
       </Suspense>
     </div>
   );

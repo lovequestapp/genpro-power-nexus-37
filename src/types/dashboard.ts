@@ -10,26 +10,15 @@ export interface Customer {
   lastContact: string;
 }
 
-export interface Project {
+export type Project = {
   id: string;
-  title: string;
-  customerId: string;
-  customerName: string;
-  status: 'pending' | 'in-progress' | 'completed' | 'cancelled';
-  type: 'installation' | 'maintenance' | 'repair' | 'inspection';
-  progress: number;
-  startDate: string;
-  dueDate: string;
-  budget: number;
-  cost: number;
-  profit: number;
-  assignedTechnicians: Technician[];
-  equipmentUsed: InventoryItem[];
-  notes: ProjectNote[];
-  documents: Document[];
-  permits: Permit[];
-  timeline: TimelineEvent[];
-}
+  name: string;
+  description: string;
+  status: 'in_progress' | 'completed' | 'cancelled' | 'archived';
+  owner_id: string;
+  owner_name: string;
+  created_at: string;
+};
 
 export interface Technician {
   id: string;

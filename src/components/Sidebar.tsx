@@ -15,6 +15,7 @@ import {
   BarChart3,
   Briefcase,
   ShieldCheck,
+  CreditCard,
 } from 'lucide-react';
 
 const adminNav = [
@@ -29,10 +30,10 @@ const adminNav = [
   { label: 'Orders', icon: <FileText className="w-5 h-5" />, to: '/admin/inventory/orders' },
   { label: 'Billing', icon: <DollarSign className="w-5 h-5" />, to: '/admin/billing' },
   { label: 'Schedule', icon: <Calendar className="w-5 h-5" />, to: '/admin/schedule' },
+  { label: 'Stripe', icon: <CreditCard className="w-5 h-5" />, to: '/admin/stripe' },
   { label: 'Support', icon: <LifeBuoy className="w-5 h-5" />, to: '/admin/support' },
   { label: 'Team', icon: <Users className="w-5 h-5" />, to: '/admin/team' },
   { label: 'Settings', icon: <Settings className="w-5 h-5" />, to: '/admin/settings' },
-  { label: 'QuickBooks', icon: <BookOpen className="w-5 h-5" />, to: '/admin/quickbooks' },
 ];
 
 export function Sidebar() {

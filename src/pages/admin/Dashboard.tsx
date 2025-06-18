@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Card,
   CardContent,
@@ -53,6 +53,7 @@ import {
   Build as WrenchIcon,
   Inventory as PackageIcon,
   People as UsersIcon,
+  CreditCard,
 } from '@mui/icons-material';
 import { generatorService, customerService, supportService, billingService, alertService } from '@/services/api';
 import { Generator, Customer, Service, Bill, Alert } from '@/types';
@@ -69,6 +70,15 @@ import {
   StarIcon,
   UserCheckIcon,
   MapPinIcon,
+  TrendingUp,
+  TrendingDown,
+  Users,
+  DollarSign,
+  RefreshCw,
+  AlertCircle,
+  Calendar,
+  ArrowRight,
+  FileText,
 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import {
@@ -82,33 +92,16 @@ import { Badge } from '@/components/ui/badge';
 import { UserIcon } from 'lucide-react';
 import { Avatar } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
+import { Link } from 'react-router-dom';
 
 const sidebarItems = [
   { label: 'Overview', icon: AccountBalanceWallet },
-  { label: 'QuickBooks', icon: Sync },
+  { label: 'Stripe', icon: CreditCard },
   { label: 'Projects', icon: Assignment },
   { label: 'Support', icon: SupportAgent },
   { label: 'Team', icon: Group },
   { label: 'Settings', icon: SettingsIcon },
 ];
-
-const mockQuickBooks = {
-  balances: [
-    { name: 'Bank Account', amount: '$24,500.00', type: 'bank' },
-    { name: 'Credit Card', amount: '-$2,300.00', type: 'credit' },
-  ],
-  invoices: [
-    { id: 'INV-1001', customer: 'Acme Corp', amount: '$1,200.00', status: 'Overdue' },
-    { id: 'INV-1002', customer: 'Beta LLC', amount: '$3,500.00', status: 'Open' },
-    { id: 'INV-1003', customer: 'Gamma Inc', amount: '$2,000.00', status: 'Paid' },
-  ],
-  transactions: [
-    { date: '2024-07-01', desc: 'Payment from Acme Corp', amount: '+$1,200.00' },
-    { date: '2024-06-28', desc: 'Office Supplies', amount: '-$150.00' },
-    { date: '2024-06-27', desc: 'Payment to Vendor', amount: '-$2,000.00' },
-  ],
-  syncStatus: 'Last synced 2 hours ago',
-};
 
 interface StatCardProps {
   title: string;
@@ -227,6 +220,154 @@ const ProjectCard = ({ project }: { project: Project }) => {
   );
 };
 
+// Add new interfaces for HGP-specific features
+interface HGPStats {
+  totalGenerators: number;
+  activeProjects: number;
+  pendingMaintenance: number;
+  revenueThisMonth: number;
+  customerSatisfaction: number;
+}
+
+interface Notification {
+  id: string;
+  type: 'alert' | 'info' | 'success' | 'warning' | 'error';
+  message: string;
+  timestamp: Date;
+  read: boolean;
+}
+
+// Mock Stripe data
+const stripeMock = {
+  revenue: 154320,
+  revenueChange: 8.2,
+  revenueTrend: 'up',
+  customers: 312,
+  payouts: [
+    { id: 'po_1', amount: 12000, date: '2024-07-10' },
+    { id: 'po_2', amount: 8000, date: '2024-07-03' },
+  ],
+  transactions: [
+    { id: 'txn_1', customer: 'Sarah Johnson', amount: 1200, status: 'succeeded', date: '2024-07-09' },
+    { id: 'txn_2', customer: 'Michael Chen', amount: 3500, status: 'pending', date: '2024-07-08' },
+    { id: 'txn_3', customer: 'Emily Rodriguez', amount: 2000, status: 'refunded', date: '2024-07-07' },
+    { id: 'txn_4', customer: 'David Lee', amount: 500, status: 'succeeded', date: '2024-07-06' },
+  ],
+  refunds: 2,
+  disputes: 1,
+  revenueChart: [
+    { date: 'Jun 10', revenue: 3200 },
+    { date: 'Jun 15', revenue: 4200 },
+    { date: 'Jun 20', revenue: 5100 },
+    { date: 'Jun 25', revenue: 6100 },
+    { date: 'Jul 1', revenue: 7200 },
+    { date: 'Jul 5', revenue: 8300 },
+    { date: 'Jul 10', revenue: 9000 },
+  ],
+};
+
+function StripeCard({ title, value, icon, trend, change, subtitle, color }) {
+  return (
+    <div className={`rounded-2xl p-6 bg-gradient-to-br from-white/70 to-white/30 shadow-xl border border-white/30 backdrop-blur-lg flex flex-col gap-2 min-w-[180px] relative overflow-hidden`}> 
+      <div className="flex items-center gap-3 mb-2">
+        <div className={`p-3 rounded-full bg-gradient-to-br from-${color}-100 to-${color}-200 shadow-lg`}>{icon}</div>
+        <span className="text-lg font-bold text-gray-900">{title}</span>
+      </div>
+      <div className="flex items-end gap-2">
+        <span className="text-3xl font-extrabold text-gray-900">{value}</span>
+        {trend && (
+          <span className={`flex items-center gap-1 text-sm font-semibold ${trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>{trend === 'up' ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}{change}%</span>
+        )}
+      </div>
+      {subtitle && <span className="text-xs text-gray-500 mt-1">{subtitle}</span>}
+      <div className={`absolute right-0 bottom-0 w-24 h-24 bg-gradient-to-br from-${color}-200/30 to-transparent rounded-full blur-2xl`} />
+    </div>
+  );
+}
+
+function StripeDashboard() {
+  return (
+    <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <StripeCard
+        title="Total Revenue"
+        value={`$${stripeMock.revenue.toLocaleString()}`}
+        icon={<DollarSign className="w-6 h-6 text-green-600" />}
+        trend={stripeMock.revenueTrend}
+        change={stripeMock.revenueChange}
+        color="green"
+        subtitle="Last 30 days"
+      />
+      <StripeCard
+        title="Active Customers"
+        value={stripeMock.customers}
+        icon={<Users className="w-6 h-6 text-blue-600" />}
+        trend={null}
+        change={null}
+        color="blue"
+        subtitle="All time"
+      />
+      <StripeCard
+        title="Upcoming Payout"
+        value={`$${stripeMock.payouts[0].amount.toLocaleString()}`}
+        icon={<CreditCard className="w-6 h-6 text-purple-600" />}
+        trend={null}
+        change={null}
+        color="purple"
+        subtitle={`On ${stripeMock.payouts[0].date}`}
+      />
+      <StripeCard
+        title="Refunds/Disputes"
+        value={`${stripeMock.refunds} / ${stripeMock.disputes}`}
+        icon={<AlertCircle className="w-6 h-6 text-red-600" />}
+        trend={null}
+        change={null}
+        color="red"
+        subtitle="This month"
+      />
+    </div>
+  );
+}
+
+function StripeRevenueChart() {
+  return (
+    <div className="rounded-2xl p-6 bg-gradient-to-br from-white/70 to-white/30 shadow-xl border border-white/30 backdrop-blur-lg mb-10">
+      <h3 className="text-lg font-bold mb-4 text-gray-900 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-green-600" /> Revenue Trend</h3>
+      <ResponsiveContainer width="100%" height={220}>
+        <LineChart data={stripeMock.revenueChart}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+          <XAxis dataKey="date" stroke="#888" />
+          <YAxis stroke="#888" />
+          <Tooltip />
+          <Line type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} dot={{ r: 5, fill: '#10b981' }} activeDot={{ r: 8 }} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+function StripeTransactions() {
+  return (
+    <div className="rounded-2xl p-6 bg-gradient-to-br from-white/70 to-white/30 shadow-xl border border-white/30 backdrop-blur-lg mb-10">
+      <h3 className="text-lg font-bold mb-4 text-gray-900 flex items-center gap-2"><RefreshCw className="w-5 h-5 text-blue-600" /> Recent Transactions</h3>
+      <div className="divide-y divide-gray-200">
+        {stripeMock.transactions.map(txn => (
+          <div key={txn.id} className="flex items-center justify-between py-3">
+            <div>
+              <div className="font-semibold text-gray-900">{txn.customer}</div>
+              <div className="text-xs text-gray-500">{txn.date}</div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={`font-bold ${txn.status === 'succeeded' ? 'text-green-600' : txn.status === 'pending' ? 'text-yellow-600' : 'text-red-600'}`}>{txn.status}</span>
+              <span className="font-semibold text-gray-900">${txn.amount.toLocaleString()}</span>
+              <button className="ml-2 px-2 py-1 rounded bg-blue-100 text-blue-700 text-xs font-bold hover:bg-blue-200 transition-all flex items-center gap-1"><ArrowRight className="w-3 h-3" /> Details</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -297,79 +438,115 @@ const AdminDashboard: React.FC = () => {
     },
   ];
 
-  useEffect(() => {
-    fetchData();
+  const [hgpStats, setHGPStats] = useState<HGPStats>({
+    totalGenerators: 0,
+    activeProjects: 0,
+    pendingMaintenance: 0,
+    revenueThisMonth: 0,
+    customerSatisfaction: 0,
+  });
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [refreshInterval, setRefreshInterval] = useState(30000); // 30 seconds
+
+  // Enhanced error handling
+  const handleError = useCallback((error: any) => {
+    console.error('Dashboard Error:', error);
+    setError(error.message || 'An unexpected error occurred');
+    // Add error to notifications
+    setNotifications(prev => [{
+      id: Date.now().toString(),
+      type: 'error',
+      message: error.message || 'An unexpected error occurred',
+      timestamp: new Date(),
+      read: false
+    }, ...prev]);
   }, []);
 
-  const fetchData = async () => {
+  // Real-time data fetching with retry logic
+  const fetchData = useCallback(async (retryCount = 0) => {
     try {
       setLoading(true);
       const [
-        generatorsRes,
-        customersRes,
-        ticketsRes,
-        billsRes,
-        alertsRes
+        generatorsData,
+        customersData,
+        ticketsData,
+        billsData,
+        alertsData,
+        statsData
       ] = await Promise.all([
         generatorService.getAll(),
         customerService.getAll(),
         supportService.getAll(),
         billingService.getAll(),
-        alertService.getAll()
+        alertService.getAll(),
+        generatorService.getStatus('all') // Using existing getStatus method for stats
       ]);
 
-      setGenerators(generatorsRes.data);
-      setCustomers(customersRes.data);
-      setTickets(ticketsRes.data);
-      setBills(billsRes.data);
-      setAlerts(alertsRes.data);
+      setGenerators(generatorsData.data);
+      setCustomers(customersData.data);
+      setTickets(ticketsData.data);
+      setBills(billsData.data);
+      setAlerts(alertsData.data);
+      setHGPStats({
+        totalGenerators: generatorsData.data.length,
+        activeProjects: ticketsData.data.filter(t => t.status === 'in_progress').length,
+        pendingMaintenance: generatorsData.data.filter(g => g.status === 'maintenance').length,
+        revenueThisMonth: billsData.data.reduce((sum, bill) => sum + bill.amount, 0),
+        customerSatisfaction: 95 // Placeholder - should be calculated from customer feedback
+      });
       setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch data');
+    } catch (error) {
+      handleError(error);
+      // Retry logic
+      if (retryCount < 3) {
+        setTimeout(() => fetchData(retryCount + 1), 5000);
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }, [handleError]);
 
-  const handleSaveGenerator = async () => {
+  // Auto-refresh setup
+  useEffect(() => {
+    if (autoRefresh) {
+      const interval = setInterval(fetchData, refreshInterval);
+      return () => clearInterval(interval);
+    }
+  }, [autoRefresh, refreshInterval, fetchData]);
+
+  // Initial data fetch
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Enhanced save handlers with validation
+  const handleSaveGenerator = async (generatorData: Partial<Generator>) => {
     try {
-      if (editingGenerator) {
-        await generatorService.update(editingGenerator.id, {
-          name: editingGenerator.name,
-          model: editingGenerator.model,
-          type: editingGenerator.type,
-          status: editingGenerator.status,
-          location: editingGenerator.location,
-          lastMaintenance: editingGenerator.lastMaintenance,
-          nextMaintenance: editingGenerator.nextMaintenance,
-          readings: editingGenerator.readings,
-          powerRating: editingGenerator.powerRating,
-          fuelType: editingGenerator.fuelType,
-          runtime: editingGenerator.runtime,
-          installationDate: editingGenerator.installationDate,
-          warrantyExpiry: editingGenerator.warrantyExpiry
-        });
-      } else {
-        await generatorService.create({
-          name: editingGenerator.name,
-          model: editingGenerator.model,
-          type: editingGenerator.type,
-          status: editingGenerator.status,
-          location: editingGenerator.location,
-          lastMaintenance: editingGenerator.lastMaintenance,
-          nextMaintenance: editingGenerator.nextMaintenance,
-          readings: [],
-          powerRating: editingGenerator.powerRating,
-          fuelType: editingGenerator.fuelType,
-          runtime: editingGenerator.runtime,
-          installationDate: editingGenerator.installationDate,
-          warrantyExpiry: editingGenerator.warrantyExpiry
-        });
+      // Validate required fields
+      if (!generatorData.model || !generatorData.name) {
+        throw new Error('Model and Name are required');
       }
+
+      const savedGenerator = editingGenerator
+        ? await generatorService.update(editingGenerator.id, generatorData)
+        : await generatorService.create(generatorData as Omit<Generator, 'id'>);
+
+      setGenerators(prev => 
+        prev.map(g => g.id === savedGenerator.data.id ? savedGenerator.data : g)
+      );
       setOpenGeneratorDialog(false);
-      fetchData();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save generator');
+      
+      // Add success notification
+      setNotifications(prev => [{
+        id: Date.now().toString(),
+        type: 'success',
+        message: 'Generator saved successfully',
+        timestamp: new Date(),
+        read: false
+      }, ...prev]);
+    } catch (error) {
+      handleError(error);
     }
   };
 
@@ -644,8 +821,76 @@ const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className={`min-h-screen ${themeClass}`}>
       <AnimatedCircuitBackground />
+      {/* Enhanced Header with Notifications */}
+      <div className="flex justify-between items-center p-4 bg-white shadow-sm">
+        <h1 className="text-2xl font-bold text-steel-900">HGP Admin Dashboard</h1>
+        <div className="flex items-center gap-4">
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            onClick={() => fetchData()}
+            disabled={loading}
+          >
+            Refresh
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => setDarkMode(!darkMode)}
+            startIcon={darkMode ? <SunIcon /> : <MoonIcon />}
+          >
+            {darkMode ? 'Light Mode' : 'Dark Mode'}
+          </Button>
+        </div>
+      </div>
+
+      {/* Enhanced Stats Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+        <StatCard
+          title="Total Generators"
+          value={hgpStats.totalGenerators}
+          icon={<PackageIcon />}
+          trend="up"
+          change={5}
+        />
+        <StatCard
+          title="Active Projects"
+          value={hgpStats.activeProjects}
+          icon={<Assignment />}
+          trend="up"
+          change={3}
+        />
+        <StatCard
+          title="Pending Maintenance"
+          value={hgpStats.pendingMaintenance}
+          icon={<WrenchIcon />}
+          trend="down"
+          change={-2}
+        />
+        <StatCard
+          title="Monthly Revenue"
+          value={`$${hgpStats.revenueThisMonth.toLocaleString()}`}
+          icon={<DollarSignIcon />}
+          trend="up"
+          change={8}
+        />
+      </div>
+
+      {/* Enhanced Error Display */}
+      {error && (
+        <MuiAlert severity="error" className="m-4">
+          {error}
+        </MuiAlert>
+      )}
+
+      {/* Loading State */}
+      {loading && (
+        <div className="flex justify-center items-center p-8">
+          <CircularProgress />
+        </div>
+      )}
+
       {/* Main Content */}
       <main className="min-h-screen transition-all duration-300 ease-in-out bg-white lg:pl-0 pt-10">
         <div className="max-w-7xl mx-auto px-6">
@@ -737,6 +982,14 @@ const AdminDashboard: React.FC = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Invoice Templates Widget */}
+                <Link to="/admin/invoice-templates" className="dashboard-widget card bg-white shadow-md rounded-xl p-6 flex flex-col items-center hover:bg-accent/10 transition">
+                  <FileText className="w-8 h-8 text-accent mb-2" />
+                  <span className="font-semibold text-lg mb-1">Invoice Templates</span>
+                  {/* Optionally, show a count or quick action here */}
+                  <span className="text-sm text-muted-foreground">Manage & create templates</span>
+                </Link>
               </div>
 
               {/* Middle Column */}
