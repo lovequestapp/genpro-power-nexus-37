@@ -8,8 +8,82 @@ type Attachment = Database['public']['Tables']['attachments']['Row'];
 type Notification = Database['public']['Tables']['notifications']['Row'];
 type Generator = Database['public']['Tables']['generators']['Row'];
 type Project = Database['public']['Tables']['projects']['Row'];
+type Customer = Database['public']['Tables']['customers']['Row'];
 
 export const supabaseService = {
+  // Customer operations
+  async getCustomers(filters?: { search?: string; status?: string }) {
+    try {
+      let query = supabase
+        .from('customers')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (filters?.search) {
+        query = query.or(`name.ilike.%${filters.search}%,email.ilike.%${filters.search}%,company.ilike.%${filters.search}%`);
+      }
+      
+      if (filters?.status && filters.status !== 'all') {
+        query = query.eq('status', filters.status);
+      }
+      
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error fetching customers:', error);
+      throw error;
+    }
+  },
+
+  async createCustomer(customer: Omit<Customer, 'id' | 'created_at' | 'updated_at' | 'last_contact' | 'total_spent' | 'project_history'>) {
+    try {
+      const { data, error } = await supabase
+        .from('customers')
+        .insert(customer)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error creating customer:', error);
+      throw error;
+    }
+  },
+
+  async updateCustomer(id: string, updates: Partial<Customer>) {
+    try {
+      const { data, error } = await supabase
+        .from('customers')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error updating customer:', error);
+      throw error;
+    }
+  },
+
+  async deleteCustomer(id: string) {
+    try {
+      const { error } = await supabase
+        .from('customers')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Error deleting customer:', error);
+      throw error;
+    }
+  },
+
   // Generator operations
   async getGenerators() {
     try {
