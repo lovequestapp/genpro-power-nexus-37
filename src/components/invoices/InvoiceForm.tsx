@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -5,7 +6,7 @@ import {
   Typography,
   TextField,
   Button,
-  Grid,
+  Grid2 as Grid,
   IconButton,
   MenuItem,
   Divider,
@@ -242,7 +243,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoiceId, mode }) => 
           </Box>
 
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <Autocomplete
                 options={clients}
                 getOptionLabel={(option) => option.name}
@@ -268,7 +269,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoiceId, mode }) => 
                 )}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <TextField
                 select
                 label="Template"
@@ -289,7 +290,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoiceId, mode }) => 
                 ))}
               </TextField>
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <DatePicker
                 label="Issue Date"
                 value={new Date(formData.issue_date)}
@@ -314,7 +315,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoiceId, mode }) => 
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <DatePicker
                 label="Due Date"
                 value={new Date(formData.due_date)}
@@ -350,7 +351,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoiceId, mode }) => 
           {formData.items.map((item, index) => (
             <Box key={index} sx={{ mb: 2 }}>
               <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} md={6}>
+                <Grid xs={12} md={6}>
                   <TextField
                     label="Description"
                     value={item.description}
@@ -364,7 +365,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoiceId, mode }) => 
                     }}
                   />
                 </Grid>
-                <Grid item xs={12} md={2}>
+                <Grid xs={12} md={2}>
                   <TextField
                     label="Quantity"
                     type="number"
@@ -379,7 +380,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoiceId, mode }) => 
                     }}
                   />
                 </Grid>
-                <Grid item xs={12} md={3}>
+                <Grid xs={12} md={3}>
                   <TextField
                     label="Unit Price"
                     type="number"
@@ -397,7 +398,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoiceId, mode }) => 
                     }}
                   />
                 </Grid>
-                <Grid item xs={12} md={1}>
+                <Grid xs={12} md={1}>
                   <IconButton
                     onClick={() => removeItem(index)}
                     disabled={formData.items.length === 1}
@@ -431,7 +432,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoiceId, mode }) => 
           </Button>
 
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <TextField
                 label="Tax Rate (%)"
                 type="number"
@@ -448,7 +449,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoiceId, mode }) => 
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <TextField
                 label="Notes"
                 value={formData.notes}
@@ -463,7 +464,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoiceId, mode }) => 
                 }}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid xs={12}>
               <TextField
                 label="Terms & Conditions"
                 value={formData.terms}
@@ -483,4 +484,4 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ invoiceId, mode }) => 
       </Box>
     </LocalizationProvider>
   );
-}; 
+};

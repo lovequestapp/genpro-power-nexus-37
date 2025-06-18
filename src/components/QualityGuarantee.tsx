@@ -1,3 +1,4 @@
+
 import { motion, Transition, TargetAndTransition } from 'framer-motion';
 import { Shield, Star, CheckCircle2, Zap } from 'lucide-react';
 import { useState } from 'react';
@@ -26,7 +27,11 @@ const QualityGuarantee = () => {
 
   const pathVariants = {
     hidden: { pathLength: 0, opacity: 0 },
-    visible: { pathLength: 1, opacity: 1, transition: { duration: 1, ease: "easeInOut" } },
+    visible: { 
+      pathLength: 1, 
+      opacity: 1, 
+      transition: { duration: 1, ease: [0.4, 0, 0.2, 1] } 
+    },
   };
 
   const powerPulse: { animate: TargetAndTransition; transition: Transition } = {
@@ -36,7 +41,7 @@ const QualityGuarantee = () => {
     },
     transition: {
       duration: 1.5,
-      ease: "linear",
+      ease: [0.4, 0, 0.6, 1] as const,
       repeat: Infinity,
       repeatType: "loop" as const
     }
@@ -50,7 +55,7 @@ const QualityGuarantee = () => {
       transition: {
         duration: 0.8,
         repeat: Infinity,
-        ease: "easeOut",
+        ease: [0.4, 0, 0.6, 1] as const,
         repeatType: "loop" as const
       }
     }
@@ -305,4 +310,4 @@ const QualityGuarantee = () => {
   );
 };
 
-export default QualityGuarantee; 
+export default QualityGuarantee;
