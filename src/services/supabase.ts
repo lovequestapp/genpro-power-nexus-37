@@ -6,8 +6,206 @@ type Ticket = Database['public']['Tables']['tickets']['Row'];
 type Comment = Database['public']['Tables']['comments']['Row'];
 type Attachment = Database['public']['Tables']['attachments']['Row'];
 type Notification = Database['public']['Tables']['notifications']['Row'];
+type Generator = Database['public']['Tables']['generators']['Row'];
+type Project = Database['public']['Tables']['projects']['Row'];
 
 export const supabaseService = {
+  // Generator operations
+  async getGenerators() {
+    try {
+      const { data, error } = await supabase
+        .from('generators')
+        .select(`
+          *,
+          project:projects(id, name, status),
+          customer:customers(id, name, email)
+        `)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error fetching generators:', error);
+      throw error;
+    }
+  },
+
+  async getGeneratorStats() {
+    try {
+      const { data, error } = await supabase
+        .from('generators')
+        .select('status');
+      
+      if (error) throw error;
+      
+      const stats = {
+        total: data.length,
+        available: data.filter(g => g.status === 'available').length,
+        installed: data.filter(g => g.status === 'installed').length,
+        maintenance: data.filter(g => g.status === 'maintenance').length,
+        decommissioned: data.filter(g => g.status === 'decommissioned').length,
+      };
+      
+      return stats;
+    } catch (error) {
+      console.error('Error fetching generator stats:', error);
+      throw error;
+    }
+  },
+
+  async createGenerator(generator: Omit<Generator, 'id' | 'created_at' | 'updated_at'>) {
+    try {
+      const { data, error } = await supabase
+        .from('generators')
+        .insert(generator)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error creating generator:', error);
+      throw error;
+    }
+  },
+
+  async updateGenerator(id: string, updates: Partial<Generator>) {
+    try {
+      const { data, error } = await supabase
+        .from('generators')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error updating generator:', error);
+      throw error;
+    }
+  },
+
+  async assignGeneratorToProject(generatorId: string, projectId: string) {
+    try {
+      // Update generator
+      const { error: genError } = await supabase
+        .from('generators')
+        .update({ 
+          project_id: projectId, 
+          status: 'installed'
+        })
+        .eq('id', generatorId);
+      
+      if (genError) throw genError;
+
+      // Update project
+      const { data, error: projError } = await supabase
+        .from('projects')
+        .update({ 
+          generator_id: generatorId,
+          has_generator: true,
+          generator_status: 'installed'
+        })
+        .eq('id', projectId)
+        .select()
+        .single();
+      
+      if (projError) throw projError;
+      return data;
+    } catch (error) {
+      console.error('Error assigning generator to project:', error);
+      throw error;
+    }
+  },
+
+  // Updated project operations to include generator info
+  async getProjectsWithGenerators(filters?: { status?: string; search?: string }) {
+    let query = supabase
+      .from('projects')
+      .select(`
+        *,
+        generator:generators(id, serial_number, model, status),
+        owner:profiles!owner_id(id, full_name, email)
+      `)
+      .order('created_at', { ascending: false });
+      
+    if (filters?.status) query = query.eq('status', filters.status);
+    if (filters?.search) query = query.ilike('name', `%${filters.search}%`);
+    
+    const { data, error } = await query;
+    if (error) throw error;
+    return data;
+  },
+
+  async getDashboardStats() {
+    try {
+      const [
+        projectsResult,
+        generatorsResult,
+        ticketsResult,
+        customersResult
+      ] = await Promise.all([
+        supabase.from('projects').select('status, created_at'),
+        supabase.from('generators').select('status'),
+        supabase.from('tickets').select('status, created_at'),
+        supabase.from('customers').select('created_at')
+      ]);
+
+      if (projectsResult.error) throw projectsResult.error;
+      if (generatorsResult.error) throw generatorsResult.error;
+      if (ticketsResult.error) throw ticketsResult.error;
+      if (customersResult.error) throw customersResult.error;
+
+      const projects = projectsResult.data;
+      const generators = generatorsResult.data;
+      const tickets = ticketsResult.data;
+      const customers = customersResult.data;
+
+      // Calculate current month data
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+      
+      const thisMonthProjects = projects.filter(p => {
+        const date = new Date(p.created_at);
+        return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+      });
+
+      const thisMonthTickets = tickets.filter(t => {
+        const date = new Date(t.created_at);
+        return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+      });
+
+      const thisMonthCustomers = customers.filter(c => {
+        const date = new Date(c.created_at);
+        return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+      });
+
+      return {
+        totalProjects: projects.length,
+        activeProjects: projects.filter(p => p.status === 'in_progress').length,
+        completedProjects: projects.filter(p => p.status === 'completed').length,
+        projectsThisMonth: thisMonthProjects.length,
+        
+        totalGenerators: generators.length,
+        availableGenerators: generators.filter(g => g.status === 'available').length,
+        installedGenerators: generators.filter(g => g.status === 'installed').length,
+        maintenanceGenerators: generators.filter(g => g.status === 'maintenance').length,
+        
+        totalTickets: tickets.length,
+        openTickets: tickets.filter(t => t.status === 'open').length,
+        inProgressTickets: tickets.filter(t => t.status === 'in_progress').length,
+        ticketsThisMonth: thisMonthTickets.length,
+        
+        totalCustomers: customers.length,
+        newCustomersThisMonth: thisMonthCustomers.length,
+      };
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error);
+      throw error;
+    }
+  },
+
   // Profile operations
   async getProfile(userId: string) {
     const { data, error } = await supabase
@@ -364,4 +562,4 @@ export const supabaseService = {
     if (error) throw error;
     return true;
   },
-}; 
+};

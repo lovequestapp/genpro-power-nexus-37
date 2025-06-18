@@ -44,6 +44,56 @@ export type Database = {
           role?: string;
         };
       };
+      generators: {
+        Row: {
+          id: string;
+          serial_number: string;
+          model: string;
+          manufacturer: string;
+          power_output: number;
+          fuel_type: string;
+          status: 'available' | 'installed' | 'maintenance' | 'decommissioned';
+          location: string | null;
+          installation_date: string | null;
+          last_maintenance_date: string | null;
+          next_maintenance_date: string | null;
+          project_id: string | null;
+          customer_id: string | null;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          serial_number: string;
+          model: string;
+          manufacturer?: string;
+          power_output: number;
+          fuel_type?: string;
+          status?: 'available' | 'installed' | 'maintenance' | 'decommissioned';
+          location?: string | null;
+          installation_date?: string | null;
+          last_maintenance_date?: string | null;
+          next_maintenance_date?: string | null;
+          project_id?: string | null;
+          customer_id?: string | null;
+          notes?: string | null;
+        };
+        Update: {
+          serial_number?: string;
+          model?: string;
+          manufacturer?: string;
+          power_output?: number;
+          fuel_type?: string;
+          status?: 'available' | 'installed' | 'maintenance' | 'decommissioned';
+          location?: string | null;
+          installation_date?: string | null;
+          last_maintenance_date?: string | null;
+          next_maintenance_date?: string | null;
+          project_id?: string | null;
+          customer_id?: string | null;
+          notes?: string | null;
+        };
+      };
       projects: {
         Row: {
           id: string;
@@ -51,6 +101,9 @@ export type Database = {
           description: string;
           status: 'in_progress' | 'completed' | 'cancelled' | 'archived';
           owner_id: string;
+          generator_id: string | null;
+          has_generator: boolean;
+          generator_status: 'none' | 'pending' | 'installed' | 'maintenance';
           created_at: string;
           updated_at: string;
         };
@@ -59,12 +112,18 @@ export type Database = {
           description: string;
           status: 'in_progress' | 'completed' | 'cancelled' | 'archived';
           owner_id: string;
+          generator_id?: string | null;
+          has_generator?: boolean;
+          generator_status?: 'none' | 'pending' | 'installed' | 'maintenance';
         };
         Update: {
           name?: string;
           description?: string;
           status?: 'in_progress' | 'completed' | 'cancelled' | 'archived';
           owner_id?: string;
+          generator_id?: string | null;
+          has_generator?: boolean;
+          generator_status?: 'none' | 'pending' | 'installed' | 'maintenance';
         };
       };
       project_notes: {
@@ -170,3 +229,5 @@ export type Profile = Database['public']['Tables']['profiles']['Row'];
 export type Comment = Database['public']['Tables']['comments']['Row'];
 export type Attachment = Database['public']['Tables']['attachments']['Row'];
 export type Notification = Database['public']['Tables']['notifications']['Row'];
+export type Generator = Database['public']['Tables']['generators']['Row'];
+export type Project = Database['public']['Tables']['projects']['Row'];

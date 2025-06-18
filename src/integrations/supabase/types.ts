@@ -184,6 +184,78 @@ export type Database = {
         }
         Relationships: []
       }
+      generators: {
+        Row: {
+          created_at: string
+          customer_id: string | null
+          fuel_type: string | null
+          id: string
+          installation_date: string | null
+          last_maintenance_date: string | null
+          location: string | null
+          manufacturer: string | null
+          model: string
+          next_maintenance_date: string | null
+          notes: string | null
+          power_output: number
+          project_id: string | null
+          serial_number: string
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id?: string | null
+          fuel_type?: string | null
+          id?: string
+          installation_date?: string | null
+          last_maintenance_date?: string | null
+          location?: string | null
+          manufacturer?: string | null
+          model: string
+          next_maintenance_date?: string | null
+          notes?: string | null
+          power_output: number
+          project_id?: string | null
+          serial_number: string
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string | null
+          fuel_type?: string | null
+          id?: string
+          installation_date?: string | null
+          last_maintenance_date?: string | null
+          location?: string | null
+          manufacturer?: string | null
+          model?: string
+          next_maintenance_date?: string | null
+          notes?: string | null
+          power_output?: number
+          project_id?: string | null
+          serial_number?: string
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generators_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "generators_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string
@@ -428,6 +500,9 @@ export type Database = {
           customer_id: string | null
           description: string | null
           end_date: string | null
+          generator_id: string | null
+          generator_status: string | null
+          has_generator: boolean | null
           id: string
           name: string
           start_date: string | null
@@ -441,6 +516,9 @@ export type Database = {
           customer_id?: string | null
           description?: string | null
           end_date?: string | null
+          generator_id?: string | null
+          generator_status?: string | null
+          has_generator?: boolean | null
           id?: string
           name: string
           start_date?: string | null
@@ -454,6 +532,9 @@ export type Database = {
           customer_id?: string | null
           description?: string | null
           end_date?: string | null
+          generator_id?: string | null
+          generator_status?: string | null
+          has_generator?: boolean | null
           id?: string
           name?: string
           start_date?: string | null
@@ -466,6 +547,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projects_generator_id_fkey"
+            columns: ["generator_id"]
+            isOneToOne: false
+            referencedRelation: "generators"
             referencedColumns: ["id"]
           },
         ]
