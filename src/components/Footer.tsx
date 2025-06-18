@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Phone, Mail, MapPin, Clock, Facebook, Instagram, Youtube, Award, Shield, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -176,7 +175,7 @@ const Footer = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
             <div className="text-xs sm:text-sm font-medium text-center sm:text-left">
-              © 2024 HOU GEN PROS. All rights reserved. | Licensed & Insured
+              © 2025 HOU GEN PROS. All rights reserved. | Licensed & Insured
             </div>
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-8 text-xs sm:text-sm">
               {[
