@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -249,7 +248,7 @@ export default function GetQuote() {
           <Card className="shadow-xl border-0 overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-primary to-steel-700 text-white">
               <CardTitle className="flex items-center text-2xl">
-                {React.createElement(steps[currentStep - 1].icon, { className: "w-6 h-6 mr-3" })}
+                <steps[currentStep - 1].icon className="w-6 h-6 mr-3" />
                 {steps[currentStep - 1].title}
               </CardTitle>
             </CardHeader>
