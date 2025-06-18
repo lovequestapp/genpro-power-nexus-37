@@ -25,11 +25,10 @@ type ProjectFormValues = Database['public']['Tables']['projects']['Insert'];
 // Statuses for filtering
 const STATUS_TABS: { label: string; value: ProjectStatus | 'all' }[] = [
   { label: 'All', value: 'all' },
-  { label: 'Planned', value: 'planned' },
   { label: 'In Progress', value: 'in_progress' },
   { label: 'Completed', value: 'completed' },
   { label: 'Cancelled', value: 'cancelled' },
-  { label: 'On Hold', value: 'on_hold' },
+  { label: 'Archived', value: 'archived' },
 ];
 
 // ErrorBoundary for catching runtime errors
@@ -223,6 +222,7 @@ const ProjectsPage: React.FC = () => {
                 <TableHead>Name</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Customer</TableHead>
+                <TableHead>Budget</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -253,8 +253,7 @@ const ProjectsPage: React.FC = () => {
                     <Badge variant={
                       project.status === 'completed' ? 'default' :
                       project.status === 'in_progress' ? 'secondary' :
-                      project.status === 'planned' ? 'outline' :
-                      project.status === 'on_hold' ? 'outline' :
+                      project.status === 'archived' ? 'outline' :
                       project.status === 'cancelled' ? 'destructive' : 'secondary'
                     }>
                       {project.status?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Unknown'}
@@ -262,6 +261,9 @@ const ProjectsPage: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     {project.customer_id ? `Customer ${project.customer_id.slice(0, 8)}...` : '-'}
+                  </TableCell>
+                  <TableCell>
+                    {project.budget ? `$${Number(project.budget).toLocaleString()}` : '-'}
                   </TableCell>
                   <TableCell>{new Date(project.created_at || '').toLocaleDateString()}</TableCell>
                   <TableCell className="text-right">
@@ -278,7 +280,7 @@ const ProjectsPage: React.FC = () => {
               ))}
               {filtered.length === 0 && !loading && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-steel-500 py-8">
+                  <TableCell colSpan={7} className="text-center text-steel-500 py-8">
                     {error ? 'Unable to load projects' : 'No projects found.'}
                     {!error && (
                       <div className="mt-2">
@@ -331,6 +333,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ initial, onSuccess }) => {
     name: initial.name,
     description: initial.description,
     status: initial.status,
+    owner_id: initial.owner_id,
     customer_id: initial.customer_id,
     start_date: initial.start_date,
     end_date: initial.end_date,
@@ -338,7 +341,8 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ initial, onSuccess }) => {
   } : {
     name: '',
     description: '',
-    status: 'planned' as const,
+    status: 'in_progress' as const,
+    owner_id: 'temp-user-id', // This should come from auth context
     customer_id: null,
     start_date: null,
     end_date: null,
@@ -405,11 +409,10 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ initial, onSuccess }) => {
           value={values.status}
           onChange={handleChange}
         >
-          <option value="planned">Planned</option>
           <option value="in_progress">In Progress</option>
           <option value="completed">Completed</option>
-          <option value="on_hold">On Hold</option>
           <option value="cancelled">Cancelled</option>
+          <option value="archived">Archived</option>
         </select>
       </div>
       <div className="grid grid-cols-2 gap-4">
@@ -469,8 +472,7 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project }) => {
         <Badge variant={
           project.status === 'completed' ? 'default' :
           project.status === 'in_progress' ? 'secondary' :
-          project.status === 'planned' ? 'outline' :
-          project.status === 'on_hold' ? 'outline' :
+          project.status === 'archived' ? 'outline' :
           project.status === 'cancelled' ? 'destructive' : 'secondary'
         }>
           {project.status?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Unknown'}

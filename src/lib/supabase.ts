@@ -1,5 +1,4 @@
 
-
 import { createClient } from '@supabase/supabase-js';
 
 // Use the Supabase project configuration directly
@@ -147,17 +146,25 @@ export type Database = {
           generator_id: string | null;
           has_generator: boolean;
           generator_status: 'none' | 'pending' | 'installed' | 'maintenance';
+          customer_id: string | null;
+          start_date: string | null;
+          end_date: string | null;
+          budget: number | null;
           created_at: string;
           updated_at: string;
         };
         Insert: {
           name: string;
           description: string;
-          status: 'in_progress' | 'completed' | 'cancelled' | 'archived';
+          status?: 'in_progress' | 'completed' | 'cancelled' | 'archived';
           owner_id: string;
           generator_id?: string | null;
           has_generator?: boolean;
           generator_status?: 'none' | 'pending' | 'installed' | 'maintenance';
+          customer_id?: string | null;
+          start_date?: string | null;
+          end_date?: string | null;
+          budget?: number | null;
         };
         Update: {
           name?: string;
@@ -167,6 +174,10 @@ export type Database = {
           generator_id?: string | null;
           has_generator?: boolean;
           generator_status?: 'none' | 'pending' | 'installed' | 'maintenance';
+          customer_id?: string | null;
+          start_date?: string | null;
+          end_date?: string | null;
+          budget?: number | null;
         };
       };
       project_notes: {
@@ -275,4 +286,3 @@ export type Notification = Database['public']['Tables']['notifications']['Row'];
 export type Generator = Database['public']['Tables']['generators']['Row'];
 export type Project = Database['public']['Tables']['projects']['Row'];
 export type Customer = Database['public']['Tables']['customers']['Row'];
-
