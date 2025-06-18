@@ -29,9 +29,6 @@ import AdminDashboard from '@/pages/admin/Dashboard';
 import Customers from '@/pages/admin/Customers';
 import CustomerDetails from '@/pages/admin/CustomerDetails';
 import Projects from '@/pages/admin/Projects';
-import ProjectsActive from '@/pages/admin/ProjectsActive';
-import ProjectsCompleted from '@/pages/admin/ProjectsCompleted';
-import ProjectsCancelled from '@/pages/admin/ProjectsCancelled';
 import Inventory from '@/pages/admin/Inventory';
 import InventoryParts from '@/pages/admin/InventoryParts';
 import InventoryOrders from '@/pages/admin/InventoryOrders';
@@ -80,9 +77,6 @@ function App() {
                 <Route path="/admin/customers" element={<Customers />} />
                 <Route path="/admin/customers/:id" element={<CustomerDetails />} />
                 <Route path="/admin/projects" element={<Projects />} />
-                <Route path="/admin/projects/active" element={<ProjectsActive />} />
-                <Route path="/admin/projects/completed" element={<ProjectsCompleted />} />
-                <Route path="/admin/projects/cancelled" element={<ProjectsCancelled />} />
                 <Route path="/admin/inventory" element={<Inventory />} />
                 <Route path="/admin/inventory/parts" element={<InventoryParts />} />
                 <Route path="/admin/inventory/orders" element={<InventoryOrders />} />

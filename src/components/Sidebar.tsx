@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -11,10 +12,6 @@ import {
   FileText,
   Calendar,
   DollarSign,
-  BookOpen,
-  BarChart3,
-  Briefcase,
-  ShieldCheck,
   CreditCard,
 } from 'lucide-react';
 
@@ -22,9 +19,6 @@ const adminNav = [
   { label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" />, to: '/admin' },
   { label: 'Customers', icon: <Users className="w-5 h-5" />, to: '/admin/customers' },
   { label: 'Projects', icon: <ClipboardList className="w-5 h-5" />, to: '/admin/projects' },
-  { label: 'Active Projects', icon: <BarChart3 className="w-5 h-5" />, to: '/admin/projects/active' },
-  { label: 'Completed Projects', icon: <Briefcase className="w-5 h-5" />, to: '/admin/projects/completed' },
-  { label: 'Cancelled Projects', icon: <ShieldCheck className="w-5 h-5" />, to: '/admin/projects/cancelled' },
   { label: 'Inventory', icon: <Package className="w-5 h-5" />, to: '/admin/inventory' },
   { label: 'Parts', icon: <Wrench className="w-5 h-5" />, to: '/admin/inventory/parts' },
   { label: 'Orders', icon: <FileText className="w-5 h-5" />, to: '/admin/inventory/orders' },

@@ -56,11 +56,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       title: 'Projects',
       icon: <FileText className="w-5 h-5" />,
       path: '/admin/projects',
-      submenu: [
-        { title: 'Active Projects', icon: <ChevronDown className="w-4 h-4" />, path: '/admin/projects/active' },
-        { title: 'Project Calendar', icon: <ChevronDown className="w-4 h-4" />, path: '/admin/projects/calendar' },
-        { title: 'Resources', icon: <ChevronDown className="w-4 h-4" />, path: '/admin/projects/resources' },
-      ],
     },
     {
       title: 'Customers',
@@ -299,4 +294,4 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </main>
     </div>
   );
-} 
+}
