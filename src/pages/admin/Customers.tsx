@@ -1,9 +1,11 @@
+
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
+import { supabaseService } from '@/services/supabase';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,22 +14,26 @@ import { toast } from '@/components/ui/use-toast';
 import { Edit, Trash, Plus, Search, Filter, Download, Mail, Phone, Building, Calendar, DollarSign, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 
-// Customer type
+// Customer type based on the database schema
 interface Customer {
   id: string;
   name: string;
   email: string;
-  phone: string;
-  address: string;
-  company: string;
+  phone?: string;
+  address?: string;
+  company?: string;
   status: 'active' | 'inactive';
   type: 'residential' | 'commercial';
-  serviceLevel: 'basic' | 'premium' | 'enterprise';
-  createdAt: string;
-  lastContact: string;
-  totalSpent: number;
-  projectHistory: any[];
+  service_level: 'basic' | 'premium' | 'enterprise';
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+  last_contact: string;
+  total_spent: number;
+  project_history: any[];
 }
+
+type CustomerFormData = Omit<Customer, 'id' | 'created_at' | 'updated_at' | 'last_contact' | 'total_spent' | 'project_history'>;
 
 export default function CustomersPage() {
   const queryClient = useQueryClient();
@@ -35,7 +41,7 @@ export default function CustomersPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editCustomer, setEditCustomer] = useState<Customer | null>(null);
   const [activeTab, setActiveTab] = useState('all');
-  const [form, setForm] = useState<Omit<Customer, 'id' | 'createdAt' | 'lastContact' | 'totalSpent' | 'projectHistory'>>({
+  const [form, setForm] = useState<CustomerFormData>({
     name: '',
     email: '',
     phone: '',
@@ -43,106 +49,144 @@ export default function CustomersPage() {
     company: '',
     status: 'active',
     type: 'residential',
-    serviceLevel: 'basic'
+    service_level: 'basic',
+    notes: ''
   });
 
-  // Fetch customers
+  // Fetch customers with proper filtering
   const { data: customers, isLoading } = useQuery({
     queryKey: ['customers', search, activeTab],
     queryFn: async () => {
-      let query = supabase.from('customers').select('*').order('createdAt', { ascending: false });
-      
-      if (search) {
-        query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%,company.ilike.%${search}%`);
-      }
-      
-      if (activeTab !== 'all') {
-        query = query.eq('status', activeTab);
-      }
-      
-      const { data, error } = await query;
-      if (error) throw error;
-      return data as Customer[];
+      console.log('Fetching customers with search:', search, 'tab:', activeTab);
+      return await supabaseService.getCustomers({ search, status: activeTab });
     }
   });
 
-  // Add or update customer
+  // Create or update customer mutation
   const mutation = useMutation({
-    mutationFn: async (customer: { id?: string } & Omit<Customer, 'id' | 'createdAt' | 'lastContact' | 'totalSpent' | 'projectHistory'>) => {
-      if (customer.id) {
-        const { error } = await supabase.from('customers').update(customer).eq('id', customer.id);
-        if (error) throw error;
-        return { id: customer.id };
+    mutationFn: async (customerData: CustomerFormData & { id?: string }) => {
+      console.log('Submitting customer data:', customerData);
+      
+      if (customerData.id) {
+        // Update existing customer
+        const { id, ...updateData } = customerData;
+        return await supabaseService.updateCustomer(id, updateData);
       } else {
-        const { error } = await supabase.from('customers').insert([{
-          ...customer,
-          createdAt: new Date().toISOString(),
-          lastContact: new Date().toISOString(),
-          totalSpent: 0,
-          projectHistory: []
-        }]);
-        if (error) throw error;
-        return {};
+        // Create new customer
+        const { id, ...createData } = customerData;
+        return await supabaseService.createCustomer(createData);
       }
     },
-    onSuccess: () => {
-      toast({ title: `Customer ${editCustomer ? 'updated' : 'added'} successfully!` });
+    onSuccess: (data) => {
+      console.log('Customer operation successful:', data);
+      toast({ 
+        title: `Customer ${editCustomer ? 'updated' : 'created'} successfully!`,
+        description: `${form.name} has been ${editCustomer ? 'updated' : 'added'} to your customer database.`
+      });
       setModalOpen(false);
       setEditCustomer(null);
-      setForm({
-        name: '',
-        email: '',
-        phone: '',
-        address: '',
-        company: '',
-        status: 'active',
-        type: 'residential',
-        serviceLevel: 'basic'
+      resetForm();
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+    },
+    onError: (error: any) => {
+      console.error('Customer operation failed:', error);
+      toast({ 
+        title: 'Error', 
+        description: error.message || 'Failed to save customer. Please try again.',
+        variant: 'destructive' 
+      });
+    }
+  });
+
+  // Delete customer mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      console.log('Deleting customer:', id);
+      return await supabaseService.deleteCustomer(id);
+    },
+    onSuccess: () => {
+      toast({ 
+        title: 'Customer deleted!',
+        description: 'The customer has been permanently removed from your database.'
       });
       queryClient.invalidateQueries({ queryKey: ['customers'] });
     },
-    onError: (error: any) => toast({ title: 'Error', description: error.message, variant: 'destructive' })
+    onError: (error: any) => {
+      console.error('Delete failed:', error);
+      toast({ 
+        title: 'Error', 
+        description: error.message || 'Failed to delete customer. Please try again.',
+        variant: 'destructive' 
+      });
+    }
   });
 
-  // Delete customer
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from('customers').delete().eq('id', id);
-      if (error) throw error;
-      return id;
-    },
-    onSuccess: () => {
-      toast({ title: 'Customer deleted!' });
-      queryClient.invalidateQueries({ queryKey: ['customers'] });
-    },
-    onError: (error: any) => toast({ title: 'Error', description: error.message, variant: 'destructive' })
-  });
+  const resetForm = () => {
+    setForm({
+      name: '',
+      email: '',
+      phone: '',
+      address: '',
+      company: '',
+      status: 'active',
+      type: 'residential',
+      service_level: 'basic',
+      notes: ''
+    });
+  };
 
   const handleEdit = (customer: Customer) => {
+    console.log('Editing customer:', customer);
     setEditCustomer(customer);
     setForm({
       name: customer.name,
       email: customer.email,
-      phone: customer.phone,
-      address: customer.address,
-      company: customer.company,
+      phone: customer.phone || '',
+      address: customer.address || '',
+      company: customer.company || '',
       status: customer.status,
       type: customer.type,
-      serviceLevel: customer.serviceLevel
+      service_level: customer.service_level,
+      notes: customer.notes || ''
     });
     setModalOpen(true);
   };
 
   const handleDelete = (customer: Customer) => {
-    if (window.confirm(`Are you sure you want to delete ${customer.name}? This action cannot be undone.`)) {
+    if (window.confirm(`Are you sure you want to delete ${customer.name}? This action cannot be undone and will permanently remove all customer data.`)) {
       deleteMutation.mutate(customer.id);
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted:', form);
+    
+    // Validate required fields
+    if (!form.name.trim()) {
+      toast({ title: 'Error', description: 'Customer name is required.', variant: 'destructive' });
+      return;
+    }
+    if (!form.email.trim()) {
+      toast({ title: 'Error', description: 'Customer email is required.', variant: 'destructive' });
+      return;
+    }
+
     mutation.mutate(editCustomer ? { ...form, id: editCustomer.id } : form);
   };
+
+  const openAddModal = () => {
+    setEditCustomer(null);
+    resetForm();
+    setModalOpen(true);
+  };
+
+  const filteredCustomers = customers?.filter(customer => {
+    if (activeTab !== 'all' && activeTab !== customer.status && activeTab !== customer.type) {
+      return false;
+    }
+    return true;
+  }) || [];
 
   return (
     <div className="p-6 space-y-6">
@@ -158,61 +202,111 @@ export default function CustomersPage() {
           </Button>
           <Dialog open={modalOpen} onOpenChange={setModalOpen}>
             <DialogTrigger asChild>
-              <Button onClick={() => { setEditCustomer(null); setForm({
-                name: '',
-                email: '',
-                phone: '',
-                address: '',
-                company: '',
-                status: 'active',
-                type: 'residential',
-                serviceLevel: 'basic'
-              }); setModalOpen(true); }}>
+              <Button onClick={openAddModal}>
                 <Plus className="w-4 h-4 mr-2" /> Add Customer
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>{editCustomer ? 'Edit Customer' : 'Add Customer'}</DialogTitle>
+                <DialogTitle>{editCustomer ? 'Edit Customer' : 'Add New Customer'}</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-4">
-                    <Input placeholder="Name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required />
-                    <Input placeholder="Email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} type="email" />
-                    <Input placeholder="Phone" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
-                    <Input placeholder="Address" value={form.address} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} />
+                    <div>
+                      <label className="text-sm font-medium">Name *</label>
+                      <Input 
+                        placeholder="Full Name" 
+                        value={form.name} 
+                        onChange={e => setForm(f => ({ ...f, name: e.target.value }))} 
+                        required 
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Email *</label>
+                      <Input 
+                        placeholder="email@example.com" 
+                        value={form.email} 
+                        onChange={e => setForm(f => ({ ...f, email: e.target.value }))} 
+                        type="email" 
+                        required 
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Phone</label>
+                      <Input 
+                        placeholder="(555) 123-4567" 
+                        value={form.phone} 
+                        onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} 
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Address</label>
+                      <Textarea 
+                        placeholder="Full Address" 
+                        value={form.address} 
+                        onChange={e => setForm(f => ({ ...f, address: e.target.value }))} 
+                        rows={2}
+                      />
+                    </div>
                   </div>
                   <div className="space-y-4">
-                    <Input placeholder="Company" value={form.company} onChange={e => setForm(f => ({ ...f, company: e.target.value }))} />
-                    <select 
-                      className="w-full p-2 border rounded-md"
-                      value={form.type}
-                      onChange={e => setForm(f => ({ ...f, type: e.target.value as 'residential' | 'commercial' }))}
-                    >
-                      <option value="residential">Residential</option>
-                      <option value="commercial">Commercial</option>
-                    </select>
-                    <select 
-                      className="w-full p-2 border rounded-md"
-                      value={form.serviceLevel}
-                      onChange={e => setForm(f => ({ ...f, serviceLevel: e.target.value as 'basic' | 'premium' | 'enterprise' }))}
-                    >
-                      <option value="basic">Basic</option>
-                      <option value="premium">Premium</option>
-                      <option value="enterprise">Enterprise</option>
-                    </select>
-                    <select 
-                      className="w-full p-2 border rounded-md"
-                      value={form.status}
-                      onChange={e => setForm(f => ({ ...f, status: e.target.value as 'active' | 'inactive' }))}
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
+                    <div>
+                      <label className="text-sm font-medium">Company</label>
+                      <Input 
+                        placeholder="Company Name" 
+                        value={form.company} 
+                        onChange={e => setForm(f => ({ ...f, company: e.target.value }))} 
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Customer Type</label>
+                      <select 
+                        className="w-full p-2 border rounded-md bg-white"
+                        value={form.type}
+                        onChange={e => setForm(f => ({ ...f, type: e.target.value as 'residential' | 'commercial' }))}
+                      >
+                        <option value="residential">Residential</option>
+                        <option value="commercial">Commercial</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Service Level</label>
+                      <select 
+                        className="w-full p-2 border rounded-md bg-white"
+                        value={form.service_level}
+                        onChange={e => setForm(f => ({ ...f, service_level: e.target.value as 'basic' | 'premium' | 'enterprise' }))}
+                      >
+                        <option value="basic">Basic</option>
+                        <option value="premium">Premium</option>
+                        <option value="enterprise">Enterprise</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Status</label>
+                      <select 
+                        className="w-full p-2 border rounded-md bg-white"
+                        value={form.status}
+                        onChange={e => setForm(f => ({ ...f, status: e.target.value as 'active' | 'inactive' }))}
+                      >
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
-                <Button type="submit" className="w-full">{editCustomer ? 'Update' : 'Add'} Customer</Button>
+                <div>
+                  <label className="text-sm font-medium">Notes</label>
+                  <Textarea 
+                    placeholder="Additional notes about this customer..." 
+                    value={form.notes} 
+                    onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} 
+                    rows={3}
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={mutation.isPending}>
+                  {mutation.isPending ? 'Saving...' : (editCustomer ? 'Update Customer' : 'Add Customer')}
+                </Button>
               </form>
             </DialogContent>
           </Dialog>
@@ -222,7 +316,12 @@ export default function CustomersPage() {
       <div className="flex gap-4 mb-6">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-          <Input placeholder="Search customers..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
+          <Input 
+            placeholder="Search customers by name, email, or company..." 
+            value={search} 
+            onChange={e => setSearch(e.target.value)} 
+            className="pl-10" 
+          />
         </div>
         <Button variant="outline">
           <Filter className="w-4 h-4 mr-2" />
@@ -232,11 +331,11 @@ export default function CustomersPage() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
-          <TabsTrigger value="all">All Customers</TabsTrigger>
-          <TabsTrigger value="active">Active</TabsTrigger>
-          <TabsTrigger value="inactive">Inactive</TabsTrigger>
-          <TabsTrigger value="commercial">Commercial</TabsTrigger>
-          <TabsTrigger value="residential">Residential</TabsTrigger>
+          <TabsTrigger value="all">All Customers ({customers?.length || 0})</TabsTrigger>
+          <TabsTrigger value="active">Active ({customers?.filter(c => c.status === 'active').length || 0})</TabsTrigger>
+          <TabsTrigger value="inactive">Inactive ({customers?.filter(c => c.status === 'inactive').length || 0})</TabsTrigger>
+          <TabsTrigger value="commercial">Commercial ({customers?.filter(c => c.type === 'commercial').length || 0})</TabsTrigger>
+          <TabsTrigger value="residential">Residential ({customers?.filter(c => c.type === 'residential').length || 0})</TabsTrigger>
         </TabsList>
 
         <TabsContent value={activeTab}>
@@ -250,18 +349,19 @@ export default function CustomersPage() {
                   <TableHead>Service Level</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Last Contact</TableHead>
+                  <TableHead>Total Spent</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  <TableRow><TableCell colSpan={7} className="text-center">Loading...</TableCell></TableRow>
-                ) : customers && customers.length ? customers.map(customer => (
+                  <TableRow><TableCell colSpan={8} className="text-center py-8">Loading customers...</TableCell></TableRow>
+                ) : filteredCustomers.length ? filteredCustomers.map(customer => (
                   <TableRow key={customer.id}>
                     <TableCell>
                       <div>
                         <div className="font-medium">{customer.name}</div>
-                        <div className="text-sm text-muted-foreground">{customer.company}</div>
+                        {customer.company && <div className="text-sm text-muted-foreground">{customer.company}</div>}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -270,10 +370,12 @@ export default function CustomersPage() {
                           <Mail className="w-3 h-3 mr-2" />
                           {customer.email}
                         </div>
-                        <div className="flex items-center text-sm">
-                          <Phone className="w-3 h-3 mr-2" />
-                          {customer.phone}
-                        </div>
+                        {customer.phone && (
+                          <div className="flex items-center text-sm">
+                            <Phone className="w-3 h-3 mr-2" />
+                            {customer.phone}
+                          </div>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -283,11 +385,11 @@ export default function CustomersPage() {
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className={
-                        customer.serviceLevel === 'enterprise' ? 'border-purple-500 text-purple-500' :
-                        customer.serviceLevel === 'premium' ? 'border-blue-500 text-blue-500' :
+                        customer.service_level === 'enterprise' ? 'border-purple-500 text-purple-500' :
+                        customer.service_level === 'premium' ? 'border-blue-500 text-blue-500' :
                         'border-gray-500 text-gray-500'
                       }>
-                        {customer.serviceLevel}
+                        {customer.service_level}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -298,20 +400,39 @@ export default function CustomersPage() {
                     <TableCell>
                       <div className="flex items-center text-sm text-muted-foreground">
                         <Calendar className="w-3 h-3 mr-2" />
-                        {format(new Date(customer.lastContact), 'MMM d, yyyy')}
+                        {format(new Date(customer.last_contact), 'MMM d, yyyy')}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center text-sm">
+                        <DollarSign className="w-3 h-3 mr-1" />
+                        ${customer.total_spent.toFixed(2)}
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" onClick={() => handleEdit(customer)}>
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(customer)}>
-                        <Trash className="w-4 h-4" />
-                      </Button>
+                      <div className="flex justify-end gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => handleEdit(customer)}>
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(customer)}>
+                          <Trash className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 )) : (
-                  <TableRow><TableCell colSpan={7} className="text-center">No customers found.</TableCell></TableRow>
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center py-8">
+                      <div className="flex flex-col items-center gap-2">
+                        <FileText className="w-8 h-8 text-muted-foreground" />
+                        <p className="text-muted-foreground">No customers found.</p>
+                        <Button onClick={openAddModal} size="sm">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add your first customer
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
                 )}
               </TableBody>
             </Table>
@@ -320,4 +441,4 @@ export default function CustomersPage() {
       </Tabs>
     </div>
   );
-} 
+}
