@@ -603,7 +603,8 @@ const AdminDashboard: React.FC = () => {
           updatedAt: editingTicket.updatedAt,
           title: editingTicket.title,
           customerName: editingTicket.customerName,
-          comments: editingTicket.comments
+          comments: editingTicket.comments,
+          date: editingTicket.date
         });
       } else {
         await supportService.create({
@@ -618,7 +619,8 @@ const AdminDashboard: React.FC = () => {
           updatedAt: new Date().toISOString(),
           title: editingTicket.title,
           customerName: editingTicket.customerName,
-          comments: []
+          comments: [],
+          date: new Date().toISOString()
         });
       }
       setOpenTicketDialog(false);
@@ -1160,4 +1162,4 @@ const AdminDashboard: React.FC = () => {
   );
 };
 
-export default AdminDashboard; 
+export default AdminDashboard;

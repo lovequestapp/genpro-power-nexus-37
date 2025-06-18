@@ -30,6 +30,7 @@ import { TicketList } from '@/components/tickets/TicketList';
 import { TicketDetails } from '@/components/tickets/TicketDetails';
 import { TicketStats } from '@/components/tickets/TicketStats';
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface GeneratorStatus {
   status: string;
@@ -67,6 +68,15 @@ export default function Dashboard() {
     inProgress: 0,
     resolved: 0,
     closed: 0
+  });
+  const queryClient = useQueryClient();
+  const addComment = useMutation({
+    mutationFn: async ({ ticketId, comment }: { ticketId: string; comment: string }) => {
+      return await supportService.addComment(ticketId, comment);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customerTickets'] });
+    },
   });
 
   useEffect(() => {
@@ -203,10 +213,7 @@ export default function Dashboard() {
 
   const handleAddComment = async (ticketId: string, comment: string) => {
     try {
-      const response = await supportService.addComment(ticketId, {
-        content: comment,
-        author: 'Customer',
-      });
+      const response = await addComment.mutateAsync({ ticketId, comment });
       if (response.success) {
         const updatedTickets = tickets.map(ticket => 
           ticket.id === ticketId ? response.data : ticket
@@ -426,4 +433,4 @@ export default function Dashboard() {
       </div>
     </div>
   );
-} 
+}

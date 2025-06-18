@@ -18,6 +18,8 @@ export type Project = {
   owner_id: string;
   owner_name: string;
   created_at: string;
+  address: string;
+  technicians: string[];
 };
 
 export interface Technician {
@@ -207,4 +209,4 @@ export interface Bill {
   dueDate: string;
   createdAt: string;
   updatedAt: string;
-} 
+}

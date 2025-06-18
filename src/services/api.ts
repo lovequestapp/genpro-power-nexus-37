@@ -423,9 +423,11 @@ export const supportService = {
     }
     ticket.comments.push({
       id: `comment-${ticket.comments.length + 1}`,
-      text: comment,
-      createdAt: new Date().toISOString(),
-      createdBy: 'admin'
+      content: comment,
+      message: comment,
+      author: 'admin',
+      date: new Date().toISOString(),
+      createdAt: new Date().toISOString()
     });
     return {
       success: true,
@@ -469,7 +471,10 @@ export const supportService = {
     }
     ticket.attachments.push({
       id: `attachment-${ticket.attachments.length + 1}`,
-      ...attachment,
+      name: attachment.name,
+      url: attachment.url,
+      type: 'file',
+      size: 1024,
       uploadedAt: new Date().toISOString()
     });
     return {

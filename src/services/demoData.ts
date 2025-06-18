@@ -59,7 +59,7 @@ export const generateDemoGenerators = (): Generator[] => {
       readings: generateReadings(`res-${index + 1}`),
       model: type.name,
       powerRating: type.power,
-      fuelType: type.fuel,
+      fuelType: type.fuel as 'gasoline' | 'diesel' | 'propane',
       runtime: type.runtime,
       installationDate: new Date(Date.now() - Math.random() * 365 * 24 * 3600000).toISOString(),
       warrantyExpiry: new Date(Date.now() + Math.random() * 365 * 24 * 3600000).toISOString()
@@ -79,7 +79,7 @@ export const generateDemoGenerators = (): Generator[] => {
       readings: generateReadings(`com-${index + 1}`),
       model: type.name,
       powerRating: type.power,
-      fuelType: type.fuel,
+      fuelType: type.fuel as 'gasoline' | 'diesel' | 'propane',
       runtime: type.runtime,
       installationDate: new Date(Date.now() - Math.random() * 365 * 24 * 3600000).toISOString(),
       warrantyExpiry: new Date(Date.now() + Math.random() * 365 * 24 * 3600000).toISOString()
@@ -92,8 +92,8 @@ export const generateDemoGenerators = (): Generator[] => {
 // Generate demo customers
 export const generateDemoCustomers = (): Customer[] => {
   const customers: Customer[] = [];
-  const customerTypes = ['residential', 'commercial'];
-  const serviceLevels = ['basic', 'premium', 'enterprise'];
+  const customerTypes: ('residential' | 'commercial')[] = ['residential', 'commercial'];
+  const serviceLevels: ('basic' | 'premium' | 'enterprise')[] = ['basic', 'premium', 'enterprise'];
 
   for (let i = 0; i < 20; i++) {
     const type = customerTypes[Math.floor(Math.random() * customerTypes.length)];
@@ -121,7 +121,7 @@ export const generateDemoCustomers = (): Customer[] => {
 // Generate demo staff
 export const generateDemoStaff = (): StaffMember[] => {
   const staff: StaffMember[] = [];
-  const roles = ['admin', 'support', 'technician'];
+  const roles: ('admin' | 'support' | 'technician')[] = ['admin', 'support', 'technician'];
   const names = [
     'John Smith', 'Jane Doe', 'Mike Johnson', 'Sarah Williams',
     'David Brown', 'Lisa Davis', 'Tom Wilson', 'Emma Taylor'
@@ -148,9 +148,9 @@ export const generateDemoStaff = (): StaffMember[] => {
 // Generate demo tickets
 export const generateDemoTickets = (customers: Customer[], staff: StaffMember[]): Service[] => {
   const tickets: Service[] = [];
-  const ticketTypes = ['technical', 'billing', 'general'];
-  const priorities = ['low', 'medium', 'high', 'urgent'];
-  const statuses = ['open', 'in_progress', 'resolved', 'closed'];
+  const ticketTypes: ('technical' | 'billing' | 'general')[] = ['technical', 'billing', 'general'];
+  const priorities: ('low' | 'medium' | 'high' | 'urgent')[] = ['low', 'medium', 'high', 'urgent'];
+  const statuses: ('open' | 'in_progress' | 'resolved' | 'closed')[] = ['open', 'in_progress', 'resolved', 'closed'];
 
   for (let i = 0; i < 50; i++) {
     const customer = customers[Math.floor(Math.random() * customers.length)];
@@ -171,6 +171,7 @@ export const generateDemoTickets = (customers: Customer[], staff: StaffMember[])
       assignedTo: Math.random() > 0.3 ? staffMember.id : undefined,
       createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 3600000).toISOString(),
       updatedAt: new Date().toISOString(),
+      date: new Date(Date.now() - Math.random() * 30 * 24 * 3600000).toISOString(),
       comments: [],
       attachments: []
     });
@@ -182,7 +183,7 @@ export const generateDemoTickets = (customers: Customer[], staff: StaffMember[])
 // Generate demo bills
 export const generateDemoBills = (customers: Customer[]): Bill[] => {
   const bills: Bill[] = [];
-  const statuses = ['pending', 'paid', 'overdue'];
+  const statuses: ('pending' | 'paid' | 'overdue')[] = ['pending', 'paid', 'overdue'];
 
   customers.forEach(customer => {
     const billCount = Math.floor(Math.random() * 5) + 1;
@@ -193,6 +194,7 @@ export const generateDemoBills = (customers: Customer[]): Bill[] => {
       bills.push({
         id: `bill-${customer.id}-${i + 1}`,
         customerId: customer.id,
+        customerName: customer.name,
         amount,
         status,
         dueDate: new Date(Date.now() + Math.random() * 30 * 24 * 3600000).toISOString(),
@@ -223,8 +225,8 @@ export const generateDemoBills = (customers: Customer[]): Bill[] => {
 // Generate demo alerts
 export const generateDemoAlerts = (generators: Generator[]): Alert[] => {
   const alerts: Alert[] = [];
-  const alertTypes = ['warning', 'error', 'info'];
-  const statuses = ['active', 'resolved'];
+  const alertTypes: ('warning' | 'error' | 'info')[] = ['warning', 'error', 'info'];
+  const statuses: ('active' | 'resolved')[] = ['active', 'resolved'];
 
   generators.forEach(generator => {
     const alertCount = Math.floor(Math.random() * 3);
@@ -269,4 +271,4 @@ export const getDemoData = () => {
     data: demoData,
     message: 'Demo data retrieved successfully'
   };
-}; 
+};
