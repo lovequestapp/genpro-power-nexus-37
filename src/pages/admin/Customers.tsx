@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabaseService } from '@/services/supabase';
@@ -13,25 +14,6 @@ import { toast } from '@/components/ui/use-toast';
 import { Edit, Trash, Plus, Search, Filter, Download, Mail, Phone, Building, Calendar, DollarSign, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import type { Customer } from '@/lib/supabase';
-
-// Customer type based on the database schema
-interface Customer {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  address?: string;
-  company?: string;
-  status: 'active' | 'inactive';
-  type: 'residential' | 'commercial';
-  service_level: 'basic' | 'premium' | 'enterprise';
-  notes?: string;
-  created_at: string;
-  updated_at: string;
-  last_contact: string;
-  total_spent: number;
-  project_history: any[];
-}
 
 type CustomerFormData = {
   name: string;
@@ -358,14 +340,13 @@ export default function CustomersPage() {
                   <TableHead>Type</TableHead>
                   <TableHead>Service Level</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Last Contact</TableHead>
-                  <TableHead>Total Spent</TableHead>
+                  <TableHead>Created</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  <TableRow><TableCell colSpan={8} className="text-center py-8">Loading customers...</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={7} className="text-center py-8">Loading customers...</TableCell></TableRow>
                 ) : filteredCustomers.length ? filteredCustomers.map(customer => (
                   <TableRow key={customer.id}>
                     <TableCell>
@@ -410,13 +391,7 @@ export default function CustomersPage() {
                     <TableCell>
                       <div className="flex items-center text-sm text-muted-foreground">
                         <Calendar className="w-3 h-3 mr-2" />
-                        {format(new Date(customer.last_contact), 'MMM d, yyyy')}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center text-sm">
-                        <DollarSign className="w-3 h-3 mr-1" />
-                        ${customer.total_spent.toFixed(2)}
+                        {customer.created_at ? format(new Date(customer.created_at), 'MMM d, yyyy') : 'N/A'}
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
@@ -432,7 +407,7 @@ export default function CustomersPage() {
                   </TableRow>
                 )) : (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8">
+                    <TableCell colSpan={7} className="text-center py-8">
                       <div className="flex flex-col items-center gap-2">
                         <FileText className="w-8 h-8 text-muted-foreground" />
                         <p className="text-muted-foreground">No customers found.</p>

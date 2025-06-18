@@ -36,7 +36,17 @@ export const supabaseService = {
     }
   },
 
-  async createCustomer(customer: Omit<Customer, 'id' | 'created_at' | 'updated_at' | 'last_contact' | 'total_spent' | 'project_history'>) {
+  async createCustomer(customer: {
+    name: string;
+    email: string;
+    phone?: string | null;
+    address?: string | null;
+    company?: string | null;
+    status?: 'active' | 'inactive';
+    type?: 'residential' | 'commercial';
+    service_level?: 'basic' | 'premium' | 'enterprise';
+    notes?: string | null;
+  }) {
     try {
       const { data, error } = await supabase
         .from('customers')
@@ -52,7 +62,17 @@ export const supabaseService = {
     }
   },
 
-  async updateCustomer(id: string, updates: Partial<Customer>) {
+  async updateCustomer(id: string, updates: {
+    name?: string;
+    email?: string;
+    phone?: string | null;
+    address?: string | null;
+    company?: string | null;
+    status?: 'active' | 'inactive';
+    type?: 'residential' | 'commercial';
+    service_level?: 'basic' | 'premium' | 'enterprise';
+    notes?: string | null;
+  }) {
     try {
       const { data, error } = await supabase
         .from('customers')
