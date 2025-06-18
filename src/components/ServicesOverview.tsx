@@ -15,6 +15,7 @@ import {
   Zap,
   Shield
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const ServicesOverview = () => {
   const services = [
@@ -113,13 +114,15 @@ const ServicesOverview = () => {
                       ))}
                     </div>
                     
-                    <Button 
-                      variant="outline" 
-                      className="w-full group-hover:bg-accent group-hover:text-white group-hover:border-accent transition-all duration-300 touch-manipulation h-10 sm:h-auto bg-white border-steel-300 text-steel-700"
-                    >
-                      Get Free Quote
-                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                    </Button>
+                    <Link to="/get-quote">
+                      <Button 
+                        variant="outline" 
+                        className="w-full group-hover:bg-accent group-hover:text-white group-hover:border-accent transition-all duration-300 touch-manipulation h-10 sm:h-auto bg-white border-steel-300 text-steel-700"
+                      >
+                        Get Free Quote
+                        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                      </Button>
+                    </Link>
                   </div>
                 </CardContent>
               </Card>
@@ -164,13 +167,15 @@ const ServicesOverview = () => {
                 * Permit fees not included. Delivery & installation available (cost varies by location)
               </p>
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center max-w-lg mx-auto">
-                <Button 
-                  size="lg" 
-                  className="bg-accent hover:bg-orange-600 text-white touch-manipulation h-12 sm:h-auto flex-1 sm:flex-none"
-                >
-                  <Phone className="w-5 h-5 mr-2" />
-                  Message for Free Quote
-                </Button>
+                <Link to="/get-quote" className="flex-1 sm:flex-none">
+                  <Button 
+                    size="lg" 
+                    className="bg-accent hover:bg-orange-600 text-white touch-manipulation h-12 sm:h-auto w-full"
+                  >
+                    <Phone className="w-5 h-5 mr-2" />
+                    Message for Free Quote
+                  </Button>
+                </Link>
                 <Button 
                   size="lg" 
                   variant="outline" 

@@ -1,7 +1,9 @@
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Home, CheckCircle, Star } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const ProductShowcase = () => {
   const products = [
@@ -141,13 +143,15 @@ const ProductShowcase = () => {
                     ))}
                   </ul>
                   
-                  <Button 
-                    variant="outline" 
-                    className="w-full group-hover:bg-accent group-hover:text-white group-hover:border-accent transition-all duration-300 touch-manipulation h-10 sm:h-auto"
-                  >
-                    Get Quote
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                  </Button>
+                  <Link to="/get-quote">
+                    <Button 
+                      variant="outline" 
+                      className="w-full group-hover:bg-accent group-hover:text-white group-hover:border-accent transition-all duration-300 touch-manipulation h-10 sm:h-auto"
+                    >
+                      Get Quote
+                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             );
@@ -191,14 +195,16 @@ const ProductShowcase = () => {
               View All Products
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="border-accent text-accent hover:bg-accent hover:text-white px-6 sm:px-8 touch-manipulation h-12 sm:h-auto flex-1 sm:flex-none"
-            >
-              Message for Free Quote
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
+            <Link to="/get-quote" className="flex-1 sm:flex-none">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="border-accent text-accent hover:bg-accent hover:text-white px-6 sm:px-8 touch-manipulation h-12 sm:h-auto w-full"
+              >
+                Message for Free Quote
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

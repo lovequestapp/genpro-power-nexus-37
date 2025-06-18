@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
@@ -18,6 +19,7 @@ import Services from '@/pages/Services';
 import Products from '@/pages/Products';
 import Industries from '@/pages/Industries';
 import Emergency from '@/pages/Emergency';
+import GetQuote from '@/pages/GetQuote';
 import CustomerDashboard from '@/pages/customer/Dashboard';
 import CustomerProfile from '@/pages/customer/Profile';
 import CustomerProjects from '@/pages/customer/Projects';
@@ -58,6 +60,7 @@ function App() {
                 <Route path="/products" element={<Products />} />
                 <Route path="/industries" element={<Industries />} />
                 <Route path="/emergency" element={<Emergency />} />
+                <Route path="/get-quote" element={<GetQuote />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
