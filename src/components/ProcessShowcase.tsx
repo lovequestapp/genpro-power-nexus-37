@@ -335,14 +335,14 @@ const ProcessShowcase = () => {
                   <step.icon className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">{step.title}</h3>
-                <p className="text-white/80 mb-4">{step.description}</p>
+                <p className="text-white mb-4">{step.description}</p>
                 
                 {/* Features */}
                 <div className="space-y-2">
                   {step.features.map((feature, featureIndex) => (
-                    <div key={featureIndex} className="flex items-center text-white/70">
+                    <div key={featureIndex} className="flex items-center text-white">
                       <feature.icon className="w-4 h-4 mr-2 text-orange-400" />
-                      <span className="text-sm">{feature.label}</span>
+                      <span className="text-sm text-white">{feature.label}</span>
                     </div>
                   ))}
                 </div>
