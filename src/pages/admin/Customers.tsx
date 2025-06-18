@@ -43,20 +43,23 @@ export default function CustomersPage() {
     notes: ''
   });
 
-  // Fetch customers with proper filtering
-  const { data: customers, isLoading, error } = useQuery({
+  // Fetch customers with proper typing and error handling
+  const { data: customers, isLoading, error } = useQuery<Customer[]>({
     queryKey: ['customers', search, activeTab],
-    queryFn: async () => {
+    queryFn: async (): Promise<Customer[]> => {
       console.log('Fetching customers with search:', search, 'tab:', activeTab);
-      return await supabaseService.getCustomers({ search, status: activeTab });
-    },
-    onError: (error: any) => {
-      console.error('Error fetching customers:', error);
-      toast({
-        title: 'Error fetching customers',
-        description: error.message || 'Failed to load customers. Please try again.',
-        variant: 'destructive'
-      });
+      try {
+        const result = await supabaseService.getCustomers({ search, status: activeTab });
+        return result || [];
+      } catch (error: any) {
+        console.error('Error fetching customers:', error);
+        toast({
+          title: 'Error fetching customers',
+          description: error.message || 'Failed to load customers. Please try again.',
+          variant: 'destructive'
+        });
+        throw error;
+      }
     }
   });
 
