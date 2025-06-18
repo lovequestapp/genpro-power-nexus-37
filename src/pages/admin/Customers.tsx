@@ -44,12 +44,13 @@ export default function CustomersPage() {
   });
 
   // Fetch customers with proper typing and error handling
-  const { data: customers, isLoading, error } = useQuery<Customer[]>({
+  const { data: customers = [], isLoading, error } = useQuery<Customer[]>({
     queryKey: ['customers', search, activeTab],
     queryFn: async (): Promise<Customer[]> => {
       console.log('Fetching customers with search:', search, 'tab:', activeTab);
       try {
         const result = await supabaseService.getCustomers({ search, status: activeTab });
+        console.log('Customers fetched successfully:', result?.length || 0);
         return result || [];
       } catch (error: any) {
         console.error('Error fetching customers:', error);
@@ -78,13 +79,15 @@ export default function CustomersPage() {
         } else {
           // Create new customer - remove id from data
           const { id, ...createData } = customerData;
+          console.log('Creating customer with cleaned data:', createData);
           const result = await supabaseService.createCustomer(createData);
           console.log('Customer created successfully:', result);
           return result;
         }
       } catch (error: any) {
         console.error('Customer operation error:', error);
-        throw error;
+        console.error('Error details:', error.message, error.details);
+        throw new Error(error.message || 'Failed to save customer');
       }
     },
     onSuccess: (data) => {
@@ -180,10 +183,17 @@ export default function CustomersPage() {
       return;
     }
 
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email.trim())) {
+      toast({ title: 'Error', description: 'Please enter a valid email address.', variant: 'destructive' });
+      return;
+    }
+
     // Prepare form data - ensure null values are properly handled
     const formData: CustomerFormData & { id?: string } = {
       name: form.name.trim(),
-      email: form.email.trim(),
+      email: form.email.trim().toLowerCase(),
       phone: form.phone?.trim() || null,
       address: form.address?.trim() || null,
       company: form.company?.trim() || null,
@@ -193,8 +203,13 @@ export default function CustomersPage() {
       ...(editCustomer && { id: editCustomer.id })
     };
 
-    console.log('Prepared form data:', formData);
-    mutation.mutate(formData);
+    console.log('Prepared form data for submission:', formData);
+    
+    try {
+      await mutation.mutateAsync(formData);
+    } catch (error) {
+      console.error('Form submission error:', error);
+    }
   };
 
   const openAddModal = () => {
