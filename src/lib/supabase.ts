@@ -4,6 +4,8 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
+  console.error('Supabase URL:', supabaseUrl);
+  console.error('Supabase Key:', supabaseKey ? 'Present' : 'Missing');
   throw new Error('Missing Supabase environment variables');
 }
 
@@ -166,4 +168,4 @@ export type Ticket = Database['public']['Tables']['tickets']['Row'];
 export type Profile = Database['public']['Tables']['profiles']['Row'];
 export type Comment = Database['public']['Tables']['comments']['Row'];
 export type Attachment = Database['public']['Tables']['attachments']['Row'];
-export type Notification = Database['public']['Tables']['notifications']['Row']; 
+export type Notification = Database['public']['Tables']['notifications']['Row'];
