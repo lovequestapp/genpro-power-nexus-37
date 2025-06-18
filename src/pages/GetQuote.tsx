@@ -195,7 +195,7 @@ export default function GetQuote() {
     );
   }
 
-  const currentStepIcon = steps[currentStep - 1].icon;
+  const CurrentStepIcon = steps[currentStep - 1].icon;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-steel-50 to-white pt-24 pb-12">
@@ -250,7 +250,7 @@ export default function GetQuote() {
           <Card className="shadow-xl border-0 overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-primary to-steel-700 text-white">
               <CardTitle className="flex items-center text-2xl">
-                <currentStepIcon className="w-6 h-6 mr-3" />
+                <CurrentStepIcon className="w-6 h-6 mr-3" />
                 {steps[currentStep - 1].title}
               </CardTitle>
             </CardHeader>
