@@ -256,6 +256,75 @@ export type Database = {
           },
         ]
       }
+      milestones: {
+        Row: {
+          assigned_to: string | null
+          completed_date: string | null
+          created_at: string
+          dependencies: string[] | null
+          description: string | null
+          due_date: string | null
+          id: string
+          metadata: Json | null
+          order_index: number | null
+          priority: string | null
+          progress_percentage: number | null
+          project_id: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          completed_date?: string | null
+          created_at?: string
+          dependencies?: string[] | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          metadata?: Json | null
+          order_index?: number | null
+          priority?: string | null
+          progress_percentage?: number | null
+          project_id: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          completed_date?: string | null
+          created_at?: string
+          dependencies?: string[] | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          metadata?: Json | null
+          order_index?: number | null
+          priority?: string | null
+          progress_percentage?: number | null
+          project_id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "milestones_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "milestones_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string
@@ -403,6 +472,57 @@ export type Database = {
           },
         ]
       }
+      project_audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          field_name: string | null
+          id: string
+          metadata: Json | null
+          new_value: string | null
+          old_value: string | null
+          project_id: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          field_name?: string | null
+          id?: string
+          metadata?: Json | null
+          new_value?: string | null
+          old_value?: string | null
+          project_id: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          field_name?: string | null
+          id?: string
+          metadata?: Json | null
+          new_value?: string | null
+          old_value?: string | null
+          project_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_audit_log_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_audit_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_comments: {
         Row: {
           author_id: string | null
@@ -492,8 +612,42 @@ export type Database = {
           },
         ]
       }
+      project_status_rules: {
+        Row: {
+          allowed_roles: string[]
+          created_at: string
+          from_status: string
+          id: string
+          metadata: Json | null
+          notification_template: string | null
+          requires_approval: boolean | null
+          to_status: string
+        }
+        Insert: {
+          allowed_roles: string[]
+          created_at?: string
+          from_status: string
+          id?: string
+          metadata?: Json | null
+          notification_template?: string | null
+          requires_approval?: boolean | null
+          to_status: string
+        }
+        Update: {
+          allowed_roles?: string[]
+          created_at?: string
+          from_status?: string
+          id?: string
+          metadata?: Json | null
+          notification_template?: string | null
+          requires_approval?: boolean | null
+          to_status?: string
+        }
+        Relationships: []
+      }
       projects: {
         Row: {
+          address: string | null
           assigned_to: string[] | null
           budget: number | null
           created_at: string | null
@@ -504,12 +658,15 @@ export type Database = {
           generator_status: string | null
           has_generator: boolean | null
           id: string
+          metadata: Json | null
           name: string
+          owner_id: string | null
           start_date: string | null
           status: string | null
           updated_at: string | null
         }
         Insert: {
+          address?: string | null
           assigned_to?: string[] | null
           budget?: number | null
           created_at?: string | null
@@ -520,12 +677,15 @@ export type Database = {
           generator_status?: string | null
           has_generator?: boolean | null
           id?: string
+          metadata?: Json | null
           name: string
+          owner_id?: string | null
           start_date?: string | null
           status?: string | null
           updated_at?: string | null
         }
         Update: {
+          address?: string | null
           assigned_to?: string[] | null
           budget?: number | null
           created_at?: string | null
@@ -536,7 +696,9 @@ export type Database = {
           generator_status?: string | null
           has_generator?: boolean | null
           id?: string
+          metadata?: Json | null
           name?: string
+          owner_id?: string | null
           start_date?: string | null
           status?: string | null
           updated_at?: string | null
@@ -554,6 +716,13 @@ export type Database = {
             columns: ["generator_id"]
             isOneToOne: false
             referencedRelation: "generators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projects_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -679,6 +848,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_project_progress: {
+        Args: { project_uuid: string }
+        Returns: {
+          total_milestones: number
+          completed_milestones: number
+          in_progress_milestones: number
+          delayed_milestones: number
+          overall_progress: number
+        }[]
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
