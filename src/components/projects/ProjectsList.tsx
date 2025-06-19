@@ -1,10 +1,10 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreVerticalIcon, EditIcon, EyeIcon } from 'lucide-react';
-import type { Project } from '@/lib/supabase';
+import { MoreVerticalIcon, EditIcon, EyeIcon, UsersIcon } from 'lucide-react';
+import { supabaseService } from '@/services/supabase';
+import type { Project, Customer, Profile } from '@/lib/supabase';
 
 interface ProjectsListProps {
   projects: Project[];
@@ -20,7 +20,6 @@ const getStatusBadgeVariant = (status: string) => {
   switch (status) {
     case 'completed': return 'default';
     case 'in_progress': return 'secondary';
-    case 'planned': return 'outline';
     case 'archived': return 'outline';
     case 'cancelled': return 'destructive';
     default: return 'secondary';
@@ -28,13 +27,17 @@ const getStatusBadgeVariant = (status: string) => {
 };
 
 const formatCurrency = (amount: number | null) => {
-  if (!amount) return '-';
+  if (!amount) return 'Not set';
   return `$${Number(amount).toLocaleString()}`;
 };
 
 const formatDate = (date: string | null) => {
-  if (!date) return '-';
-  return new Date(date).toLocaleDateString();
+  if (!date) return 'Not set';
+  return new Date(date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
 };
 
 export function ProjectsList({
@@ -46,6 +49,43 @@ export function ProjectsList({
   onEdit,
   loading = false
 }: ProjectsListProps) {
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [technicians, setTechnicians] = useState<Profile[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
+
+  // Fetch customers and technicians for display
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoadingData(true);
+        const [customersData, techniciansData] = await Promise.all([
+          supabaseService.getCustomers(),
+          supabaseService.getStaff()
+        ]);
+        
+        setCustomers(customersData || []);
+        setTechnicians(techniciansData || []);
+      } catch (error) {
+        console.error('Error fetching list data:', error);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const getCustomerName = (customerId: string | null) => {
+    if (!customerId) return 'Not assigned';
+    const customer = customers.find(c => c.id === customerId);
+    return customer ? `${customer.name}${customer.company ? ` (${customer.company})` : ''}` : 'Unknown Customer';
+  };
+
+  const getTechniciansCount = (assignedTo: string[] | null) => {
+    if (!assignedTo || assignedTo.length === 0) return 0;
+    return assignedTo.length;
+  };
+
   const allSelected = selectedIds.length === projects.length && projects.length > 0;
 
   if (loading) {
@@ -75,8 +115,9 @@ export function ProjectsList({
             </TableHead>
             <TableHead>Project</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Owner</TableHead>
+            <TableHead>Customer</TableHead>
             <TableHead>Budget</TableHead>
+            <TableHead>Technicians</TableHead>
             <TableHead>Start Date</TableHead>
             <TableHead>Created</TableHead>
             <TableHead className="text-right">Actions</TableHead>
@@ -120,8 +161,8 @@ export function ProjectsList({
                 </Badge>
               </TableCell>
               <TableCell>
-                <span className="text-steel-600">
-                  {project.owner_id ? `Owner ${project.owner_id.slice(0, 8)}...` : 'Not assigned'}
+                <span className="text-steel-600 text-sm">
+                  {getCustomerName(project.customer_id)}
                 </span>
               </TableCell>
               <TableCell>
@@ -130,12 +171,20 @@ export function ProjectsList({
                 </span>
               </TableCell>
               <TableCell>
-                <span className="text-steel-600">
+                <div className="flex items-center gap-1">
+                  <UsersIcon className="w-4 h-4 text-steel-400" />
+                  <span className="text-sm text-steel-600">
+                    {getTechniciansCount(project.assigned_to)}
+                  </span>
+                </div>
+              </TableCell>
+              <TableCell>
+                <span className="text-steel-600 text-sm">
                   {formatDate(project.start_date)}
                 </span>
               </TableCell>
               <TableCell>
-                <span className="text-steel-600">
+                <span className="text-steel-600 text-sm">
                   {formatDate(project.created_at)}
                 </span>
               </TableCell>
@@ -163,7 +212,7 @@ export function ProjectsList({
           ))}
           {projects.length === 0 && (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-12">
+              <TableCell colSpan={9} className="text-center py-12">
                 <div className="text-center">
                   <p className="text-steel-500 mb-4">No projects found</p>
                   <p className="text-sm text-steel-400">Start by creating your first project</p>

@@ -195,6 +195,15 @@ const Footer = () => {
           </div>
         </div>
       </div>
+
+      {/* Construction Banner */}
+      <div className="bg-accent text-white py-3 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center text-sm sm:text-base font-medium">
+            🚧 Website Currently Under Construction 🚧 | For Updates or Any Issues, Please Message Us or Call Us at (915) 800-7767
+          </div>
+        </div>
+      </div>
     </footer>
   );
 };

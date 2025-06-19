@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
@@ -72,7 +71,7 @@ function App() {
                 <Route path="/customer/support" element={<CustomerSupport />} />
               </Route>
 
-              <Route element={<AdminLayout />}>
+              <Route element={<ProtectedRoute allowedRoles={['admin']}><AdminLayout /></ProtectedRoute>}>
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/customers" element={<Customers />} />
                 <Route path="/admin/customers/:id" element={<CustomerDetails />} />

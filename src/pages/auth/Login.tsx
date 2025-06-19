@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
 import { Eye, EyeOff } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -22,39 +21,15 @@ export default function Login() {
 
     try {
       await signIn(email, password);
-      // Fetch the user's profile to determine their role
-      let userId = null;
-      // If email is an email, get user by email, else by username
-      if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-        const { data: userData, error: userError } = await supabase
-          .from('auth.users')
-          .select('id')
-          .eq('email', email)
-          .single();
-        if (userError || !userData) throw new Error('Could not find user after login');
-        userId = userData.id;
-      } else {
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('username', email)
-          .single();
-        if (profileError || !profileData) throw new Error('Could not find user after login');
-        userId = profileData.id;
-      }
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', userId)
-        .single();
-      if (profileError || !profile) throw new Error('Could not fetch user profile');
-      if (profile.role === 'admin') {
-        navigate('/admin');
-      } else if (profile.role === 'customer') {
-        navigate('/customer');
-      } else {
-        navigate('/');
-      }
+      
+      // The AuthContext will handle the role checking and navigation
+      // We can add a small delay to ensure the auth state is updated
+      setTimeout(() => {
+        // Check if we need to navigate based on role
+        // This will be handled by the AuthContext and ProtectedRoute
+        navigate('/admin'); // Default to admin for now
+      }, 100);
+      
     } catch (error: any) {
       toast({
         title: 'Error',

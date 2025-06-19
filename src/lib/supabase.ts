@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 
 // Use the Supabase project configuration directly
@@ -11,7 +10,18 @@ if (!supabaseUrl || !supabaseKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'supabase-js/2.x'
+    }
+  }
+});
 
 export type Json =
   | string
@@ -141,12 +151,13 @@ export type Database = {
           id: string;
           name: string;
           description: string;
-          status: 'in_progress' | 'completed' | 'cancelled' | 'archived';
+          status: 'planned' | 'in_progress' | 'completed' | 'cancelled' | 'archived';
           owner_id: string;
           generator_id: string | null;
           has_generator: boolean;
           generator_status: 'none' | 'pending' | 'installed' | 'maintenance';
           customer_id: string | null;
+          assigned_to: string[] | null;
           start_date: string | null;
           end_date: string | null;
           budget: number | null;
@@ -156,12 +167,13 @@ export type Database = {
         Insert: {
           name: string;
           description: string;
-          status?: 'in_progress' | 'completed' | 'cancelled' | 'archived';
+          status?: 'planned' | 'in_progress' | 'completed' | 'cancelled' | 'archived';
           owner_id: string;
           generator_id?: string | null;
           has_generator?: boolean;
           generator_status?: 'none' | 'pending' | 'installed' | 'maintenance';
           customer_id?: string | null;
+          assigned_to?: string[] | null;
           start_date?: string | null;
           end_date?: string | null;
           budget?: number | null;
@@ -169,12 +181,13 @@ export type Database = {
         Update: {
           name?: string;
           description?: string;
-          status?: 'in_progress' | 'completed' | 'cancelled' | 'archived';
+          status?: 'planned' | 'in_progress' | 'completed' | 'cancelled' | 'archived';
           owner_id?: string;
           generator_id?: string | null;
           has_generator?: boolean;
           generator_status?: 'none' | 'pending' | 'installed' | 'maintenance';
           customer_id?: string | null;
+          assigned_to?: string[] | null;
           start_date?: string | null;
           end_date?: string | null;
           budget?: number | null;

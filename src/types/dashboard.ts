@@ -20,6 +20,8 @@ export type Project = {
   created_at: string;
   address: string;
   technicians: string[];
+  progress_percentage?: number;
+  milestones?: Milestone[];
 };
 
 export interface Technician {
@@ -209,4 +211,55 @@ export interface Bill {
   dueDate: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Milestone {
+  id: string;
+  project_id: string;
+  title: string;
+  description?: string;
+  status: 'pending' | 'in_progress' | 'completed' | 'delayed' | 'cancelled';
+  due_date?: string;
+  completed_date?: string;
+  assigned_to?: string;
+  priority: 'low' | 'medium' | 'high';
+  progress_percentage: number;
+  dependencies: string[];
+  order_index: number;
+  created_at: string;
+  updated_at: string;
+  metadata?: Record<string, any>;
+}
+
+export interface ProjectAuditLog {
+  id: string;
+  project_id: string;
+  user_id?: string;
+  action: string;
+  field_name?: string;
+  old_value?: string;
+  new_value?: string;
+  created_at: string;
+  metadata?: Record<string, any>;
+}
+
+export interface ProjectStatusRule {
+  id: string;
+  from_status: string;
+  to_status: string;
+  allowed_roles: string[];
+  requires_approval: boolean;
+  notification_template?: string;
+  created_at: string;
+  metadata?: Record<string, any>;
+}
+
+export interface ProjectProgress {
+  total_milestones: number;
+  completed_milestones: number;
+  in_progress_milestones: number;
+  delayed_milestones: number;
+  overall_progress: number;
+  estimated_completion?: string;
+  critical_path_milestones: string[];
 }

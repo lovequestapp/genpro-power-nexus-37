@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Phone, MessageSquare, Users, Award, MapPin, Calendar, CheckCircle, Shield, Wrench, Clock, Star, Building, Target, Heart } from 'lucide-react';
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+
 const About = () => {
   const stats = [{
     number: '15+',
@@ -17,25 +17,6 @@ const About = () => {
   }, {
     number: '24/7',
     label: 'Emergency Support'
-  }];
-  const team = [{
-    name: 'Michael Brown',
-    position: 'CEO & Founder',
-    image: 'https://images.unsplash.com/photo-1534528741702-a0cfae58c947?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=4&w=300&h=300&q=80',
-    bio: 'Experienced entrepreneur with a passion for power solutions and a commitment to customer satisfaction.',
-    experience: '15 years'
-  }, {
-    name: 'Jessica Davis',
-    position: 'Service Manager',
-    image: 'https://images.unsplash.com/photo-1599566150163-29194dca953c?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=4&w=300&h=300&q=80',
-    bio: 'Dedicated service professional ensuring every client receives prompt, reliable, and expert support.',
-    experience: '10 years'
-  }, {
-    name: 'David Wilson',
-    position: 'Lead Technician',
-    image: 'https://images.unsplash.com/photo-1580489944761-15a19d674x?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=4&w=300&h=300&q=80',
-    bio: 'Certified technician with extensive experience in generator installation, maintenance, and emergency repair.',
-    experience: '12 years'
   }];
   const values = [{
     title: 'Reliability',
@@ -105,7 +86,7 @@ const About = () => {
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Button size="lg" className="bg-accent hover:bg-orange-600 text-white px-8 py-4">
                 <Phone className="w-5 h-5 mr-2" />
-                Meet Our Team
+                Get Free Quote
               </Button>
               <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-4 text-steel-800">
                 <MessageSquare className="w-5 h-5 mr-2" />
@@ -128,39 +109,8 @@ const About = () => {
         </div>
       </section>
 
-      {/* Leadership Team */}
-      <section className="py-20 bg-steel-50">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-primary mb-6">Leadership Team</h2>
-            <p className="text-xl text-steel-600 max-w-3xl mx-auto">
-              Meet the experienced professionals leading Houston's premier generator service company.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {team.map((member, index) => <Card key={index} className="overflow-hidden hover:shadow-xl transition-shadow duration-300 border-0 shadow-md">
-                <div className="relative h-80 bg-gradient-to-br from-steel-100 to-steel-200">
-                  <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
-                    <h3 className="text-xl font-bold text-white mb-1">{member.name}</h3>
-                    <p className="text-accent font-medium">{member.position}</p>
-                  </div>
-                </div>
-                <CardContent className="p-6">
-                  <p className="text-steel-600 mb-4 text-sm">{member.bio}</p>
-                  <div className="flex items-center text-sm text-steel-500">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    {member.experience} with company
-                  </div>
-                </CardContent>
-              </Card>)}
-          </div>
-        </div>
-      </section>
-
       {/* Company Values */}
-      <section className="py-20">
+      <section className="py-20 bg-steel-50">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-primary mb-6">Our Values</h2>
@@ -187,7 +137,7 @@ const About = () => {
       </section>
 
       {/* Company Timeline */}
-      <section className="py-20 bg-steel-50">
+      <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-primary mb-6">Our Journey</h2>
@@ -214,7 +164,7 @@ const About = () => {
       </section>
 
       {/* Certifications */}
-      <section className="py-20">
+      <section className="py-20 bg-steel-50">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-primary mb-6">Certifications & Partnerships</h2>
@@ -245,7 +195,7 @@ const About = () => {
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Button size="lg" className="bg-accent hover:bg-orange-600 text-white px-8 py-4">
               <Phone className="w-5 h-5 mr-2" />
-              Call (832) 555-POWER
+              Call (915) 800-7767
             </Button>
             <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-4 text-steel-800">
               <MessageSquare className="w-5 h-5 mr-2" />
@@ -254,8 +204,6 @@ const About = () => {
           </div>
         </div>
       </section>
-
-      <Footer />
     </div>;
 };
 export default About;

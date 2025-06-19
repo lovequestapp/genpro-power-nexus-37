@@ -1,10 +1,10 @@
-
 import React, { useEffect, useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { toast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/supabase';
 import { supabaseService } from '@/services/supabase';
+import { useAuth } from '@/contexts/AuthContext';
 import { ProjectHeader } from './ProjectHeader';
 import { ProjectFilters } from './ProjectFilters';
 import { ProjectsList } from './ProjectsList';
@@ -25,86 +25,35 @@ const ProjectsPage: React.FC = () => {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
 
-  // Check authentication
-  const checkAuth = async () => {
-    try {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (error) {
-        console.error('Auth error:', error);
-        toast({
-          title: 'Authentication Error',
-          description: 'Please log in to access projects.',
-          variant: 'destructive'
-        });
-        return false;
-      }
-      
-      if (!user) {
-        toast({
-          title: 'Not Authenticated',
-          description: 'Please log in to access projects.',
-          variant: 'destructive'
-        });
-        return false;
-      }
-      
-      setUser(user);
-      console.log('User authenticated:', user.id);
-      return true;
-    } catch (error) {
-      console.error('Error checking auth:', error);
-      return false;
-    }
-  };
-
-  // Test Supabase connection
-  const testSupabaseConnection = async () => {
-    try {
-      console.log('Testing Supabase connection...');
-      const { data, error } = await supabase.from('projects').select('count', { count: 'exact' });
-      if (error) {
-        console.error('Supabase connection test failed:', error);
-        toast({
-          title: 'Connection Error',
-          description: 'Failed to connect to database. Please refresh the page.',
-          variant: 'destructive'
-        });
-        return false;
-      } else {
-        console.log('Supabase connection successful. Project count:', data);
-        return true;
-      }
-    } catch (error) {
-      console.error('Supabase connection test error:', error);
-      return false;
-    }
-  };
+  // Use AuthContext instead of local auth state
+  const { user, loading: authLoading } = useAuth();
 
   // Fetch projects
   const fetchProjects = async () => {
     try {
-      setLoading(true);
+      if (!loading) {  // Only set loading if we're not already loading
+        setLoading(true);
+      }
       console.log('Fetching projects...');
       
-      // Check authentication first
-      const isAuthenticated = await checkAuth();
-      if (!isAuthenticated) {
-        setLoading(false);
-        return;
-      }
-      
-      // Test connection
-      const connectionOk = await testSupabaseConnection();
-      if (!connectionOk) {
-        setLoading(false);
-        return;
-      }
-      
+      // Call getProjects directly - it has its own connection test
       const data = await supabaseService.getProjects();
-      console.log('Projects fetched successfully:', data?.length || 0);
+      
+      console.log('Projects list updated:', {
+        count: data?.length || 0,
+        projects: data,
+        timestamp: new Date().toISOString()
+      });
+      
       setProjects(data || []);
+      
+      // Log the current state after setting the data
+      console.log('Current projects state:', {
+        allProjects: data?.length || 0,
+        timestamp: new Date().toISOString()
+      });
+      
     } catch (error: any) {
       console.error('Error fetching projects:', error);
       toast({
@@ -119,6 +68,12 @@ const ProjectsPage: React.FC = () => {
 
   // Filter projects
   useEffect(() => {
+    console.log('Filtering projects:', {
+      totalProjects: projects.length,
+      status,
+      search
+    });
+    
     let filtered = projects;
 
     // Filter by status
@@ -135,6 +90,12 @@ const ProjectsPage: React.FC = () => {
       );
     }
 
+    console.log('Filtered results:', {
+      filteredCount: filtered.length,
+      filters: { status, search },
+      timestamp: new Date().toISOString()
+    });
+
     setFilteredProjects(filtered);
   }, [projects, status, search]);
 
@@ -145,6 +106,14 @@ const ProjectsPage: React.FC = () => {
 
   // Handlers
   const handleCreateNew = () => {
+    if (authLoading) {
+      toast({
+        title: 'Loading',
+        description: 'Please wait while we verify your authentication...',
+      });
+      return;
+    }
+    
     if (!user) {
       toast({
         title: 'Authentication Required',
@@ -158,6 +127,14 @@ const ProjectsPage: React.FC = () => {
   };
 
   const handleEdit = (project: Project) => {
+    if (authLoading) {
+      toast({
+        title: 'Loading',
+        description: 'Please wait while we verify your authentication...',
+      });
+      return;
+    }
+    
     if (!user) {
       toast({
         title: 'Authentication Required',
@@ -174,10 +151,32 @@ const ProjectsPage: React.FC = () => {
     setSelectedProject(project);
   };
 
-  const handleFormSuccess = () => {
+  const handleFormSuccess = async () => {
+    console.log('Form success handler triggered');
     setShowForm(false);
     setEditingProject(null);
-    fetchProjects();
+    
+    // Add a small delay to ensure the server has processed the change
+    console.log('Waiting for server processing...');
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Fetch fresh data
+    console.log('Fetching updated project list...');
+    try {
+      await fetchProjects();
+      
+      toast({
+        title: 'Success',
+        description: 'Project list has been updated'
+      });
+    } catch (error) {
+      console.error('Error refreshing projects:', error);
+      toast({
+        title: 'Warning',
+        description: 'Project was saved but the list may not be up to date. Please refresh the page.',
+        variant: 'destructive'
+      });
+    }
   };
 
   const handleFormCancel = () => {
@@ -199,6 +198,14 @@ const ProjectsPage: React.FC = () => {
 
   const handleBulkDelete = async () => {
     if (!selectedIds.length) return;
+    
+    if (authLoading) {
+      toast({
+        title: 'Loading',
+        description: 'Please wait while we verify your authentication...',
+      });
+      return;
+    }
     
     if (!user) {
       toast({
@@ -230,58 +237,86 @@ const ProjectsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-steel-50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <ProjectHeader
-          selectedCount={selectedIds.length}
-          onCreateNew={handleCreateNew}
-          onBulkDelete={handleBulkDelete}
-          loading={loading}
-        />
+        {/* Show loading while auth is being checked */}
+        {authLoading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-4"></div>
+              <p className="text-steel-600">Verifying authentication...</p>
+            </div>
+          </div>
+        )}
 
-        {/* Filters */}
-        <ProjectFilters
-          status={status}
-          search={search}
-          onStatusChange={setStatus}
-          onSearchChange={setSearch}
-        />
-
-        {/* Projects List */}
-        <ProjectsList
-          projects={filteredProjects}
-          selectedIds={selectedIds}
-          onToggleSelect={handleToggleSelect}
-          onSelectAll={handleSelectAll}
-          onView={handleView}
-          onEdit={handleEdit}
-          loading={loading}
-        />
-
-        {/* Create/Edit Project Modal */}
-        <Dialog open={showForm} onOpenChange={setShowForm}>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>
-                {editingProject ? 'Edit Project' : 'Create New Project'}
-              </DialogTitle>
-            </DialogHeader>
-            <ProjectForm
-              project={editingProject}
-              onSuccess={handleFormSuccess}
-              onCancel={handleFormCancel}
+        {/* Main content - only show when not loading auth */}
+        {!authLoading && (
+          <>
+            {/* Header */}
+            <ProjectHeader
+              selectedCount={selectedIds.length}
+              onCreateNew={handleCreateNew}
+              onBulkDelete={handleBulkDelete}
+              loading={loading}
             />
-          </DialogContent>
-        </Dialog>
 
-        {/* Project Detail Drawer */}
-        <Drawer open={!!selectedProject} onOpenChange={(open) => !open && setSelectedProject(null)}>
-          <DrawerContent className="max-w-4xl mx-auto">
-            <DrawerHeader>
-              <DrawerTitle>Project Details</DrawerTitle>
-            </DrawerHeader>
-            {selectedProject && <ProjectDetail project={selectedProject} />}
-          </DrawerContent>
-        </Drawer>
+            {/* Filters */}
+            <ProjectFilters
+              status={status}
+              search={search}
+              onStatusChange={setStatus}
+              onSearchChange={setSearch}
+            />
+
+            {/* Loading State */}
+            {loading ? (
+              <div className="bg-white rounded-lg border p-8">
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mr-3"></div>
+                  <p>Loading projects...</p>
+                </div>
+              </div>
+            ) : (
+              /* Projects List */
+              <ProjectsList
+                projects={filteredProjects}
+                selectedIds={selectedIds}
+                onToggleSelect={handleToggleSelect}
+                onSelectAll={handleSelectAll}
+                onView={handleView}
+                onEdit={handleEdit}
+                loading={false}
+              />
+            )}
+
+            {/* Create/Edit Project Modal */}
+            <Dialog open={showForm} onOpenChange={(open) => !open && handleFormCancel()}>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>
+                    {editingProject ? 'Edit Project' : 'Create New Project'}
+                  </DialogTitle>
+                  <DialogDescription>
+                    {editingProject ? 'Update the project details below.' : 'Fill in the project information to create a new project.'}
+                  </DialogDescription>
+                </DialogHeader>
+                <ProjectForm
+                  project={editingProject}
+                  onSuccess={handleFormSuccess}
+                  onCancel={handleFormCancel}
+                />
+              </DialogContent>
+            </Dialog>
+
+            {/* Project Detail Drawer */}
+            <Drawer open={!!selectedProject} onOpenChange={(open) => !open && setSelectedProject(null)}>
+              <DrawerContent className="max-w-4xl mx-auto">
+                <DrawerHeader>
+                  <DrawerTitle>Project Details</DrawerTitle>
+                </DrawerHeader>
+                {selectedProject && <ProjectDetail project={selectedProject} />}
+              </DrawerContent>
+            </Drawer>
+          </>
+        )}
       </div>
     </div>
   );

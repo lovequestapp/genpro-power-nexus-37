@@ -70,7 +70,7 @@ CREATE TABLE notifications (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
     user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-    type TEXT NOT NULL CHECK (type IN ('ticket_assigned', 'ticket_updated', 'comment_added', 'ticket_closed')),
+    type TEXT NOT NULL CHECK (type IN ('ticket_assigned', 'ticket_updated', 'comment_added', 'ticket_closed', 'project_status_change', 'milestone_completed')),
     message TEXT NOT NULL,
     is_read BOOLEAN DEFAULT false NOT NULL,
     metadata JSONB
@@ -226,9 +226,9 @@ CREATE POLICY "Users can view their own notifications"
     ON notifications FOR SELECT
     USING (user_id = auth.uid());
 
-CREATE POLICY "Users can update their own notifications"
-    ON notifications FOR UPDATE
-    USING (user_id = auth.uid());
+CREATE POLICY "System can create notifications"
+    ON notifications FOR INSERT
+    WITH CHECK (true);
 
 -- Create storage bucket for attachments
 INSERT INTO storage.buckets (id, name, public) VALUES ('attachments', 'attachments', true);

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabaseService } from '@/services/supabase';
@@ -11,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
-import { Edit, Trash, Plus, Search, Filter, Download, Mail, Phone, Building, Calendar, DollarSign, FileText } from 'lucide-react';
+import { Edit, Trash, Plus, Search, Filter, Download, Mail, Phone, Building, Calendar, DollarSign, FileText, RefreshCw } from 'lucide-react';
 import { format } from 'date-fns';
 import type { Customer } from '@/lib/supabase';
 
@@ -87,6 +86,7 @@ export default function CustomersPage() {
       } catch (error: any) {
         console.error('Customer operation error:', error);
         console.error('Error details:', error.message, error.details);
+        console.error('Full error object:', error);
         throw new Error(error.message || 'Failed to save customer');
       }
     },
@@ -99,10 +99,20 @@ export default function CustomersPage() {
       setModalOpen(false);
       setEditCustomer(null);
       resetForm();
+      
+      // Force refresh the customers list
+      console.log('Invalidating customers query...');
       queryClient.invalidateQueries({ queryKey: ['customers'] });
+      
+      // Also force a refetch
+      setTimeout(() => {
+        console.log('Forcing manual refetch of customers...');
+        queryClient.refetchQueries({ queryKey: ['customers'] });
+      }, 1000);
     },
     onError: (error: any) => {
       console.error('Customer mutation failed:', error);
+      console.error('Error in onError:', error.message, error);
       toast({ 
         title: 'Error', 
         description: error.message || 'Failed to save customer. Please try again.',
@@ -172,6 +182,7 @@ export default function CustomersPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form submitted:', form);
+    console.log('Form validation passed, proceeding with submission...');
     
     // Validate required fields
     if (!form.name.trim()) {
@@ -204,11 +215,15 @@ export default function CustomersPage() {
     };
 
     console.log('Prepared form data for submission:', formData);
+    console.log('About to call mutation.mutateAsync...');
     
     try {
-      await mutation.mutateAsync(formData);
+      const result = await mutation.mutateAsync(formData);
+      console.log('Mutation completed successfully:', result);
     } catch (error) {
       console.error('Form submission error:', error);
+      console.error('Error type:', typeof error);
+      console.error('Error instanceof Error:', error instanceof Error);
     }
   };
 
@@ -248,6 +263,17 @@ export default function CustomersPage() {
           <p className="text-muted-foreground mt-1">Manage your customer relationships and track their history</p>
         </div>
         <div className="flex gap-3">
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              console.log('Manual refresh triggered');
+              queryClient.invalidateQueries({ queryKey: ['customers'] });
+              queryClient.refetchQueries({ queryKey: ['customers'] });
+            }}
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Refresh
+          </Button>
           <Button variant="outline" onClick={() => window.print()}>
             <Download className="w-4 h-4 mr-2" />
             Export

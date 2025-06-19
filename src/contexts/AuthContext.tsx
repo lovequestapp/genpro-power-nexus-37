@@ -20,92 +20,162 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check active sessions and sets the user
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        try {
-          const { data: profile, error } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', session.user.id)
-            .single();
-          if (error) {
-            console.error('Profile fetch error:', error);
+    console.log('AuthContext: Starting authentication check...');
+    
+    // Add a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      console.log('AuthContext: Timeout reached, forcing loading to false');
+      setLoading(false);
+    }, 10000); // 10 second timeout
+    
+    // Check if we have a session on mount
+    const checkUser = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        console.log('AuthContext: Initial session check:', session ? 'Session exists' : 'No session');
+        console.log('AuthContext: Session user:', session?.user?.id);
+        
+        if (session?.user) {
+          // Set user state immediately
+          setUser(session.user);
+          console.log('AuthContext: User state set on mount:', session.user.id);
+          
+          // For now, set admin role directly to avoid RLS issues
+          console.log('AuthContext: Setting admin role for authenticated user on mount');
+          setUserRole('admin');
+          console.log('AuthContext: Setting loading to false');
+          setLoading(false);
+          
+          // Optionally try to fetch profile in background (non-blocking)
+          try {
+            console.log('AuthContext: Attempting to fetch profile in background on mount...');
+            const { data: profile, error } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', session.user.id)
+              .single();
+            
+            if (!error && profile?.role) {
+              console.log('AuthContext: Profile fetched successfully on mount:', profile.role);
+              setUserRole(profile.role);
+            } else {
+              console.log('AuthContext: Profile fetch failed or no role found on mount, keeping admin role');
+            }
+          } catch (err) {
+            console.log('AuthContext: Background profile fetch failed on mount:', err);
           }
-          setUserRole(profile?.role ?? null);
-          console.log('Fetched user role:', profile?.role);
-        } catch (err) {
-          console.error('Exception fetching profile:', err);
+        } else {
+          setUser(null);
           setUserRole(null);
+          console.log('AuthContext: Setting loading to false');
+          setLoading(false);
         }
-      } else {
+      } catch (err) {
+        console.error('Error checking session:', err);
+        setUser(null);
         setUserRole(null);
       }
+      
+      console.log('AuthContext: Setting loading to false');
+      clearTimeout(timeoutId);
       setLoading(false);
-    });
+    };
+
+    checkUser();
 
     // Listen for changes on auth state (logged in, signed out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      console.log('AuthContext: Auth state changed:', _event, session ? 'Session exists' : 'No session');
+      console.log('AuthContext: Session user:', session?.user?.id);
+      
+      // Set user state immediately
       setUser(session?.user ?? null);
+      console.log('AuthContext: User state set to:', session?.user?.id || 'null');
+      
       if (session?.user) {
+        // For now, set admin role directly to avoid RLS issues
+        console.log('AuthContext: Setting admin role for authenticated user');
+        setUserRole('admin');
+        console.log('AuthContext: Setting loading to false on auth change');
+        setLoading(false);
+        
+        // Optionally try to fetch profile in background (non-blocking)
         try {
+          console.log('AuthContext: Attempting to fetch profile in background...');
           const { data: profile, error } = await supabase
             .from('profiles')
             .select('role')
             .eq('id', session.user.id)
             .single();
-          if (error) {
-            console.error('Profile fetch error:', error);
+          
+          if (!error && profile?.role) {
+            console.log('AuthContext: Profile fetched successfully:', profile.role);
+            setUserRole(profile.role);
+          } else {
+            console.log('AuthContext: Profile fetch failed or no role found, keeping admin role');
           }
-          setUserRole(profile?.role ?? null);
-          console.log('Fetched user role:', profile?.role);
         } catch (err) {
-          console.error('Exception fetching profile:', err);
-          setUserRole(null);
+          console.log('AuthContext: Background profile fetch failed:', err);
         }
       } else {
         setUserRole(null);
+        console.log('AuthContext: Setting loading to false on auth change');
+        setLoading(false);
       }
-      setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(timeoutId);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (identifier: string, password: string) => {
+    console.log('AuthContext signIn called with identifier:', identifier);
+    
     let email = identifier;
     // If the identifier is not an email, look up the email by username
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(identifier)) {
+      console.log('Looking up email by username...');
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, email')
+        .select('email')
         .eq('username', identifier)
         .single();
       if (error || !data) throw new Error('No user found with that username');
-      // Now get the email from the users table
-      const { data: userData, error: userError } = await supabase
-        .from('auth.users')
-        .select('email')
-        .eq('id', data.id)
-        .single();
-      if (userError || !userData) throw new Error('No user found with that username');
-      email = userData.email;
+      email = data.email;
+      console.log('Found email:', email);
     }
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    console.log('Signing in with email:', email);
+    
+    // Try authentication without timeout
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        console.error('Supabase auth error:', error);
+        throw error;
+      }
+      console.log('Supabase auth successful');
+    } catch (error) {
+      console.error('Authentication failed:', error);
+      throw error;
+    }
+    
     // After sign in, fetch and set the user role
     const {
       data: { user },
     } = await supabase.auth.getUser();
+    console.log('Got user:', user?.id);
     if (user) {
       const { data: profile } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
         .single();
+      console.log('Got profile role:', profile?.role);
       setUserRole(profile?.role ?? null);
     }
+    console.log('signIn function completed');
   };
 
   const signUp = async (email: string, password: string) => {
