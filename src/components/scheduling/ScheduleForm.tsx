@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -339,12 +340,12 @@ export function ScheduleForm({ event, onClose, onSave }: ScheduleFormProps) {
                 <CardContent className="space-y-4">
                   <div>
                     <Label htmlFor="customer">Customer</Label>
-                    <Select value={form.customer_id} onValueChange={(value) => handleChange('customer_id', value)}>
+                    <Select value={form.customer_id} onValueChange={(value) => handleChange('customer_id', value === 'none' ? '' : value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select customer" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">None</SelectItem>
+                        <SelectItem value="none">None</SelectItem>
                         {customers.map(customer => (
                           <SelectItem key={customer.id} value={customer.id}>
                             {customer.name}
@@ -356,12 +357,12 @@ export function ScheduleForm({ event, onClose, onSave }: ScheduleFormProps) {
 
                   <div>
                     <Label htmlFor="project">Project</Label>
-                    <Select value={form.project_id} onValueChange={(value) => handleChange('project_id', value)}>
+                    <Select value={form.project_id} onValueChange={(value) => handleChange('project_id', value === 'none' ? '' : value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select project" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">None</SelectItem>
+                        <SelectItem value="none">None</SelectItem>
                         {projects.map(project => (
                           <SelectItem key={project.id} value={project.id}>
                             {project.name}
@@ -542,4 +543,4 @@ export function ScheduleForm({ event, onClose, onSave }: ScheduleFormProps) {
       </DialogContent>
     </Dialog>
   );
-} 
+}
