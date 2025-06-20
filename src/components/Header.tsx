@@ -24,16 +24,16 @@ const Header = () => {
     <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-white border-b border-steel-200/60 shadow-lg">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-4">
         <div className="flex items-center justify-between">
-          {/* Enhanced Logo with 3D Effect */}
+          {/* Enhanced Logo with New Image */}
           <Link to="/" className="flex items-center space-x-2 sm:space-x-4 group">
             <div className="relative">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 accent-gradient rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-glow transition-all duration-500 transform group-hover:scale-105">
-                <span className="text-white font-bold text-lg sm:text-xl tracking-tight">HGP</span>
-              </div>
-              <div className="absolute inset-0 w-10 h-10 sm:w-12 sm:h-12 accent-gradient rounded-xl opacity-30 blur group-hover:opacity-50 transition-opacity duration-500"></div>
+              <img 
+                src="/lovable-uploads/73f0530a-bb1a-42c4-ae3a-294f8fc13ed0.png" 
+                alt="HOU GEN PROS Logo" 
+                className="h-10 sm:h-12 w-auto transition-all duration-500 group-hover:scale-105"
+              />
             </div>
             <div className="flex flex-col">
-              <span className="text-lg sm:text-xl lg:text-2xl font-bold text-primary tracking-tight group-hover:text-accent transition-colors duration-500">HOU GEN PROS</span>
               <span className="text-xs text-steel-500 font-medium tracking-widest uppercase hidden sm:block">Premium Power Solutions</span>
             </div>
           </Link>
