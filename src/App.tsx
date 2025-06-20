@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
@@ -36,6 +35,7 @@ import Projects from '@/pages/admin/Projects';
 import Inventory from '@/pages/admin/Inventory';
 import InventoryParts from '@/pages/admin/InventoryParts';
 import InventoryOrders from '@/pages/admin/InventoryOrders';
+import Billing from '@/pages/admin/Billing';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -88,6 +88,7 @@ function App() {
                 <Route path="/admin/inventory" element={<Inventory />} />
                 <Route path="/admin/inventory/parts" element={<InventoryParts />} />
                 <Route path="/admin/inventory/orders" element={<InventoryOrders />} />
+                <Route path="/admin/billing" element={<Billing />} />
               </Route>
             </Routes>
           </Router>
