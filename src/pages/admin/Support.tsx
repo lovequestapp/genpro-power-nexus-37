@@ -27,8 +27,21 @@ interface Profile {
   role: string;
 }
 
+interface TransformedTicket {
+  id: string;
+  title: string;
+  description: string;
+  status: 'open' | 'in_progress' | 'resolved' | 'closed';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  type: string;
+  customerName: string;
+  createdAt: string;
+  assignedTo?: string;
+  comments: any[];
+}
+
 // Transform database ticket to component-expected format
-const transformTicketForComponent = (ticket: any) => ({
+const transformTicketForComponent = (ticket: any): TransformedTicket => ({
   id: ticket.id,
   title: ticket.title,
   description: ticket.description,
@@ -38,13 +51,13 @@ const transformTicketForComponent = (ticket: any) => ({
   customerName: ticket.customer?.name || 'Unknown',
   createdAt: ticket.created_at,
   assignedTo: ticket.assigned_to,
-  comments: []
+  comments: ticket.comments || []
 });
 
 export default function SupportPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedTicket, setSelectedTicket] = useState<any | null>(null);
+  const [selectedTicket, setSelectedTicket] = useState<TransformedTicket | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [filters, setFilters] = useState({
     status: 'all',
@@ -62,7 +75,7 @@ export default function SupportPage() {
   });
 
   // Transform tickets for component compatibility
-  const tickets = rawTickets.map(transformTicketForComponent);
+  const tickets: TransformedTicket[] = rawTickets.map(transformTicketForComponent);
 
   // Fetch customers
   const { data: customers = [] } = useQuery({
