@@ -59,8 +59,8 @@ export default function Dashboard() {
   const [generators, setGenerators] = useState<Generator[]>([]);
   const [bills, setBills] = useState<Bill[]>([]);
   const [services, setServices] = useState<Service[]>([]);
-  const [tickets, setTickets] = useState<Service[]>([]);
-  const [selectedTicket, setSelectedTicket] = useState<Service | null>(null);
+  const [tickets, setTickets] = useState<any[]>([]);
+  const [selectedTicket, setSelectedTicket] = useState<any | null>(null);
   const [showCreateTicket, setShowCreateTicket] = useState(false);
   const [stats, setStats] = useState<Stats>({
     total: 0,
@@ -187,7 +187,7 @@ export default function Dashboard() {
     }
   };
 
-  const handleUpdateTicket = async (ticketId: string, updates: Partial<Service>) => {
+  const handleUpdateTicket = async (ticketId: string, updates: any) => {
     try {
       const response = await supportService.update(ticketId, updates);
       if (response.success) {
@@ -352,7 +352,7 @@ export default function Dashboard() {
                 <div className="lg:col-span-2">
                   <TicketList
                     tickets={tickets}
-                    onTicketSelect={setSelectedTicket}
+                    onTicketSelect={(ticket) => setSelectedTicket(ticket)}
                     selectedTicketId={selectedTicket?.id}
                   />
                 </div>

@@ -11,28 +11,8 @@ import { TicketDetails } from '@/components/tickets/TicketDetails';
 import { TicketFilters } from '@/components/tickets/TicketFilters';
 import { TicketMetrics } from '@/components/tickets/TicketMetrics';
 import { CreateTicketModal } from '@/components/tickets/CreateTicketModal';
-import { supabase } from '@/lib/supabase';
+import { ticketService, type Ticket } from '@/services/ticketService';
 import { Plus, Search, Filter, RefreshCw } from 'lucide-react';
-
-interface Ticket {
-  id: string;
-  title: string;
-  description: string;
-  status: 'open' | 'in_progress' | 'resolved' | 'closed';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  type: 'bug' | 'feature' | 'support' | 'other';
-  category: string;
-  customer_id?: string;
-  assigned_to?: string;
-  created_at: string;
-  updated_at: string;
-  due_date?: string;
-  tags?: string[];
-  estimated_time?: string;
-  resolution?: string;
-  metadata?: any;
-  custom_fields?: any;
-}
 
 interface Customer {
   id: string;
@@ -47,10 +27,24 @@ interface Profile {
   role: string;
 }
 
+// Transform database ticket to component-expected format
+const transformTicketForComponent = (ticket: any) => ({
+  id: ticket.id,
+  title: ticket.title,
+  description: ticket.description,
+  status: ticket.status,
+  priority: ticket.priority,
+  type: ticket.type,
+  customerName: ticket.customer?.name || 'Unknown',
+  createdAt: ticket.created_at,
+  assignedTo: ticket.assigned_to,
+  comments: []
+});
+
 export default function SupportPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
+  const [selectedTicket, setSelectedTicket] = useState<any | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [filters, setFilters] = useState({
     status: 'all',
@@ -60,47 +54,21 @@ export default function SupportPage() {
   });
 
   // Fetch tickets
-  const { data: tickets = [], isLoading: ticketsLoading, refetch: refetchTickets } = useQuery({
+  const { data: rawTickets = [], isLoading: ticketsLoading, refetch: refetchTickets } = useQuery({
     queryKey: ['tickets', filters],
     queryFn: async () => {
-      let query = supabase
-        .from('tickets')
-        .select(`
-          *,
-          customer:customers(id, name, email),
-          assigned_user:profiles!assigned_to(id, full_name, email)
-        `)
-        .order('created_at', { ascending: false });
-
-      if (filters.status !== 'all') {
-        query = query.eq('status', filters.status);
-      }
-      if (filters.priority !== 'all') {
-        query = query.eq('priority', filters.priority);
-      }
-      if (filters.type !== 'all') {
-        query = query.eq('type', filters.type);
-      }
-      if (filters.search) {
-        query = query.or(`title.ilike.%${filters.search}%, description.ilike.%${filters.search}%`);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      return data as Ticket[];
+      return await ticketService.getTickets(filters);
     },
   });
+
+  // Transform tickets for component compatibility
+  const tickets = rawTickets.map(transformTicketForComponent);
 
   // Fetch customers
   const { data: customers = [] } = useQuery({
     queryKey: ['customers'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('customers')
-        .select('id, name, email')
-        .order('name');
-      if (error) throw error;
-      return data as Customer[];
+      return await ticketService.getCustomers();
     },
   });
 
@@ -108,27 +76,14 @@ export default function SupportPage() {
   const { data: staff = [] } = useQuery({
     queryKey: ['staff'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, full_name, email, role')
-        .in('role', ['admin', 'staff'])
-        .order('full_name');
-      if (error) throw error;
-      return data as Profile[];
+      return await ticketService.getStaff();
     },
   });
 
   // Update ticket mutation
   const updateTicketMutation = useMutation({
     mutationFn: async ({ ticketId, updates }: { ticketId: string; updates: Partial<Ticket> }) => {
-      const { data, error } = await supabase
-        .from('tickets')
-        .update(updates)
-        .eq('id', ticketId)
-        .select()
-        .single();
-      if (error) throw error;
-      return data;
+      return await ticketService.updateTicket(ticketId, updates);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
@@ -143,20 +98,7 @@ export default function SupportPage() {
   // Add comment mutation
   const addCommentMutation = useMutation({
     mutationFn: async ({ ticketId, content }: { ticketId: string; content: string }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      const { data, error } = await supabase
-        .from('comments')
-        .insert({
-          ticket_id: ticketId,
-          author_id: user.id,
-          content,
-        })
-        .select()
-        .single();
-      if (error) throw error;
-      return data;
+      return await ticketService.addComment(ticketId, content);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
@@ -168,7 +110,7 @@ export default function SupportPage() {
     },
   });
 
-  const handleStatusChange = (status: Ticket['status']) => {
+  const handleStatusChange = (status: any) => {
     if (selectedTicket) {
       updateTicketMutation.mutate({
         ticketId: selectedTicket.id,
@@ -184,7 +126,7 @@ export default function SupportPage() {
         ticketId: selectedTicket.id,
         updates: { assigned_to: staffId },
       });
-      setSelectedTicket({ ...selectedTicket, assigned_to: staffId });
+      setSelectedTicket({ ...selectedTicket, assignedTo: staffId });
     }
   };
 
@@ -194,7 +136,7 @@ export default function SupportPage() {
         ticketId: selectedTicket.id,
         updates: { assigned_to: null },
       });
-      setSelectedTicket({ ...selectedTicket, assigned_to: undefined });
+      setSelectedTicket({ ...selectedTicket, assignedTo: undefined });
     }
   };
 
@@ -269,20 +211,11 @@ export default function SupportPage() {
             </div>
           ) : (
             <TicketList
-              tickets={tickets.map(ticket => ({
-                id: ticket.id,
-                title: ticket.title,
-                description: ticket.description,
-                status: ticket.status,
-                priority: ticket.priority,
-                type: ticket.type,
-                customerName: ticket.customer?.name || 'Unknown',
-                createdAt: ticket.created_at,
-                date: ticket.created_at,
-                assignedTo: ticket.assigned_to,
-                comments: []
-              }))}
-              onTicketSelect={(ticket) => setSelectedTicket(tickets.find(t => t.id === ticket.id) || null)}
+              tickets={tickets}
+              onTicketSelect={(ticket) => {
+                const originalTicket = rawTickets.find(t => t.id === ticket.id);
+                setSelectedTicket(originalTicket ? transformTicketForComponent(originalTicket) : null);
+              }}
               selectedTicketId={selectedTicket?.id}
             />
           )}
@@ -292,19 +225,7 @@ export default function SupportPage() {
         <Card className="p-4">
           {selectedTicket ? (
             <TicketDetails
-              ticket={{
-                id: selectedTicket.id,
-                title: selectedTicket.title,
-                description: selectedTicket.description,
-                status: selectedTicket.status,
-                priority: selectedTicket.priority,
-                type: selectedTicket.type,
-                customerName: selectedTicket.customer?.name || 'Unknown',
-                createdAt: selectedTicket.created_at,
-                date: selectedTicket.created_at,
-                assignedTo: selectedTicket.assigned_to,
-                comments: []
-              }}
+              ticket={selectedTicket}
               onStatusChange={handleStatusChange}
               onAssign={handleAssign}
               onUnassign={handleUnassign}

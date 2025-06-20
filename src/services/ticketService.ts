@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 
 export interface Ticket {
@@ -85,6 +84,25 @@ class TicketService {
     }
 
     const { data, error } = await query;
+    if (error) throw error;
+    return data;
+  }
+
+  async getCustomers() {
+    const { data, error } = await supabase
+      .from('customers')
+      .select('id, name, email')
+      .order('name');
+    if (error) throw error;
+    return data;
+  }
+
+  async getStaff() {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, full_name, email, role')
+      .in('role', ['admin', 'staff'])
+      .order('full_name');
     if (error) throw error;
     return data;
   }
