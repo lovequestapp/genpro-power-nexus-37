@@ -46,10 +46,15 @@ export function CreateTicketModal({
 
     try {
       setLoading(true);
-      await ticketService.createTicket({
+      
+      // Prepare the ticket data, ensuring customer_id is null if empty
+      const ticketData = {
         ...formData,
-        status: 'open',
-      });
+        status: 'open' as const,
+        customer_id: formData.customer_id.trim() || null, // Convert empty string to null
+      };
+      
+      await ticketService.createTicket(ticketData);
       
       toast({
         title: 'Success',
