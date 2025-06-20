@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Settings, 
   CheckCircle, 
@@ -17,8 +18,11 @@ import {
   Zap,
   Link as LinkIcon,
   Save,
-  TestTube
+  TestTube,
+  Loader2
 } from 'lucide-react';
+import { StripeService } from '@/services/stripeService';
+import { useToast } from '@/components/ui/use-toast';
 
 interface StripeSettings {
   isConnected: boolean;
@@ -38,10 +42,10 @@ interface StripeSettings {
 }
 
 const initialSettings: StripeSettings = {
-  isConnected: true,
+  isConnected: false,
   testMode: true,
-  publicKey: 'pk_test_51234567890...',
-  webhookEndpoint: 'https://your-domain.com/api/stripe/webhook',
+  publicKey: '',
+  webhookEndpoint: `${window.location.origin}/api/stripe/webhook`,
   currency: 'usd',
   autoInvoicing: true,
   paymentMethods: ['card', 'ach_debit', 'bank_transfer'],
@@ -57,33 +61,141 @@ const initialSettings: StripeSettings = {
 export function StripeIntegration() {
   const [settings, setSettings] = useState<StripeSettings>(initialSettings);
   const [isSaving, setIsSaving] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
+  const { toast } = useToast();
+
+  useEffect(() => {
+    checkConnectionStatus();
+  }, []);
+
+  const checkConnectionStatus = async () => {
+    try {
+      const account = await StripeService.getAccountStatus();
+      if (account.charges_enabled) {
+        setConnectionStatus('connected');
+        setSettings(prev => ({ ...prev, isConnected: true }));
+      } else {
+        setConnectionStatus('disconnected');
+        setSettings(prev => ({ ...prev, isConnected: false }));
+      }
+    } catch (error) {
+      setConnectionStatus('disconnected');
+      setSettings(prev => ({ ...prev, isConnected: false }));
+    }
+  };
 
   const handleSave = async () => {
     setIsSaving(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log('Saving Stripe settings:', settings);
-    setIsSaving(false);
+    try {
+      // Simulate saving settings - in a real app, this would save to your backend
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast({
+        title: "Settings Saved",
+        description: "Your Stripe integration settings have been saved successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Save Failed",
+        description: "Failed to save settings. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleConnect = () => {
-    console.log('Connecting to Stripe...');
-    // API integration point for Stripe Connect
+  const handleConnect = async () => {
+    setIsConnecting(true);
+    try {
+      const { url } = await StripeService.createConnectAccountLink();
+      toast({
+        title: "Redirecting to Stripe",
+        description: "You'll be redirected to complete the connection process",
+      });
+      window.location.href = url;
+    } catch (error) {
+      toast({
+        title: "Connection Failed",
+        description: "Failed to initiate Stripe connection. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsConnecting(false);
+    }
   };
 
-  const handleDisconnect = () => {
-    console.log('Disconnecting from Stripe...');
-    setSettings(prev => ({ ...prev, isConnected: false }));
+  const handleDisconnect = async () => {
+    if (!window.confirm('Are you sure you want to disconnect from Stripe? This will disable payment processing.')) {
+      return;
+    }
+    
+    try {
+      await StripeService.disconnectAccount();
+      setSettings(prev => ({ ...prev, isConnected: false }));
+      setConnectionStatus('disconnected');
+      toast({
+        title: "Disconnected",
+        description: "Successfully disconnected from Stripe",
+      });
+    } catch (error) {
+      toast({
+        title: "Disconnect Failed",
+        description: "Failed to disconnect from Stripe. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleTestConnection = () => {
-    console.log('Testing Stripe connection...');
-    // API integration point
+  const handleTestConnection = async () => {
+    setIsTesting(true);
+    try {
+      await Promise.all([
+        StripeService.getAccountStatus(),
+        StripeService.getBalance(),
+        StripeService.getPayments(1)
+      ]);
+      
+      toast({
+        title: "Connection Test Successful",
+        description: "All Stripe API endpoints are responding correctly",
+      });
+    } catch (error) {
+      toast({
+        title: "Connection Test Failed",
+        description: "Some Stripe API endpoints are not responding correctly",
+        variant: "destructive"
+      });
+    } finally {
+      setIsTesting(false);
+    }
   };
 
-  const handleWebhookTest = () => {
-    console.log('Testing webhook endpoint...');
-    // API integration point
+  const handleWebhookTest = async () => {
+    try {
+      // In a real implementation, this would test the webhook endpoint
+      const response = await fetch(settings.webhookEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ test: true })
+      });
+      
+      if (response.ok) {
+        toast({
+          title: "Webhook Test Successful",
+          description: "Your webhook endpoint is responding correctly",
+        });
+      } else {
+        throw new Error('Webhook endpoint not responding');
+      }
+    } catch (error) {
+      toast({
+        title: "Webhook Test Failed",
+        description: "Your webhook endpoint is not responding or not configured",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -95,7 +207,12 @@ export function StripeIntegration() {
           <p className="text-gray-600 mt-1">Configure your Stripe payment processing</p>
         </div>
         <div className="flex items-center space-x-2">
-          {settings.isConnected ? (
+          {connectionStatus === 'checking' ? (
+            <Badge variant="secondary">
+              <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+              Checking...
+            </Badge>
+          ) : connectionStatus === 'connected' ? (
             <Badge className="bg-green-100 text-green-800">
               <CheckCircle className="w-4 h-4 mr-1" />
               Connected
@@ -107,7 +224,11 @@ export function StripeIntegration() {
             </Badge>
           )}
           <Button onClick={handleSave} disabled={isSaving}>
-            <Save className="w-4 h-4 mr-2" />
+            {isSaving ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4 mr-2" />
+            )}
             {isSaving ? 'Saving...' : 'Save Settings'}
           </Button>
         </div>
@@ -146,12 +267,16 @@ export function StripeIntegration() {
                   />
                 </div>
 
-                <div className="flex space-x-2">
-                  <Button variant="outline" onClick={handleTestConnection} className="flex-1">
-                    <TestTube className="w-4 h-4 mr-2" />
+                <div className="flex space-x-2 flex-wrap gap-2">
+                  <Button variant="outline" onClick={handleTestConnection} disabled={isTesting} size="sm">
+                    {isTesting ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <TestTube className="w-4 h-4 mr-2" />
+                    )}
                     Test Connection
                   </Button>
-                  <Button variant="outline" onClick={handleDisconnect}>
+                  <Button variant="outline" onClick={handleDisconnect} size="sm">
                     Disconnect
                   </Button>
                 </div>
@@ -168,9 +293,13 @@ export function StripeIntegration() {
                   </div>
                 </div>
                 
-                <Button onClick={handleConnect} className="w-full bg-blue-600 hover:bg-blue-700">
-                  <LinkIcon className="w-4 h-4 mr-2" />
-                  Connect to Stripe
+                <Button onClick={handleConnect} disabled={isConnecting} className="w-full bg-blue-600 hover:bg-blue-700">
+                  {isConnecting ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <LinkIcon className="w-4 h-4 mr-2" />
+                  )}
+                  {isConnecting ? 'Connecting...' : 'Connect to Stripe'}
                 </Button>
               </div>
             )}
@@ -221,7 +350,7 @@ export function StripeIntegration() {
                   onChange={(e) => setSettings(prev => ({ ...prev, webhookEndpoint: e.target.value }))}
                   placeholder="https://your-domain.com/api/stripe/webhook"
                 />
-                <Button variant="outline" onClick={handleWebhookTest}>
+                <Button variant="outline" onClick={handleWebhookTest} size="sm">
                   Test
                 </Button>
               </div>

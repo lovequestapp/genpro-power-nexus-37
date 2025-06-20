@@ -12,9 +12,11 @@ import {
   Shield,
   CreditCard,
   Globe,
-  Zap
+  Zap,
+  Loader2
 } from 'lucide-react';
 import { StripeService } from '@/services/stripeService';
+import { useToast } from '@/components/ui/use-toast';
 
 interface StripeConnectorProps {
   onConnectionChange?: (connected: boolean) => void;
@@ -25,6 +27,8 @@ export function StripeConnector({ onConnectionChange }: StripeConnectorProps) {
   const [connected, setConnected] = useState(false);
   const [accountData, setAccountData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [testing, setTesting] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     checkConnection();
@@ -32,20 +36,31 @@ export function StripeConnector({ onConnectionChange }: StripeConnectorProps) {
 
   const checkConnection = async () => {
     setLoading(true);
+    setError(null);
     try {
       const account = await StripeService.getAccountStatus();
       if (account.charges_enabled) {
         setAccountData(account);
         setConnected(true);
         onConnectionChange?.(true);
+        toast({
+          title: "Connection Status",
+          description: "Stripe account is connected and active",
+        });
       } else {
         setConnected(false);
         onConnectionChange?.(false);
       }
     } catch (err) {
-      setError('Not connected to Stripe');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to check connection';
+      setError(errorMessage);
       setConnected(false);
       onConnectionChange?.(false);
+      toast({
+        title: "Connection Check Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -58,18 +73,57 @@ export function StripeConnector({ onConnectionChange }: StripeConnectorProps) {
     try {
       const { url } = await StripeService.createConnectAccountLink();
       
+      toast({
+        title: "Redirecting to Stripe",
+        description: "You'll be redirected to complete the connection process",
+      });
+
       // Redirect to Stripe Connect onboarding
       window.location.href = url;
     } catch (err) {
-      setError('Failed to connect to Stripe. Please try again.');
-      console.error('Stripe connection error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to connect to Stripe';
+      setError(errorMessage);
+      toast({
+        title: "Connection Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
+  const testConnection = async () => {
+    setTesting(true);
+    setError(null);
+    
+    try {
+      // Test multiple endpoints to verify connection
+      await Promise.all([
+        StripeService.getAccountStatus(),
+        StripeService.getBalance(),
+        StripeService.getPayments(1)
+      ]);
+      
+      toast({
+        title: "Connection Test Successful",
+        description: "All Stripe API endpoints are responding correctly",
+      });
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Connection test failed';
+      setError(errorMessage);
+      toast({
+        title: "Connection Test Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setTesting(false);
+    }
+  };
+
   const disconnectAccount = async () => {
-    if (!window.confirm('Are you sure you want to disconnect your Stripe account?')) {
+    if (!window.confirm('Are you sure you want to disconnect your Stripe account? This will disable payment processing.')) {
       return;
     }
     
@@ -79,19 +133,29 @@ export function StripeConnector({ onConnectionChange }: StripeConnectorProps) {
       setConnected(false);
       setAccountData(null);
       onConnectionChange?.(false);
+      toast({
+        title: "Account Disconnected",
+        description: "Your Stripe account has been disconnected",
+      });
     } catch (err) {
-      setError('Failed to disconnect account');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to disconnect account';
+      setError(errorMessage);
+      toast({
+        title: "Disconnect Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading && !connected) {
+  if (loading && !connected && !testing) {
     return (
       <Card>
         <CardContent className="flex items-center justify-center p-8">
           <div className="text-center">
-            <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
+            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
             <p className="text-gray-600">Checking Stripe connection...</p>
           </div>
         </CardContent>
@@ -154,7 +218,7 @@ export function StripeConnector({ onConnectionChange }: StripeConnectorProps) {
             >
               {loading ? (
                 <>
-                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Connecting...
                 </>
               ) : (
@@ -186,41 +250,58 @@ export function StripeConnector({ onConnectionChange }: StripeConnectorProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <p className="text-sm text-gray-500">Account ID</p>
-            <p className="font-mono text-sm">{accountData?.id}</p>
+            <p className="font-mono text-sm">{accountData?.id || 'Loading...'}</p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Email</p>
-            <p className="text-sm">{accountData?.email}</p>
+            <p className="text-sm">{accountData?.email || 'Loading...'}</p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Country</p>
-            <p className="text-sm">{accountData?.country}</p>
+            <p className="text-sm">{accountData?.country || 'Loading...'}</p>
           </div>
           <div>
             <p className="text-sm text-gray-500">Status</p>
             <div className="flex items-center space-x-2">
               <CheckCircle className="w-4 h-4 text-green-600" />
-              <span className="text-sm">Fully activated</span>
+              <span className="text-sm">
+                {accountData?.charges_enabled ? 'Fully activated' : 'Setup required'}
+              </span>
             </div>
           </div>
         </div>
         
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 flex-wrap gap-2">
           <Button variant="outline" onClick={checkConnection} disabled={loading}>
             <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
             Refresh
+          </Button>
+          <Button variant="outline" onClick={testConnection} disabled={testing}>
+            {testing ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Zap className="w-4 h-4 mr-2" />
+            )}
+            Test Connection
           </Button>
           <Button 
             variant="outline" 
             onClick={() => window.open('https://dashboard.stripe.com', '_blank')}
           >
             <ExternalLink className="w-4 h-4 mr-2" />
-            Open Stripe Dashboard
+            Stripe Dashboard
           </Button>
-          <Button variant="destructive" onClick={disconnectAccount}>
+          <Button variant="destructive" onClick={disconnectAccount} disabled={loading}>
             Disconnect
           </Button>
         </div>
