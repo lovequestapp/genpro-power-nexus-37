@@ -3,11 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ArrowRight, Phone, MessageSquare, Wrench, Shield, Clock, Zap, Settings, MapPin, Calendar, CheckCircle, AlertTriangle, Users, Award, Truck } from 'lucide-react';
 import Header from '@/components/Header';
+import ScheduleServiceForm from '@/components/ScheduleServiceForm';
 
 const Services = () => {
   const [activeTab, setActiveTab] = useState('installation');
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+
   const services = [{
     id: 'installation',
     title: 'Generator Installation',
@@ -80,12 +84,22 @@ const Services = () => {
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Button size="lg" className="bg-accent hover:bg-orange-600 text-white px-8 py-4">
                 <Phone className="w-5 h-5 mr-2" />
-                (832) 555-POWER
+                (713) 999-GENERATOR
               </Button>
-              <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-4 text-slate-900">
-                <Calendar className="w-5 h-5 mr-2" />
-                Schedule Service
-              </Button>
+              <Dialog open={isScheduleModalOpen} onOpenChange={setIsScheduleModalOpen}>
+                <DialogTrigger asChild>
+                  <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-4 text-slate-900 bg-white/10 hover:text-primary transition-all duration-300">
+                    <Calendar className="w-5 h-5 mr-2" />
+                    Schedule Service
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-bold text-primary">Schedule Your Service</DialogTitle>
+                  </DialogHeader>
+                  <ScheduleServiceForm onClose={() => setIsScheduleModalOpen(false)} />
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </div>
@@ -154,10 +168,14 @@ const Services = () => {
                             <MessageSquare className="w-4 h-4 mr-2" />
                             Get Quote
                           </Button>
-                          <Button variant="outline" className="border-2 border-accent text-accent hover:bg-accent hover:text-white flex-1 py-3">
-                            <Calendar className="w-4 h-4 mr-2" />
-                            Schedule Now
-                          </Button>
+                          <Dialog open={isScheduleModalOpen} onOpenChange={setIsScheduleModalOpen}>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" className="border-2 border-accent text-accent hover:bg-accent hover:text-white flex-1 py-3 transition-all duration-300">
+                                <Calendar className="w-4 h-4 mr-2" />
+                                Schedule Now
+                              </Button>
+                            </DialogTrigger>
+                          </Dialog>
                         </div>
                       </CardContent>
                     </div>
@@ -219,7 +237,7 @@ const Services = () => {
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Button size="lg" className="bg-accent hover:bg-orange-600 text-white px-8 py-4">
               <Phone className="w-5 h-5 mr-2" />
-              Call (832) 555-POWER
+              Call (713) 999-GENERATOR
             </Button>
             <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-4 text-steel-800">
               <MessageSquare className="w-5 h-5 mr-2" />
