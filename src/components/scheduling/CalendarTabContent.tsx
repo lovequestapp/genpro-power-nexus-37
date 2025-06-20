@@ -1,6 +1,6 @@
+
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ScheduleCalendar } from '@/components/scheduling/ScheduleCalendar';
+import { ScheduleCalendar } from './ScheduleCalendar';
 import type { ScheduleEvent } from '@/types/scheduling';
 
 interface CalendarTabContentProps {
@@ -8,18 +8,13 @@ interface CalendarTabContentProps {
   handleCreateEvent: () => void;
 }
 
-export const CalendarTabContent: React.FC<CalendarTabContentProps> = ({ handleEditEvent, handleCreateEvent }) => {
+export function CalendarTabContent({ handleEditEvent, handleCreateEvent }: CalendarTabContentProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Calendar View</CardTitle>
-        <CardDescription>
-          View and manage your schedule in a calendar format.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ScheduleCalendar onEventClick={handleEditEvent} onDateClick={handleCreateEvent} />
-      </CardContent>
-    </Card>
+    <div className="space-y-4">
+      <ScheduleCalendar 
+        onEventClick={handleEditEvent}
+        onDateClick={handleCreateEvent}
+      />
+    </div>
   );
-}; 
+}
