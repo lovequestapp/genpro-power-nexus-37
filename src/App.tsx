@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Outlet, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/ThemeProvider';
@@ -40,42 +41,22 @@ import InventoryOrders from '@/pages/admin/InventoryOrders';
 import Billing from '@/pages/admin/Billing';
 import Scheduling from '@/pages/admin/Scheduling';
 
+// Create a new query client instance
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      retry: false,
+      retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
     },
   },
 });
 
-// Global error handler to suppress external script errors
-const handleGlobalError = (event: ErrorEvent) => {
-  // Suppress share-modal.js errors and other external script errors
-  if (event.filename && (
-    event.filename.includes('share-modal.js') ||
-    event.filename.includes('chrome-extension') ||
-    event.filename.includes('moz-extension') ||
-    event.filename.includes('safari-extension')
-  )) {
-    console.warn('Suppressed external script error:', event.error);
-    event.preventDefault();
-    event.stopPropagation();
-    return false;
-  }
-  return true;
-};
-
-// Add global error handler
-if (typeof window !== 'undefined') {
-  window.addEventListener('error', handleGlobalError, true);
-}
-
 function App() {
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
           <AuthProvider>
             <Router>
               <ScrollToTop />
@@ -121,8 +102,8 @@ function App() {
             </Router>
             <Toaster />
           </AuthProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }
