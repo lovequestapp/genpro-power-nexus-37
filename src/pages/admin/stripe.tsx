@@ -1,9 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/components/ui/use-toast';
 import { 
@@ -14,31 +13,22 @@ import {
   RefreshCw,
   AlertCircle,
   CheckCircle,
-  Eye,
   Download,
-  Search,
-  Filter,
-  Plus,
-  MoreVertical,
   Calendar,
-  Globe,
   Shield,
+  ExternalLink,
   Zap,
-  Link as LinkIcon,
-  ExternalLink
+  Globe
 } from 'lucide-react';
 import { StripeService } from '@/services/stripeService';
 import { StripeConnectPopup } from '@/components/stripe/StripeConnectPopup';
-import { StripeConnector } from '@/components/stripe/StripeConnector';
-import { StripeAnalytics } from '@/components/stripe/StripeAnalytics';
 
 export default function StripePage() {
-  const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
   const [showConnectPopup, setShowConnectPopup] = useState(false);
   const [connected, setConnected] = useState(false);
   const [stripeData, setStripeData] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -47,6 +37,7 @@ export default function StripePage() {
 
   const checkConnectionStatus = async () => {
     setLoading(true);
+    setError(null);
     try {
       const account = await StripeService.getAccountStatus();
       setConnected(account.charges_enabled);
@@ -56,6 +47,7 @@ export default function StripePage() {
     } catch (error) {
       console.log('Not connected to Stripe yet');
       setConnected(false);
+      setError(null); // Don't show error for not being connected
     } finally {
       setLoading(false);
     }
@@ -85,74 +77,17 @@ export default function StripePage() {
     }
   };
 
-  const handleRefresh = async () => {
-    setLoading(true);
-    try {
-      await loadStripeData();
-      toast({
-        title: "Data refreshed",
-        description: "Stripe data has been updated"
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to refresh data",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
+  const handleConnect = async () => {
+    setShowConnectPopup(true);
   };
 
-  const handleExportData = async (type: 'payments' | 'customers' | 'all') => {
-    try {
-      const blob = await StripeService.exportData(type);
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `stripe-${type}-export-${new Date().toISOString().split('T')[0]}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-      toast({
-        title: "Export successful",
-        description: `${type} data has been exported`
-      });
-    } catch (error) {
-      toast({
-        title: "Export failed",
-        description: "Failed to export data",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleCreatePayout = async () => {
-    if (!stripeData?.balance?.available?.[0]?.amount) {
-      toast({
-        title: "No funds available",
-        description: "There are no available funds to payout",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      await StripeService.createPayout(stripeData.balance.available[0].amount);
-      toast({
-        title: "Payout scheduled",
-        description: "Your payout has been scheduled successfully"
-      });
-      await loadStripeData();
-    } catch (error) {
-      toast({
-        title: "Payout failed",
-        description: "Failed to schedule payout",
-        variant: "destructive"
-      });
-    }
+  const handleConnectionSuccess = () => {
+    setConnected(true);
+    checkConnectionStatus();
+    toast({
+      title: "Successfully connected!",
+      description: "Your Stripe account is now connected"
+    });
   };
 
   const formatCurrency = (amount: number, currency = 'usd') => {
@@ -162,22 +97,126 @@ export default function StripePage() {
     }).format(amount / 100);
   };
 
+  // Show connection interface if not connected
   if (!connected) {
     return (
       <div className="p-6">
-        <StripeConnector onConnectionChange={setConnected} />
+        <div className="max-w-2xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Connect to Stripe</h1>
+            <p className="text-gray-600">Connect your Stripe account to start accepting payments and managing your business</p>
+          </div>
+
+          {error && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {/* Connection Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <CreditCard className="w-5 h-5 mr-2" />
+                Connect Your Stripe Account
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <p className="text-gray-600">
+                Connect your Stripe account to start accepting payments and managing your business directly from this dashboard.
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg">
+                  <Shield className="w-6 h-6 text-blue-600" />
+                  <div>
+                    <p className="font-medium text-blue-900">Secure</p>
+                    <p className="text-sm text-blue-700">Bank-level security</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-3 p-4 bg-green-50 rounded-lg">
+                  <Zap className="w-6 h-6 text-green-600" />
+                  <div>
+                    <p className="font-medium text-green-900">Fast Setup</p>
+                    <p className="text-sm text-green-700">5-minute onboarding</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-3 p-4 bg-purple-50 rounded-lg">
+                  <Globe className="w-6 h-6 text-purple-600" />
+                  <div>
+                    <p className="font-medium text-purple-900">Global</p>
+                    <p className="text-sm text-purple-700">Worldwide payments</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center text-sm text-gray-500">
+                  <CheckCircle className="w-4 h-4 mr-2 text-green-500" />
+                  Secure OAuth connection
+                </div>
+                <div className="flex items-center text-sm text-gray-500">
+                  <CheckCircle className="w-4 h-4 mr-2 text-green-500" />
+                  No sensitive data stored locally
+                </div>
+                <div className="flex items-center text-sm text-gray-500">
+                  <CheckCircle className="w-4 h-4 mr-2 text-green-500" />
+                  Full control over permissions
+                </div>
+              </div>
+              
+              <Button 
+                onClick={handleConnect} 
+                disabled={loading}
+                className="w-full bg-blue-600 hover:bg-blue-700"
+                size="lg"
+              >
+                {loading ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    Checking connection...
+                  </>
+                ) : (
+                  <>
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    Connect with Stripe
+                  </>
+                )}
+              </Button>
+              
+              <p className="text-xs text-gray-500 text-center">
+                By connecting, you agree to Stripe's Terms of Service and Privacy Policy
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Alternative Options */}
+          <div className="mt-8 text-center">
+            <p className="text-gray-500 mb-4">Already have a Stripe account?</p>
+            <Button 
+              variant="outline"
+              onClick={() => window.open('https://dashboard.stripe.com', '_blank')}
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              Go to Stripe Dashboard
+            </Button>
+          </div>
+        </div>
+
         <StripeConnectPopup 
           open={showConnectPopup}
           onOpenChange={setShowConnectPopup}
-          onConnectionSuccess={() => {
-            setConnected(true);
-            checkConnectionStatus();
-          }}
+          onConnectionSuccess={handleConnectionSuccess}
         />
       </div>
     );
   }
 
+  // Show dashboard if connected
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -191,7 +230,7 @@ export default function StripePage() {
             <CheckCircle className="w-4 h-4 mr-1" />
             Connected
           </Badge>
-          <Button variant="outline" onClick={handleRefresh} disabled={loading}>
+          <Button variant="outline" onClick={checkConnectionStatus} disabled={loading}>
             <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
@@ -205,234 +244,125 @@ export default function StripePage() {
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="payments">Payments</TabsTrigger>
-          <TabsTrigger value="customers">Customers</TabsTrigger>
-          <TabsTrigger value="products">Products</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-        </TabsList>
+      {/* Connected Dashboard Content */}
+      {stripeData && (
+        <>
+          {/* Balance Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Available Balance</CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-600">
+                  {formatCurrency(stripeData.balance?.available?.[0]?.amount || 0)}
+                </div>
+                <p className="text-xs text-muted-foreground">Ready for payout</p>
+              </CardContent>
+            </Card>
 
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
-          {stripeData && (
-            <>
-              {/* Balance Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Available Balance</CardTitle>
-                    <DollarSign className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-green-600">
-                      {formatCurrency(stripeData.balance?.available?.[0]?.amount || 0)}
-                    </div>
-                    <p className="text-xs text-muted-foreground">Ready for payout</p>
-                  </CardContent>
-                </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Pending Balance</CardTitle>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-orange-600">
+                  {formatCurrency(stripeData.balance?.pending?.[0]?.amount || 0)}
+                </div>
+                <p className="text-xs text-muted-foreground">Processing</p>
+              </CardContent>
+            </Card>
 
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Pending Balance</CardTitle>
-                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-orange-600">
-                      {formatCurrency(stripeData.balance?.pending?.[0]?.amount || 0)}
-                    </div>
-                    <p className="text-xs text-muted-foreground">Processing</p>
-                  </CardContent>
-                </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Customers</CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stripeData.customers?.length || 0}</div>
+                <p className="text-xs text-muted-foreground">Active customers</p>
+              </CardContent>
+            </Card>
+          </div>
 
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Customers</CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{stripeData.customers?.length || 0}</div>
-                    <p className="text-xs text-muted-foreground">Active customers</p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Quick Actions */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Quick Actions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <Button 
-                      variant="outline" 
-                      className="h-20 flex flex-col"
-                      onClick={() => handleExportData('all')}
-                    >
-                      <Download className="w-6 h-6 mb-2" />
-                      Export Data
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="h-20 flex flex-col"
-                      onClick={handleCreatePayout}
-                      disabled={!stripeData.balance?.available?.[0]?.amount}
-                    >
-                      <Calendar className="w-6 h-6 mb-2" />
-                      Schedule Payout
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="h-20 flex flex-col"
-                      onClick={() => window.open('https://dashboard.stripe.com/settings/account', '_blank')}
-                    >
-                      <Shield className="w-6 h-6 mb-2" />
-                      Account Settings
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="h-20 flex flex-col"
-                      onClick={() => window.open('https://dashboard.stripe.com', '_blank')}
-                    >
-                      <ExternalLink className="w-6 h-6 mb-2" />
-                      Full Dashboard
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </>
-          )}
-        </TabsContent>
-
-        {/* Other tabs */}
-        <TabsContent value="payments">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Payments</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {stripeData?.payments?.length > 0 ? (
-                <div className="space-y-4">
-                  {stripeData.payments.map((payment: any) => (
-                    <div key={payment.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center space-x-4">
-                        <CreditCard className="w-8 h-8 text-gray-400" />
+          {/* Recent Activity */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Payments</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {stripeData.payments?.length > 0 ? (
+                  <div className="space-y-4">
+                    {stripeData.payments.slice(0, 5).map((payment: any) => (
+                      <div key={payment.id} className="flex items-center justify-between">
                         <div>
                           <p className="font-medium">{payment.customer || 'Unknown Customer'}</p>
                           <p className="text-sm text-gray-500">
-                            {payment.id} • {new Date(payment.created * 1000).toLocaleDateString()}
+                            {new Date(payment.created * 1000).toLocaleDateString()}
                           </p>
                         </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium">{formatCurrency(payment.amount)}</p>
-                        <Badge variant={payment.status === 'succeeded' ? 'default' : 'secondary'}>
-                          {payment.status}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-center text-gray-500 py-8">No payments found</p>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="customers">
-          <Card>
-            <CardHeader>
-              <CardTitle>Customer List</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {stripeData?.customers?.length > 0 ? (
-                <div className="space-y-4">
-                  {stripeData.customers.map((customer: any) => (
-                    <div key={customer.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                          <Users className="w-5 h-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <p className="font-medium">{customer.name || customer.email}</p>
-                          <p className="text-sm text-gray-500">{customer.email}</p>
+                        <div className="text-right">
+                          <p className="font-medium">{formatCurrency(payment.amount)}</p>
+                          <Badge variant={payment.status === 'succeeded' ? 'default' : 'secondary'}>
+                            {payment.status}
+                          </Badge>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-sm text-gray-500">
-                          Created: {new Date(customer.created * 1000).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-center text-gray-500 py-8">No customers found</p>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-center text-gray-500 py-4">No payments found</p>
+                )}
+              </CardContent>
+            </Card>
 
-        <TabsContent value="products">
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Products & Pricing</h2>
-              <Button onClick={() => window.open('https://dashboard.stripe.com/products', '_blank')}>
-                <Plus className="w-4 h-4 mr-2" />
-                Create Product
-              </Button>
-            </div>
-
-            {stripeData?.products?.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {stripeData.products.map((product: any) => (
-                  <Card key={product.id}>
-                    <CardHeader>
-                      <CardTitle className="text-lg">{product.name}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <Badge variant={product.active ? 'default' : 'secondary'}>
-                          {product.active ? 'Active' : 'Inactive'}
-                        </Badge>
-                        <div className="flex space-x-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="flex-1"
-                            onClick={() => window.open(`https://dashboard.stripe.com/products/${product.id}`, '_blank')}
-                          >
-                            Edit
-                          </Button>
-                          <Button variant="outline" size="sm" className="flex-1">
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <Card>
-                <CardContent className="text-center py-8">
-                  <p className="text-gray-500 mb-4">No products found</p>
-                  <Button onClick={() => window.open('https://dashboard.stripe.com/products', '_blank')}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create Your First Product
+            <Card>
+              <CardHeader>
+                <CardTitle>Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex flex-col"
+                    onClick={() => window.open('https://dashboard.stripe.com/products', '_blank')}
+                  >
+                    <CreditCard className="w-6 h-6 mb-2" />
+                    Manage Products
                   </Button>
-                </CardContent>
-              </Card>
-            )}
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex flex-col"
+                    onClick={() => window.open('https://dashboard.stripe.com/customers', '_blank')}
+                  >
+                    <Users className="w-6 h-6 mb-2" />
+                    View Customers
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex flex-col"
+                    onClick={() => window.open('https://dashboard.stripe.com/settings', '_blank')}
+                  >
+                    <Shield className="w-6 h-6 mb-2" />
+                    Settings
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex flex-col"
+                    onClick={() => window.open('https://dashboard.stripe.com/reports', '_blank')}
+                  >
+                    <TrendingUp className="w-6 h-6 mb-2" />
+                    Reports
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </TabsContent>
-
-        <TabsContent value="analytics">
-          <StripeAnalytics />
-        </TabsContent>
-      </Tabs>
+        </>
+      )}
     </div>
   );
 }

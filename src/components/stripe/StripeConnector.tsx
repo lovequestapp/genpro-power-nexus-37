@@ -14,6 +14,7 @@ import {
   Globe,
   Zap
 } from 'lucide-react';
+import { StripeService } from '@/services/stripeService';
 
 interface StripeConnectorProps {
   onConnectionChange?: (connected: boolean) => void;
@@ -32,22 +33,17 @@ export function StripeConnector({ onConnectionChange }: StripeConnectorProps) {
   const checkConnection = async () => {
     setLoading(true);
     try {
-      // In real implementation, this would check Stripe Connect status
-      // For now, simulating with mock data
-      const mockAccount = {
-        id: 'acct_1234567890',
-        email: 'admin@houstongeneratorpros.com',
-        country: 'US',
-        charges_enabled: true,
-        payouts_enabled: true,
-        details_submitted: true
-      };
-      
-      setAccountData(mockAccount);
-      setConnected(true);
-      onConnectionChange?.(true);
+      const account = await StripeService.getAccountStatus();
+      if (account.charges_enabled) {
+        setAccountData(account);
+        setConnected(true);
+        onConnectionChange?.(true);
+      } else {
+        setConnected(false);
+        onConnectionChange?.(false);
+      }
     } catch (err) {
-      setError('Failed to check connection status');
+      setError('Not connected to Stripe');
       setConnected(false);
       onConnectionChange?.(false);
     } finally {
@@ -60,26 +56,10 @@ export function StripeConnector({ onConnectionChange }: StripeConnectorProps) {
     setError(null);
     
     try {
-      // In real implementation, this would call your backend to create Stripe Connect account link
-      const response = await fetch('/api/stripe/connect', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          refresh_url: window.location.href,
-          return_url: window.location.href + '?connected=true'
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to initiate connection');
-      }
-      
-      const data = await response.json();
+      const { url } = await StripeService.createConnectAccountLink();
       
       // Redirect to Stripe Connect onboarding
-      window.location.href = data.url;
+      window.location.href = url;
     } catch (err) {
       setError('Failed to connect to Stripe. Please try again.');
       console.error('Stripe connection error:', err);
@@ -95,7 +75,7 @@ export function StripeConnector({ onConnectionChange }: StripeConnectorProps) {
     
     setLoading(true);
     try {
-      // In real implementation, this would deauthorize the Stripe account
+      await StripeService.disconnectAccount();
       setConnected(false);
       setAccountData(null);
       onConnectionChange?.(false);
