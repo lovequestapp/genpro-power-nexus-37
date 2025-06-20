@@ -14,7 +14,7 @@ export const getStripe = () => {
 };
 
 export class StripeService {
-  private static baseUrl = '/api/stripe';
+  private static baseUrl = 'https://fgpmeulzlrdgnlmibjkm.supabase.co/functions/v1/stripe-api';
 
   static async createConnectAccountLink() {
     const response = await fetch(`${this.baseUrl}/connect/account-link`, {

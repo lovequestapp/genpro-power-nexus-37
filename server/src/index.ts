@@ -1,3 +1,4 @@
+
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
@@ -7,6 +8,7 @@ import { billingRoutes } from './routes/billing';
 import { serviceRoutes } from './routes/services';
 import { alertRoutes } from './routes/alerts';
 import { supportRoutes } from './routes/support';
+import { stripeRoutes } from './routes/stripe';
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -22,6 +24,7 @@ app.use('/api/billing', billingRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/support', supportRoutes);
+app.use('/api', stripeRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
