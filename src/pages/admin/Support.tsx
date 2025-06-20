@@ -35,9 +35,13 @@ interface TransformedTicket {
   priority: 'low' | 'medium' | 'high' | 'urgent';
   type: string;
   customerName: string;
+  customerId: string;
   createdAt: string;
+  updatedAt: string;
+  date: string;
   assignedTo?: string;
   comments: any[];
+  attachments: any[];
 }
 
 // Transform database ticket to component-expected format
@@ -49,9 +53,13 @@ const transformTicketForComponent = (ticket: any): TransformedTicket => ({
   priority: ticket.priority,
   type: ticket.type,
   customerName: ticket.customer?.name || 'Unknown',
+  customerId: ticket.customer_id || '',
   createdAt: ticket.created_at,
+  updatedAt: ticket.updated_at || ticket.created_at,
+  date: ticket.created_at,
   assignedTo: ticket.assigned_to,
-  comments: ticket.comments || []
+  comments: ticket.comments || [],
+  attachments: ticket.attachments || []
 });
 
 export default function SupportPage() {
