@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -32,6 +31,7 @@ const adminNav = [
 
 export function Sidebar() {
   const location = useLocation();
+  
   return (
     <aside className="w-64 bg-white h-screen p-6 border-r shadow-lg flex flex-col">
       <div className="mb-8">
