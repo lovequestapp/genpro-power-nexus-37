@@ -159,15 +159,24 @@ export default function Scheduling() {
         </TabsContent>
 
         <TabsContent value="list">
-          <ScheduleList />
+          <ScheduleList 
+            onEventClick={handleEditEvent}
+            onRefresh={handleRefresh}
+          />
         </TabsContent>
 
         <TabsContent value="projects">
-          <ProjectSchedule />
+          <ProjectSchedule 
+            onEventClick={handleEditEvent}
+            onRefresh={handleRefresh}
+          />
         </TabsContent>
 
         <TabsContent value="technicians">
-          <TechnicianSchedule />
+          <TechnicianSchedule 
+            onEventClick={handleEditEvent}
+            onRefresh={handleRefresh}
+          />
         </TabsContent>
 
         <TabsContent value="integration">
