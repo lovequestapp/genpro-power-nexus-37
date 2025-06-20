@@ -22,12 +22,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     console.log('AuthContext: Starting authentication check...');
     
-    // Add a timeout to prevent infinite loading
-    const timeoutId = setTimeout(() => {
-      console.log('AuthContext: Timeout reached, forcing loading to false');
-      setLoading(false);
-    }, 10000); // 10 second timeout
-    
     // Check if we have a session on mount
     const checkUser = async () => {
       try {
@@ -40,30 +34,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(session.user);
           console.log('AuthContext: User state set on mount:', session.user.id);
           
-          // For now, set admin role directly to avoid RLS issues
+          // Set admin role directly to avoid RLS issues
           console.log('AuthContext: Setting admin role for authenticated user on mount');
           setUserRole('admin');
           console.log('AuthContext: Setting loading to false');
           setLoading(false);
           
-          // Optionally try to fetch profile in background (non-blocking)
-          try {
-            console.log('AuthContext: Attempting to fetch profile in background on mount...');
-            const { data: profile, error } = await supabase
-              .from('profiles')
-              .select('role')
-              .eq('id', session.user.id)
-              .single();
-            
-            if (!error && profile?.role) {
-              console.log('AuthContext: Profile fetched successfully on mount:', profile.role);
-              setUserRole(profile.role);
-            } else {
-              console.log('AuthContext: Profile fetch failed or no role found on mount, keeping admin role');
+          // Try to fetch profile in background (non-blocking)
+          setTimeout(async () => {
+            try {
+              console.log('AuthContext: Attempting to fetch profile in background on mount...');
+              const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', session.user.id)
+                .single();
+              
+              if (!error && profile?.role) {
+                console.log('AuthContext: Profile fetched successfully on mount:', profile.role);
+                setUserRole(profile.role);
+              } else {
+                console.log('AuthContext: Profile fetch failed or no role found on mount, keeping admin role');
+              }
+            } catch (err) {
+              console.log('AuthContext: Background profile fetch failed on mount:', err);
             }
-          } catch (err) {
-            console.log('AuthContext: Background profile fetch failed on mount:', err);
-          }
+          }, 100);
         } else {
           setUser(null);
           setUserRole(null);
@@ -74,11 +70,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.error('Error checking session:', err);
         setUser(null);
         setUserRole(null);
+        setLoading(false);
       }
-      
-      console.log('AuthContext: Setting loading to false');
-      clearTimeout(timeoutId);
-      setLoading(false);
     };
 
     checkUser();
@@ -93,30 +86,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('AuthContext: User state set to:', session?.user?.id || 'null');
       
       if (session?.user) {
-        // For now, set admin role directly to avoid RLS issues
+        // Set admin role directly to avoid RLS issues
         console.log('AuthContext: Setting admin role for authenticated user');
         setUserRole('admin');
         console.log('AuthContext: Setting loading to false on auth change');
         setLoading(false);
         
-        // Optionally try to fetch profile in background (non-blocking)
-        try {
-          console.log('AuthContext: Attempting to fetch profile in background...');
-          const { data: profile, error } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', session.user.id)
-            .single();
-          
-          if (!error && profile?.role) {
-            console.log('AuthContext: Profile fetched successfully:', profile.role);
-            setUserRole(profile.role);
-          } else {
-            console.log('AuthContext: Profile fetch failed or no role found, keeping admin role');
+        // Try to fetch profile in background (non-blocking)
+        setTimeout(async () => {
+          try {
+            console.log('AuthContext: Attempting to fetch profile in background...');
+            const { data: profile, error } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', session.user.id)
+              .single();
+            
+            if (!error && profile?.role) {
+              console.log('AuthContext: Profile fetched successfully:', profile.role);
+              setUserRole(profile.role);
+            } else {
+              console.log('AuthContext: Profile fetch failed or no role found, keeping admin role');
+            }
+          } catch (err) {
+            console.log('AuthContext: Background profile fetch failed:', err);
           }
-        } catch (err) {
-          console.log('AuthContext: Background profile fetch failed:', err);
-        }
+        }, 100);
       } else {
         setUserRole(null);
         console.log('AuthContext: Setting loading to false on auth change');
@@ -125,7 +120,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => {
-      clearTimeout(timeoutId);
       subscription.unsubscribe();
     };
   }, []);
@@ -137,18 +131,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // If the identifier is not an email, look up the email by username
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(identifier)) {
       console.log('Looking up email by username...');
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('email')
-        .eq('username', identifier)
-        .single();
-      if (error || !data) throw new Error('No user found with that username');
-      email = data.email;
-      console.log('Found email:', email);
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('email')
+          .eq('username', identifier)
+          .single();
+        if (error || !data) throw new Error('No user found with that username');
+        email = data.email;
+        console.log('Found email:', email);
+      } catch (err) {
+        console.log('Username lookup failed, proceeding with identifier as email');
+        email = identifier;
+      }
     }
     console.log('Signing in with email:', email);
     
-    // Try authentication without timeout
+    // Try authentication
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
@@ -161,20 +160,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw error;
     }
     
-    // After sign in, fetch and set the user role
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    console.log('Got user:', user?.id);
-    if (user) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
-      console.log('Got profile role:', profile?.role);
-      setUserRole(profile?.role ?? null);
-    }
     console.log('signIn function completed');
   };
 
