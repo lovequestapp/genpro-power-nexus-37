@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -33,7 +32,7 @@ interface TransformedTicket {
   description: string;
   status: 'open' | 'in_progress' | 'resolved' | 'closed';
   priority: 'low' | 'medium' | 'high' | 'urgent';
-  type: string;
+  type: 'technical' | 'billing' | 'general';
   customerName: string;
   customerId: string;
   createdAt: string;
@@ -51,7 +50,7 @@ const transformTicketForComponent = (ticket: any): TransformedTicket => ({
   description: ticket.description,
   status: ticket.status,
   priority: ticket.priority,
-  type: ticket.type,
+  type: ticket.type === 'support' ? 'technical' : ticket.type === 'bug' ? 'technical' : ticket.type === 'feature' ? 'technical' : 'general',
   customerName: ticket.customer?.name || 'Unknown',
   customerId: ticket.customer_id || '',
   createdAt: ticket.created_at,
