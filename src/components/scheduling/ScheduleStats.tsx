@@ -2,15 +2,15 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Calendar, Clock, Users, TrendingUp, TrendingDown, BarChart3 } from 'lucide-react';
+import { Calendar, Clock, Users, TrendingUp, TrendingDown, BarChart3, CheckCircle } from 'lucide-react';
 import type { ScheduleStats as StatsType, ScheduleEvent } from '@/types/scheduling';
 
 interface ScheduleStatsProps {
-  stats: StatsType | null;
-  recentEvents: ScheduleEvent[];
+  stats?: StatsType | null;
+  recentEvents?: ScheduleEvent[];
 }
 
-export function ScheduleStats({ stats, recentEvents }: ScheduleStatsProps) {
+export function ScheduleStats({ stats, recentEvents = [] }: ScheduleStatsProps) {
   if (!stats) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -343,4 +343,4 @@ export function ScheduleStats({ stats, recentEvents }: ScheduleStatsProps) {
       </Card>
     </div>
   );
-} 
+}

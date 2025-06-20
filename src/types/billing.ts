@@ -29,6 +29,7 @@ export interface Invoice {
   created_at: string;
   updated_at: string;
   metadata?: Record<string, any>;
+  line_items?: InvoiceLineItem[];
 }
 
 export interface InvoiceLineItem {
@@ -209,4 +210,4 @@ export interface PaymentFormData {
   payment_method: string;
   reference?: string;
   notes?: string;
-} 
+}

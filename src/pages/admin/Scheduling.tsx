@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,6 +19,7 @@ export default function Scheduling() {
   const [showForm, setShowForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState<ScheduleEvent | null>(null);
   const [stats, setStats] = useState<StatsType | null>(null);
+  const [recentEvents, setRecentEvents] = useState<ScheduleEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,6 +31,8 @@ export default function Scheduling() {
     try {
       const statsData = await getScheduleStats();
       setStats(statsData);
+      // For demo purposes, setting empty recent events
+      setRecentEvents([]);
     } catch (error) {
       console.error('Error loading scheduling stats:', error);
     } finally {
@@ -50,6 +54,10 @@ export default function Scheduling() {
     setShowForm(false);
     setEditingEvent(null);
     loadData(); // Refresh data
+  };
+
+  const handleRefresh = () => {
+    loadData();
   };
 
   return (
@@ -151,23 +159,23 @@ export default function Scheduling() {
         </TabsContent>
 
         <TabsContent value="list">
-          <ScheduleList onEdit={handleEditEvent} />
+          <ScheduleList />
         </TabsContent>
 
         <TabsContent value="projects">
-          <ProjectSchedule onEditEvent={handleEditEvent} />
+          <ProjectSchedule />
         </TabsContent>
 
         <TabsContent value="technicians">
-          <TechnicianSchedule onEditEvent={handleEditEvent} />
+          <TechnicianSchedule />
         </TabsContent>
 
         <TabsContent value="integration">
-          <CalendarIntegration />
+          <CalendarIntegration onRefresh={handleRefresh} />
         </TabsContent>
 
         <TabsContent value="stats">
-          <ScheduleStats />
+          <ScheduleStats stats={stats} recentEvents={recentEvents} />
         </TabsContent>
         
       </Tabs>
@@ -181,4 +189,4 @@ export default function Scheduling() {
       )} */}
     </div>
   );
-} 
+}

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,7 +33,8 @@ export function BillingInvoiceList({ onCreateInvoice, onViewInvoice, onEditInvoi
     setLoading(true);
     setError(null);
     try {
-      const data = await getInvoices({ status: status === 'all' ? undefined : status, search });
+      const statusFilter = status === 'all' ? undefined : [status];
+      const data = await getInvoices({ status: statusFilter, search });
       setInvoices(data);
     } catch (e: any) {
       setError(e.message || 'Failed to load invoices');
@@ -128,4 +130,4 @@ export function BillingInvoiceList({ onCreateInvoice, onViewInvoice, onEditInvoi
       )}
     </div>
   );
-} 
+}

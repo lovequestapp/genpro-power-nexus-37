@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -117,7 +118,11 @@ export function BillingItemsManager() {
             </div>
             <div>
               <label className="block font-medium">Type</label>
-              <select value={form.item_type || 'service'} onChange={e => setForm(f => ({ ...f, item_type: e.target.value }))} className="w-full border rounded p-2">
+              <select 
+                value={form.item_type || 'service'} 
+                onChange={e => setForm(f => ({ ...f, item_type: e.target.value as BillingItem['item_type'] }))} 
+                className="w-full border rounded p-2"
+              >
                 <option value="service">Service</option>
                 <option value="product">Product</option>
                 <option value="labor">Labor</option>
@@ -153,4 +158,4 @@ export function BillingItemsManager() {
       )}
     </div>
   );
-} 
+}

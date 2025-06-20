@@ -79,6 +79,7 @@ export interface CalendarIntegration {
   type: 'google' | 'outlook' | 'apple' | 'ical' | 'other';
   enabled: boolean;
   sync_direction: 'import' | 'export' | 'bidirectional';
+  sync_status?: 'synced' | 'pending' | 'failed';
   last_sync?: string;
   settings: Record<string, any>;
   created_at: string;
@@ -158,4 +159,4 @@ export interface CalendarExportOptions {
   include_reminders: boolean;
   include_attachments: boolean;
   filter?: ScheduleFilter;
-} 
+}
