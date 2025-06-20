@@ -2,7 +2,7 @@
 import { loadStripe } from '@stripe/stripe-js';
 
 // This would be your Stripe publishable key
-const STRIPE_PUBLISHABLE_KEY = process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || 'pk_test_...';
+const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_...';
 
 let stripePromise: Promise<any> | null = null;
 
