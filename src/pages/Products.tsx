@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Check } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface GeneratorProduct {
   id: string;
@@ -162,13 +163,14 @@ const ProductCard = ({ product }: { product: GeneratorProduct }) => {
           ))}
         </div>
 
-        <Button 
-          className="w-full justify-center group"
-          variant="outline"
-        >
-          <span>Get Quote</span>
-          <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-        </Button>
+        <Link to="/get-quote">
+          <Button 
+            className="w-full justify-center group accent-gradient text-white hover:shadow-glow transition-all duration-500"
+          >
+            <span>Get Quote</span>
+            <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+          </Button>
+        </Link>
       </div>
     </motion.div>
   );
@@ -215,13 +217,15 @@ const Products = () => {
             <p className="text-steel-600 mb-8">
               Our experts are here to help you select the perfect generator for your home. Contact us for a free consultation.
             </p>
-            <Button 
-              size="lg"
-              className="accent-gradient text-white px-8"
-            >
-              Schedule a Consultation
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
+            <Link to="/get-quote">
+              <Button 
+                size="lg"
+                className="accent-gradient text-white px-8"
+              >
+                Schedule a Consultation
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
           </div>
         </motion.div>
       </div>
