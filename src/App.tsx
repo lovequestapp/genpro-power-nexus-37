@@ -36,7 +36,7 @@ import AdminInventory from '@/pages/admin/Inventory';
 import AdminInventoryParts from '@/pages/admin/InventoryParts';
 import AdminInventoryOrders from '@/pages/admin/InventoryOrders';
 import AdminBilling from '@/pages/admin/Billing';
-import AdminSchedule from '@/pages/admin/Schedule';
+import AdminScheduling from '@/pages/admin/Scheduling';
 import AdminSettings from '@/pages/admin/Settings';
 import AdminTeam from '@/pages/admin/Team';
 import AdminSupport from '@/pages/admin/Support';
@@ -110,7 +110,7 @@ function App() {
                   <Route path="inventory/parts" element={<AdminInventoryParts />} />
                   <Route path="inventory/orders" element={<AdminInventoryOrders />} />
                   <Route path="billing" element={<AdminBilling />} />
-                  <Route path="schedule" element={<AdminSchedule />} />
+                  <Route path="schedule" element={<AdminScheduling />} />
                   <Route path="settings" element={<AdminSettings />} />
                   <Route path="team" element={<AdminTeam />} />
                   <Route path="support" element={<AdminSupport />} />
