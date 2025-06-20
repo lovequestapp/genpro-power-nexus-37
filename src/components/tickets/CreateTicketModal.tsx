@@ -47,14 +47,24 @@ export function CreateTicketModal({
     try {
       setLoading(true);
       
-      // Prepare the ticket data, ensuring customer_id is null if empty
+      console.log('Creating ticket with data:', formData);
+      
+      // Prepare the ticket data with proper customer_id handling
       const ticketData = {
-        ...formData,
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        priority: formData.priority,
+        type: formData.type,
+        category: formData.category,
         status: 'open' as const,
-        customer_id: formData.customer_id.trim() || null, // Convert empty string to null
+        customer_id: formData.customer_id?.trim() || null,
+        estimated_time: formData.estimated_time || null,
       };
       
-      await ticketService.createTicket(ticketData);
+      console.log('Processed ticket data:', ticketData);
+      
+      const result = await ticketService.createTicket(ticketData);
+      console.log('Ticket creation result:', result);
       
       toast({
         title: 'Success',
@@ -75,12 +85,12 @@ export function CreateTicketModal({
         estimated_time: '',
       });
     } catch (error) {
+      console.error('Create ticket error details:', error);
       toast({
         title: 'Error',
-        description: 'Failed to create ticket',
+        description: `Failed to create ticket: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: 'destructive',
       });
-      console.error('Create ticket error:', error);
     } finally {
       setLoading(false);
     }
