@@ -40,6 +40,7 @@ import InventoryParts from '@/pages/admin/InventoryParts';
 import InventoryOrders from '@/pages/admin/InventoryOrders';
 import Billing from '@/pages/admin/Billing';
 import Scheduling from '@/pages/admin/Scheduling';
+import StripePage from '@/pages/admin/stripe';
 
 // Create a new query client instance
 const queryClient = new QueryClient({
@@ -97,6 +98,7 @@ function App() {
                   <Route path="/admin/inventory/orders" element={<InventoryOrders />} />
                   <Route path="/admin/billing" element={<Billing />} />
                   <Route path="/admin/schedule" element={<Scheduling />} />
+                  <Route path="/admin/stripe" element={<StripePage />} />
                 </Route>
               </Routes>
             </Router>
