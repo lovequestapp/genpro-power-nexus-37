@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -103,6 +102,7 @@ function App() {
                   </ProtectedRoute>
                 }>
                   <Route index element={<AdminDashboard />} />
+                  <Route path="dashboard" element={<AdminDashboard />} />
                   <Route path="customers" element={<AdminCustomers />} />
                   <Route path="customers/:id" element={<CustomerDetails />} />
                   <Route path="projects" element={<AdminProjects />} />

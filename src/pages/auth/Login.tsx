@@ -3,14 +3,15 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
 import { Eye, EyeOff } from 'lucide-react';
+import { Logo } from '@/components/Logo';
+import { motion } from 'framer-motion';
 
 export default function Login() {
   const navigate = useNavigate();
   const { signIn } = useAuth();
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -20,20 +21,12 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await signIn(email, password);
-      
-      // The AuthContext will handle the role checking and navigation
-      // We can add a small delay to ensure the auth state is updated
-      setTimeout(() => {
-        // Check if we need to navigate based on role
-        // This will be handled by the AuthContext and ProtectedRoute
-        navigate('/admin'); // Default to admin for now
-      }, 100);
-      
+      await signIn(identifier, password);
+      navigate('/admin');
     } catch (error: any) {
       toast({
-        title: 'Error',
-        description: error.message,
+        title: 'Login Failed',
+        description: error.message || 'Please check your credentials and try again.',
         variant: 'destructive',
       });
     } finally {
@@ -42,64 +35,86 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Login</CardTitle>
-          <CardDescription>Enter your credentials to access your account</CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="identifier">Email or Username</label>
+    <div className="relative min-h-screen w-full bg-gray-50 flex items-center justify-center p-4 overflow-hidden">
+      <div className="absolute top-0 left-0 w-64 h-64 bg-orange-100 rounded-full opacity-50 -translate-x-20 -translate-y-20"></div>
+      <div className="absolute bottom-0 right-0 w-72 h-72 bg-gray-200 rounded-full opacity-60 translate-x-24 translate-y-24"></div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+        className="relative z-10 w-full max-w-sm"
+      >
+        <div className="bg-white/80 backdrop-blur-lg border border-gray-200/60 shadow-2xl rounded-3xl p-8 space-y-8">
+          <div className="flex justify-center">
+            <Logo />
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
               <Input
                 id="identifier"
                 type="text"
-                placeholder="Enter your email or username"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                placeholder="Email or Username"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
                 required
+                className="h-12 text-base px-4 bg-white/70 border-2 border-gray-200/80 rounded-xl focus:ring-orange-500 focus:border-orange-500 transition-shadow duration-300 shadow-sm focus:shadow-md"
               />
             </div>
-            <div className="space-y-2">
-              <label htmlFor="password">Password</label>
+
+            <div>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter your password"
+                  autoComplete="current-password"
+                  placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  className="h-12 text-base px-4 bg-white/70 border-2 border-gray-200/80 rounded-xl focus:ring-orange-500 focus:border-orange-500 transition-shadow duration-300 shadow-sm focus:shadow-md"
                 />
                 <button
                   type="button"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700"
-                  onClick={() => setShowPassword((v) => !v)}
-                  tabIndex={-1}
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-400 hover:text-gray-600"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign in'}
+            
+            <Button 
+              type="submit" 
+              className="w-full text-base font-bold bg-orange-500 hover:bg-orange-600 text-white rounded-xl shadow-lg hover:shadow-orange-300/80 transition-all duration-300 transform hover:-translate-y-0.5" 
+              size="lg" 
+              disabled={loading}
+            >
+              {loading ? 'Signing In...' : 'Sign In'}
             </Button>
-            <div className="text-sm text-center space-x-2">
-              <Link to="/forgot-password" className="text-primary hover:underline">
-                Forgot password?
+          </form>
+
+          <div className="text-center text-sm space-y-2">
+            <Link to="/forgot-password" className="font-medium text-gray-600 hover:text-orange-600">
+              Forgot password?
+            </Link>
+            <p className="text-gray-500">
+              Don't have an account?{' '}
+              <Link to="/register" className="font-bold text-orange-600 hover:text-orange-500">
+                Sign up
               </Link>
-              <span>•</span>
-              <Link to="/register" className="text-primary hover:underline">
-                Create an account
-              </Link>
-            </div>
-          </CardFooter>
-        </form>
-      </Card>
+            </p>
+          </div>
+        </div>
+        
+        <footer className="text-center text-xs text-gray-400 mt-8">
+          <p>Developed by Cardinal Consulting for HOU GEN PROS.</p>
+          <p>Licensed to and owned by HOU GEN PROS.</p>
+        </footer>
+      </motion.div>
     </div>
   );
 } 

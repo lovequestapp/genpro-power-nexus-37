@@ -12,49 +12,87 @@ import {
   Calendar,
   DollarSign,
   CreditCard,
+  X,
+  LogOut,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Logo } from './Logo';
+import { useAuth } from '@/contexts/AuthContext';
 
 const adminNav = [
-  { label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" />, to: '/admin' },
-  { label: 'Customers', icon: <Users className="w-5 h-5" />, to: '/admin/customers' },
-  { label: 'Projects', icon: <ClipboardList className="w-5 h-5" />, to: '/admin/projects' },
-  { label: 'Inventory', icon: <Package className="w-5 h-5" />, to: '/admin/inventory' },
-  { label: 'Parts', icon: <Wrench className="w-5 h-5" />, to: '/admin/inventory/parts' },
-  { label: 'Orders', icon: <FileText className="w-5 h-5" />, to: '/admin/inventory/orders' },
-  { label: 'Billing', icon: <DollarSign className="w-5 h-5" />, to: '/admin/billing' },
-  { label: 'Schedule', icon: <Calendar className="w-5 h-5" />, to: '/admin/schedule' },
-  { label: 'Stripe', icon: <CreditCard className="w-5 h-5" />, to: '/admin/stripe' },
-  { label: 'Support', icon: <LifeBuoy className="w-5 h-5" />, to: '/admin/support' },
-  { label: 'Team', icon: <Users className="w-5 h-5" />, to: '/admin/team' },
-  { label: 'Settings', icon: <Settings className="w-5 h-5" />, to: '/admin/settings' },
+  { label: 'Dashboard', icon: <LayoutDashboard />, to: '/admin/dashboard' },
+  { label: 'Customers', icon: <Users />, to: '/admin/customers' },
+  { label: 'Projects', icon: <ClipboardList />, to: '/admin/projects' },
+  { label: 'Inventory', icon: <Package />, to: '/admin/inventory' },
+  { label: 'Parts', icon: <Wrench />, to: '/admin/inventory/parts' },
+  { label: 'Orders', icon: <FileText />, to: '/admin/inventory/orders' },
+  { label: 'Billing', icon: <DollarSign />, to: '/admin/billing' },
+  { label: 'Schedule', icon: <Calendar />, to: '/admin/schedule' },
+  { label: 'Stripe', icon: <CreditCard />, to: '/admin/stripe' },
+  { label: 'Support', icon: <LifeBuoy />, to: '/admin/support' },
+  { label: 'Team', icon: <Users />, to: '/admin/team' },
+  { label: 'Settings', icon: <Settings />, to: '/admin/settings' },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const location = useLocation();
+  const { signOut } = useAuth();
   
   return (
-    <aside className="w-64 bg-white h-screen p-6 border-r shadow-lg flex flex-col">
-      <div className="mb-8">
-        <Link to="/admin" className="flex items-center space-x-3 mb-6">
-          <span className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent">HGP</span>
-          <span className="text-lg font-semibold text-steel-900">Admin</span>
-        </Link>
-      </div>
-      <nav className="flex-1">
-        <ul className="space-y-2">
-          {adminNav.map((item) => (
-            <li key={item.to}>
-              <Link
-                to={item.to}
-                className={`flex items-center px-4 py-2 rounded-lg transition-colors font-medium text-steel-700 hover:bg-accent/10 hover:text-accent ${location.pathname === item.to ? 'bg-accent/20 text-accent font-bold' : ''}`}
-              >
-                {item.icon}
-                <span className="ml-3">{item.label}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </aside>
+    <>
+      <aside className={cn(
+        "fixed lg:relative lg:translate-x-0 inset-y-0 left-0 z-50 w-64 bg-white h-screen p-4 flex flex-col transition-transform duration-300 ease-in-out",
+        "border-r border-gray-200",
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        <div className="flex items-center justify-between p-2 mb-6">
+          <Link to="/admin">
+            <Logo />
+          </Link>
+          <button onClick={onClose} className="lg:hidden text-gray-500 hover:text-gray-800">
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+        <nav className="flex-1">
+          <ul className="space-y-1">
+            {adminNav.map((item) => (
+              <li key={item.to}>
+                <Link
+                  to={item.to}
+                  onClick={onClose}
+                  className={cn(
+                    "flex items-center px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
+                    location.pathname === item.to || (item.to !== '/admin/dashboard' && location.pathname.startsWith(item.to))
+                      ? 'bg-orange-50 text-orange-600' 
+                      : 'text-gray-700 hover:bg-gray-100'
+                  )}
+                >
+                  {React.cloneElement(item.icon, { className: 'w-5 h-5 mr-3' })}
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <div className="mt-auto">
+          <button
+            onClick={() => {
+              signOut();
+              onClose();
+            }}
+            className="flex items-center w-full px-3 py-2.5 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
+          >
+            <LogOut className="w-5 h-5 mr-3" />
+            Sign Out
+          </button>
+        </div>
+      </aside>
+      {isOpen && <div onClick={onClose} className="fixed inset-0 bg-black/30 z-40 lg:hidden" />}
+    </>
   );
 } 
