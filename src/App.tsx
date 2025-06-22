@@ -39,6 +39,7 @@ import AdminScheduling from '@/pages/admin/Scheduling';
 import AdminSettings from '@/pages/admin/Settings';
 import AdminTeam from '@/pages/admin/Team';
 import AdminSupport from '@/pages/admin/Support';
+import AdminForms from '@/pages/admin/Forms';
 import StripeDashboard from '@/pages/admin/StripeDashboard';
 import ProjectDetailPage from '@/pages/admin/ProjectDetailPage';
 import EmailPage from '@/pages/admin/Email';
@@ -121,6 +122,7 @@ function App() {
                   <Route path="team" element={<AdminTeam />} />
                   <Route path="support" element={<AdminSupport />} />
                   <Route path="stripe" element={<StripeDashboard />} />
+                  <Route path="forms" element={<AdminForms />} />
                 </Route>
 
                 {/* Customer routes */}

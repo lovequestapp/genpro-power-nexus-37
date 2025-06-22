@@ -25,6 +25,7 @@ const adminNav = [
   { label: 'Customers', icon: <Users />, to: '/admin/customers' },
   { label: 'Projects', icon: <ClipboardList />, to: '/admin/projects' },
   { label: 'Email', icon: <Mail />, to: '/admin/email' },
+  { label: 'Forms', icon: <FileText />, to: '/admin/forms' },
   { label: 'Inventory', icon: <Package />, to: '/admin/inventory' },
   { label: 'Parts', icon: <Wrench />, to: '/admin/inventory/parts' },
   { label: 'Orders', icon: <FileText />, to: '/admin/inventory/orders' },
