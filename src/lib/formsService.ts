@@ -20,11 +20,18 @@ export async function getFormDefinitions(): Promise<FormDefinition[]> {
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      // If table doesn't exist, return empty array
+      if (error.code === 'PGRST116') {
+        console.warn('form_definitions table does not exist yet');
+        return [];
+      }
+      throw error;
+    }
     return data || [];
   } catch (error) {
     console.error('Error fetching form definitions:', error);
-    throw error;
+    return [];
   }
 }
 
@@ -37,7 +44,13 @@ export async function getFormDefinition(slug: string): Promise<FormDefinition | 
       .eq('is_active', true)
       .single();
 
-    if (error) throw error;
+    if (error) {
+      if (error.code === 'PGRST116') {
+        console.warn('form_definitions table does not exist yet');
+        return null;
+      }
+      throw error;
+    }
     return data;
   } catch (error) {
     console.error('Error fetching form definition:', error);
@@ -125,11 +138,17 @@ export async function getFormSubmissions(filters: FormSubmissionFilters = {}): P
     }
 
     const { data, error } = await query;
-    if (error) throw error;
+    if (error) {
+      if (error.code === 'PGRST116') {
+        console.warn('form_submissions table does not exist yet');
+        return [];
+      }
+      throw error;
+    }
     return data || [];
   } catch (error) {
     console.error('Error fetching form submissions:', error);
-    throw error;
+    return [];
   }
 }
 
@@ -144,7 +163,13 @@ export async function getFormSubmission(id: string): Promise<FormSubmission | nu
       .eq('id', id)
       .single();
 
-    if (error) throw error;
+    if (error) {
+      if (error.code === 'PGRST116') {
+        console.warn('form_submissions table does not exist yet');
+        return null;
+      }
+      throw error;
+    }
     return data;
   } catch (error) {
     console.error('Error fetching form submission:', error);
@@ -244,26 +269,32 @@ export async function getFormAnalytics(filters: FormAnalyticsFilters = {}): Prom
     let query = supabase
       .from('form_analytics')
       .select('*')
-      .order('date', { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (filters.form_id) {
       query = query.eq('form_id', filters.form_id);
     }
 
     if (filters.date_from) {
-      query = query.gte('date', filters.date_from);
+      query = query.gte('created_at', filters.date_from);
     }
 
     if (filters.date_to) {
-      query = query.lte('date', filters.date_to);
+      query = query.lte('created_at', filters.date_to);
     }
 
     const { data, error } = await query;
-    if (error) throw error;
+    if (error) {
+      if (error.code === 'PGRST116') {
+        console.warn('form_analytics table does not exist yet');
+        return [];
+      }
+      throw error;
+    }
     return data || [];
   } catch (error) {
     console.error('Error fetching form analytics:', error);
-    throw error;
+    return [];
   }
 }
 
@@ -273,16 +304,38 @@ export async function getFormSubmissionStats(): Promise<FormSubmissionStats> {
       .from('form_submissions')
       .select('status, created_at');
 
-    if (error) throw error;
+    if (error) {
+      if (error.code === 'PGRST116') {
+        console.warn('form_submissions table does not exist yet');
+        return {
+          total_submissions: 0,
+          new_submissions: 0,
+          read_submissions: 0,
+          completed_submissions: 0,
+          this_month: {
+            submissions: 0,
+            change_percentage: 0,
+          },
+          by_status: {
+            new: 0,
+            read: 0,
+            in_progress: 0,
+            completed: 0,
+            archived: 0,
+          },
+        };
+      }
+      throw error;
+    }
 
     const now = new Date();
     const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
     const totalSubmissions = submissions.length;
-    const newSubmissions = submissions.filter(s => s.status === 'new').length;
+    const newSubmissions = submissions.filter(s => s.status === 'pending').length;
     const readSubmissions = submissions.filter(s => s.status === 'read').length;
-    const completedSubmissions = submissions.filter(s => s.status === 'completed').length;
+    const completedSubmissions = submissions.filter(s => s.status === 'processed').length;
 
     const thisMonthSubmissions = submissions.filter(s => 
       new Date(s.created_at) >= thisMonth
@@ -297,10 +350,10 @@ export async function getFormSubmissionStats(): Promise<FormSubmissionStats> {
       : 0;
 
     const byStatus = {
-      new: submissions.filter(s => s.status === 'new').length,
+      new: submissions.filter(s => s.status === 'pending').length,
       read: submissions.filter(s => s.status === 'read').length,
       in_progress: submissions.filter(s => s.status === 'in_progress').length,
-      completed: submissions.filter(s => s.status === 'completed').length,
+      completed: submissions.filter(s => s.status === 'processed').length,
       archived: submissions.filter(s => s.status === 'archived').length,
     };
 
@@ -317,7 +370,23 @@ export async function getFormSubmissionStats(): Promise<FormSubmissionStats> {
     };
   } catch (error) {
     console.error('Error fetching form submission stats:', error);
-    throw error;
+    return {
+      total_submissions: 0,
+      new_submissions: 0,
+      read_submissions: 0,
+      completed_submissions: 0,
+      this_month: {
+        submissions: 0,
+        change_percentage: 0,
+      },
+      by_status: {
+        new: 0,
+        read: 0,
+        in_progress: 0,
+        completed: 0,
+        archived: 0,
+      },
+    };
   }
 }
 
@@ -330,34 +399,54 @@ export async function getFormAnalyticsStats(): Promise<FormAnalyticsStats> {
         form:form_definitions(name)
       `);
 
-    if (error) throw error;
+    if (error) {
+      if (error.code === 'PGRST116') {
+        console.warn('form_analytics table does not exist yet');
+        return {
+          total_views: 0,
+          total_submissions: 0,
+          average_conversion_rate: 0,
+          top_performing_forms: [],
+          recent_trends: [],
+        };
+      }
+      throw error;
+    }
 
-    const totalViews = analytics.reduce((sum, a) => sum + (a.views || 0), 0);
-    const totalSubmissions = analytics.reduce((sum, a) => sum + (a.submissions || 0), 0);
-    const averageConversionRate = analytics.length > 0 
-      ? analytics.reduce((sum, a) => sum + (a.conversion_rate || 0), 0) / analytics.length
-      : 0;
+    // Count views and submissions by event_type
+    const totalViews = analytics.filter(a => a.event_type === 'view').length;
+    const totalSubmissions = analytics.filter(a => a.event_type === 'submission').length;
+    const averageConversionRate = totalViews > 0 ? (totalSubmissions / totalViews) * 100 : 0;
 
     // Get top performing forms
-    const formPerformance = analytics.reduce((acc, a) => {
+    const formPerformance: Record<string, {
+      form_id: string;
+      form_name: string;
+      submissions: number;
+      conversion_rate: number;
+    }> = {};
+
+    analytics.forEach(a => {
       const formId = a.form_id;
-      if (!acc[formId]) {
-        acc[formId] = {
+      if (!formPerformance[formId]) {
+        formPerformance[formId] = {
           form_id: formId,
           form_name: (a.form as any)?.name || 'Unknown',
           submissions: 0,
           conversion_rate: 0,
         };
       }
-      acc[formId].submissions += (a.submissions || 0);
-      acc[formId].conversion_rate = Math.max(acc[formId].conversion_rate, (a.conversion_rate || 0));
-      return acc;
-    }, {} as Record<string, {
-      form_id: string;
-      form_name: string;
-      submissions: number;
-      conversion_rate: number;
-    }>);
+      if (a.event_type === 'submission') {
+        formPerformance[formId].submissions += 1;
+      }
+    });
+
+    // Calculate conversion rates for each form
+    Object.keys(formPerformance).forEach(formId => {
+      const formViews = analytics.filter(a => a.form_id === formId && a.event_type === 'view').length;
+      const formSubmissions = formPerformance[formId].submissions;
+      formPerformance[formId].conversion_rate = formViews > 0 ? (formSubmissions / formViews) * 100 : 0;
+    });
 
     const topPerformingForms = Object.values(formPerformance)
       .sort((a, b) => b.submissions - a.submissions)
@@ -367,12 +456,12 @@ export async function getFormAnalyticsStats(): Promise<FormAnalyticsStats> {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const recentAnalytics = analytics.filter(a => new Date(a.date) >= thirtyDaysAgo);
+    const recentAnalytics = analytics.filter(a => new Date(a.created_at) >= thirtyDaysAgo);
     const recentTrends = recentAnalytics.map(a => ({
-      date: a.date,
-      views: a.views || 0,
-      submissions: a.submissions || 0,
-      conversion_rate: a.conversion_rate || 0,
+      date: a.created_at,
+      views: a.event_type === 'view' ? 1 : 0,
+      submissions: a.event_type === 'submission' ? 1 : 0,
+      conversion_rate: a.event_type === 'view' ? 0 : 100, // Simplified for now
     }));
 
     return {
@@ -384,7 +473,13 @@ export async function getFormAnalyticsStats(): Promise<FormAnalyticsStats> {
     };
   } catch (error) {
     console.error('Error fetching form analytics stats:', error);
-    throw error;
+    return {
+      total_views: 0,
+      total_submissions: 0,
+      average_conversion_rate: 0,
+      top_performing_forms: [],
+      recent_trends: [],
+    };
   }
 }
 
@@ -431,9 +526,22 @@ async function sendAutoResponseEmail(form: FormDefinition, data: Record<string, 
 // --- FORM VIEW TRACKING ---
 export async function trackFormView(formSlug: string): Promise<void> {
   try {
-    const { error } = await supabase.rpc('increment_form_view', {
-      form_slug: formSlug,
-    });
+    const form = await getFormDefinition(formSlug);
+    if (!form) {
+      console.warn('Form not found for tracking:', formSlug);
+      return;
+    }
+
+    const { error } = await supabase
+      .from('form_analytics')
+      .insert([{
+        form_id: form.id,
+        event_type: 'view',
+        event_data: {},
+        ip_address: await getClientIP(),
+        user_agent: navigator.userAgent,
+        referrer: document.referrer,
+      }]);
 
     if (error) throw error;
   } catch (error) {
