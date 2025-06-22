@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Plus, X } from 'lucide-react';
+import { InventoryItem, InventoryFormData } from '@/types/inventory';
 
 interface InventoryItemFormProps {
   categories: Array<{
@@ -18,6 +19,7 @@ interface InventoryItemFormProps {
     id: string;
     name: string;
   }>;
+  item?: InventoryItem;
   onSubmit: (data: any) => void;
   onCancel: () => void;
 }
@@ -25,6 +27,7 @@ interface InventoryItemFormProps {
 export function InventoryItemForm({ 
   categories, 
   suppliers, 
+  item,
   onSubmit, 
   onCancel 
 }: InventoryItemFormProps) {
@@ -57,6 +60,37 @@ export function InventoryItemForm({
   const [newTag, setNewTag] = useState('');
   const [newDocument, setNewDocument] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Initialize form data with item data if editing
+  useEffect(() => {
+    if (item) {
+      setFormData({
+        name: item.name || '',
+        description: item.description || '',
+        sku: item.sku || '',
+        barcode: item.barcode || '',
+        category_id: item.category_id || '',
+        supplier_id: item.supplier_id || '',
+        manufacturer: item.manufacturer || '',
+        model: item.model || '',
+        part_number: item.part_number || '',
+        quantity: item.quantity || 0,
+        min_quantity: item.min_quantity || 0,
+        max_quantity: item.max_quantity || 0,
+        unit_cost: item.unit_cost || 0,
+        unit_price: item.unit_price || 0,
+        location: item.location || '',
+        shelf_location: item.shelf_location || '',
+        condition: item.condition || 'new',
+        warranty_period: item.warranty_period || 0,
+        weight: item.weight || 0,
+        dimensions: item.dimensions || '',
+        image_url: item.image_url || '',
+        documents: item.documents || [],
+        tags: item.tags || []
+      });
+    }
+  }, [item]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -510,9 +544,9 @@ export function InventoryItemForm({
           Cancel
         </Button>
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Creating...' : 'Create Item'}
+          {isSubmitting ? (item ? 'Updating...' : 'Creating...') : (item ? 'Update Item' : 'Create Item')}
         </Button>
       </div>
     </form>
   );
-} 
+}
