@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { toast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/supabase';
 import { supabaseService } from '@/services/supabase';
@@ -9,7 +9,6 @@ import { ProjectHeader } from './ProjectHeader';
 import { ProjectFilters } from './ProjectFilters';
 import { ProjectsList } from './ProjectsList';
 import { ProjectForm } from './ProjectForm';
-import { ProjectDetail } from './ProjectDetail';
 import type { Project } from '@/lib/supabase';
 
 type ProjectStatus = 'planned' | 'in_progress' | 'completed' | 'cancelled' | 'archived';
@@ -21,13 +20,13 @@ const ProjectsPage: React.FC = () => {
   const [status, setStatus] = useState<ProjectStatus | 'all'>('all');
   const [search, setSearch] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Use AuthContext instead of local auth state
   const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
 
   // Fetch projects
   const fetchProjects = async () => {
@@ -148,7 +147,7 @@ const ProjectsPage: React.FC = () => {
   };
 
   const handleView = (project: Project) => {
-    setSelectedProject(project);
+    navigate(`/admin/projects/${project.id}`);
   };
 
   const handleFormSuccess = async () => {
@@ -305,16 +304,6 @@ const ProjectsPage: React.FC = () => {
                 />
               </DialogContent>
             </Dialog>
-
-            {/* Project Detail Drawer */}
-            <Drawer open={!!selectedProject} onOpenChange={(open) => !open && setSelectedProject(null)}>
-              <DrawerContent className="max-w-4xl mx-auto">
-                <DrawerHeader>
-                  <DrawerTitle>Project Details</DrawerTitle>
-                </DrawerHeader>
-                {selectedProject && <ProjectDetail project={selectedProject} />}
-              </DrawerContent>
-            </Drawer>
           </>
         )}
       </div>

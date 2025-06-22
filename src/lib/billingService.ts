@@ -456,4 +456,85 @@ export async function getProjects(): Promise<any[]> {
     console.error('Exception in getProjects:', error);
     return [];
   }
+}
+
+// --- REVENUE CALCULATION ---
+export async function getRevenueStats(timePeriod: 'month' | 'year' | 'all' = 'month'): Promise<{
+  totalRevenue: number;
+  paidInvoices: number;
+  change: number;
+  trend: 'up' | 'down' | 'neutral';
+}> {
+  try {
+    let query = supabase
+      .from('invoices')
+      .select('total_amount, paid_date, status')
+      .eq('status', 'paid');
+
+    // Apply time filtering
+    const now = new Date();
+    if (timePeriod === 'month') {
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      query = query.gte('paid_date', startOfMonth.toISOString());
+    } else if (timePeriod === 'year') {
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      query = query.gte('paid_date', startOfYear.toISOString());
+    }
+    // For 'all' time, no date filter is applied
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error fetching revenue data:', error);
+      return {
+        totalRevenue: 0,
+        paidInvoices: 0,
+        change: 0,
+        trend: 'neutral'
+      };
+    }
+
+    const invoices = data || [];
+    const totalRevenue = invoices.reduce((sum, invoice) => sum + (invoice.total_amount || 0), 0);
+    const paidInvoices = invoices.length;
+
+    // Calculate change from previous period (simplified calculation)
+    let change = 0;
+    let trend: 'up' | 'down' | 'neutral' = 'neutral';
+
+    if (timePeriod === 'month') {
+      // Compare with previous month
+      const previousMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const previousMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+      
+      const { data: previousData } = await supabase
+        .from('invoices')
+        .select('total_amount')
+        .eq('status', 'paid')
+        .gte('paid_date', previousMonthStart.toISOString())
+        .lte('paid_date', previousMonthEnd.toISOString());
+
+      const previousRevenue = (previousData || []).reduce((sum, invoice) => sum + (invoice.total_amount || 0), 0);
+      
+      if (previousRevenue > 0) {
+        change = ((totalRevenue - previousRevenue) / previousRevenue) * 100;
+        trend = change > 0 ? 'up' : change < 0 ? 'down' : 'neutral';
+      }
+    }
+
+    return {
+      totalRevenue,
+      paidInvoices,
+      change: Math.round(change * 10) / 10, // Round to 1 decimal place
+      trend
+    };
+  } catch (error) {
+    console.error('Exception in getRevenueStats:', error);
+    return {
+      totalRevenue: 0,
+      paidInvoices: 0,
+      change: 0,
+      trend: 'neutral'
+    };
+  }
 } 

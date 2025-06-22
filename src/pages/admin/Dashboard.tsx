@@ -57,6 +57,7 @@ import {
   Menu as MenuIcon,
 } from '@mui/icons-material';
 import { supabaseService } from '@/services/supabase';
+import { supabase } from '@/lib/supabase';
 import { Generator, Customer, Service, Bill, Alert } from '@/types';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
@@ -94,6 +95,7 @@ import { UserIcon } from 'lucide-react';
 import { Avatar } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
+import { getRevenueStats } from '@/lib/billingService';
 
 const sidebarItems = [
   { label: 'Overview', icon: AccountBalanceWallet },
@@ -169,22 +171,37 @@ const StatCard = ({ title, value, change, icon, trend, subtitle, onClick, clicka
 
   if (clickable && onClick) {
     return (
-      <Card 
+      <Paper 
+        elevation={3}
         className="p-4 sm:p-6 lg:p-8 bg-white rounded-xl shadow-lg border-none text-steel-900 hover:shadow-xl transition-all duration-200 cursor-pointer hover:scale-105 hover:bg-slate-50 relative group"
         onClick={onClick}
+        sx={{
+          '&:hover': {
+            transform: 'scale(1.02)',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+          }
+        }}
       >
         {cardContent}
         <div className="absolute top-2 right-2 sm:top-4 sm:right-4 opacity-0 group-hover:opacity-100 transition-opacity">
           <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-steel-400" />
         </div>
-      </Card>
+      </Paper>
     );
   }
 
   return (
-    <Card className="p-4 sm:p-6 lg:p-8 bg-white rounded-xl shadow-lg border-none text-steel-900 hover:shadow-xl transition-shadow">
+    <Paper 
+      elevation={3}
+      className="p-4 sm:p-6 lg:p-8 bg-white rounded-xl shadow-lg border-none text-steel-900 hover:shadow-xl transition-shadow"
+      sx={{
+        '&:hover': {
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+        }
+      }}
+    >
       {cardContent}
-    </Card>
+    </Paper>
   );
 };
 
@@ -405,6 +422,14 @@ const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedRange, setSelectedRange] = useState("30");
+  const [revenueTimePeriod, setRevenueTimePeriod] = useState<'month' | 'year' | 'all'>('month');
+  const [revenueData, setRevenueData] = useState({
+    totalRevenue: 0,
+    paidInvoices: 0,
+    change: 0,
+    trend: 'neutral' as 'up' | 'down' | 'neutral'
+  });
+  const [revenueChartData, setRevenueChartData] = useState<Array<{ date: string; revenue: number }>>([]);
   const [stats, setStats] = useState<DashboardStats>({
     revenue: { total: 0, change: 0, trend: 'neutral' },
     projects: { total: 0, active: 0, completed: 0, change: 0 },
@@ -432,22 +457,96 @@ const AdminDashboard: React.FC = () => {
   };
 
   const navigateToRevenue = () => {
-    // For now, navigate to projects since revenue is calculated from projects
-    window.location.href = '/admin/projects';
+    window.location.href = '/admin/billing';
   };
 
   const navigateToProject = (projectId: string) => {
     window.location.href = `/admin/projects/${projectId}`;
   };
 
-  // Fetch dashboard data
+  // Load revenue data
+  const loadRevenueData = async (timePeriod: 'month' | 'year' | 'all') => {
+    try {
+      console.log('Loading revenue data for period:', timePeriod);
+      const revenueStats = await getRevenueStats(timePeriod);
+      console.log('Revenue stats received:', revenueStats);
+      setRevenueData(revenueStats);
+      
+      // Update the main stats object
+      setStats(prev => ({
+        ...prev,
+        revenue: {
+          total: revenueStats.totalRevenue,
+          change: revenueStats.change,
+          trend: revenueStats.trend
+        }
+      }));
+    } catch (error) {
+      console.error('Error loading revenue data:', error);
+    }
+  };
+
+  // Load revenue chart data
+  const loadRevenueChartData = async (days: number) => {
+    try {
+      console.log('Loading revenue chart data for', days, 'days');
+      
+      // Get paid invoices for the specified period
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+      
+      const { data: invoices, error } = await supabase
+        .from('invoices')
+        .select('total_amount, paid_date')
+        .eq('status', 'paid')
+        .gte('paid_date', startDate.toISOString().split('T')[0])
+        .lte('paid_date', endDate.toISOString().split('T')[0])
+        .order('paid_date', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching revenue chart data:', error);
+        return;
+      }
+
+      // Group revenue by date
+      const revenueByDate = new Map<string, number>();
+      
+      invoices?.forEach(invoice => {
+        if (invoice.paid_date && invoice.total_amount) {
+          const date = new Date(invoice.paid_date).toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric' 
+          });
+          revenueByDate.set(date, (revenueByDate.get(date) || 0) + invoice.total_amount);
+        }
+      });
+
+      // Convert to chart data format
+      const chartData = Array.from(revenueByDate.entries()).map(([date, revenue]) => ({
+        date,
+        revenue: Math.round(revenue)
+      }));
+
+      console.log('Revenue chart data:', chartData);
+      setRevenueChartData(chartData);
+    } catch (error) {
+      console.error('Error loading revenue chart data:', error);
+    }
+  };
+
   useEffect(() => {
-    console.log('AdminDashboard: useEffect running...');
-    
     const fetchDashboardData = async () => {
       try {
-        console.log('AdminDashboard: Fetching dashboard data...');
+        setLoading(true);
+        setError(null);
+
+        // Load revenue data
+        await loadRevenueData(revenueTimePeriod);
         
+        // Load revenue chart data
+        await loadRevenueChartData(parseInt(selectedRange));
+
         // Fetch projects
         console.log('Fetching projects...');
         const projects = await supabaseService.getProjects();
@@ -477,12 +576,8 @@ const AdminDashboard: React.FC = () => {
           totalGenerators: generators?.length || 0
         });
         
-        setStats({
-          revenue: { 
-            total: 154320, 
-            change: 8.2, 
-            trend: 'up' 
-          },
+        setStats(prev => ({
+          ...prev,
           projects: { 
             total: projects?.length || 0, 
             active: activeProjects, 
@@ -511,7 +606,7 @@ const AdminDashboard: React.FC = () => {
             responses: 24, 
             change: 0.2 
           }
-        });
+        }));
         
         // Set recent projects
         const recent = await Promise.all(
@@ -599,21 +694,32 @@ const AdminDashboard: React.FC = () => {
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
         setError('Failed to load dashboard data');
+      } finally {
         setLoading(false);
       }
     };
 
     fetchDashboardData();
-  }, []);
+  }, [revenueTimePeriod]);
+
+  // Handle revenue time period change
+  const handleRevenueTimePeriodChange = (newPeriod: 'month' | 'year' | 'all') => {
+    setRevenueTimePeriod(newPeriod);
+    loadRevenueData(newPeriod);
+  };
+
+  const handleChartRangeChange = (newRange: string) => {
+    setSelectedRange(newRange);
+    loadRevenueChartData(parseInt(newRange));
+  };
 
   if (loading) {
-    console.log('AdminDashboard: Showing loading state');
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 sm:h-32 sm:w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-800">Loading Admin Dashboard...</h2>
-          <p className="text-slate-600 mt-2 text-sm sm:text-base">Please wait while we load your data</p>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <h2 className="text-2xl font-bold text-slate-800">Loading Dashboard...</h2>
+          <p className="text-slate-600 mt-2">Fetching your data</p>
         </div>
       </div>
     );
@@ -621,21 +727,35 @@ const AdminDashboard: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
         <div className="text-center">
-          <ErrorIcon className="h-12 w-12 sm:h-16 sm:w-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-800">Error Loading Dashboard</h2>
-          <p className="text-slate-600 mt-2 text-sm sm:text-base">{error}</p>
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-slate-800">Error Loading Dashboard</h2>
+          <p className="text-slate-600 mt-2">{error}</p>
+          <Button onClick={() => window.location.reload()} className="mt-4">
+            Retry
+          </Button>
         </div>
       </div>
     );
   }
 
-  console.log('AdminDashboard: Rendering main dashboard');
-  
+  const getRevenueSubtitle = () => {
+    switch (revenueTimePeriod) {
+      case 'month':
+        return 'This month';
+      case 'year':
+        return 'This year';
+      case 'all':
+        return 'All time';
+      default:
+        return 'This month';
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="container mx-auto p-3 sm:p-4 lg:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
           <div className="flex-1 min-w-0">
@@ -649,6 +769,12 @@ const AdminDashboard: React.FC = () => {
               startIcon={<RefreshIcon />}
               onClick={() => window.location.reload()}
               className="text-xs sm:text-sm"
+              sx={{
+                fontSize: '0.75rem',
+                '@media (min-width: 640px)': {
+                  fontSize: '0.875rem'
+                }
+              }}
             >
               <span className="hidden sm:inline">Refresh</span>
               <span className="sm:hidden">↻</span>
@@ -660,6 +786,12 @@ const AdminDashboard: React.FC = () => {
               component={Link}
               to="/admin/projects/new"
               className="text-xs sm:text-sm"
+              sx={{
+                fontSize: '0.75rem',
+                '@media (min-width: 640px)': {
+                  fontSize: '0.875rem'
+                }
+              }}
             >
               <span className="hidden sm:inline">New Project</span>
               <span className="sm:hidden">+</span>
@@ -669,16 +801,41 @@ const AdminDashboard: React.FC = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
-          <StatCard
-            title="Total Revenue"
-            value={`$${stats.revenue.total.toLocaleString()}`}
-            change={stats.revenue.change}
-            icon={<DollarSignIcon className="w-4 h-4 sm:w-6 sm:h-6" />}
-            trend={stats.revenue.trend}
-            subtitle="This month"
-            onClick={navigateToRevenue}
-            clickable
-          />
+          <div className="relative">
+            <StatCard
+              title="Total Revenue"
+              value={`$${revenueData.totalRevenue.toLocaleString()}`}
+              change={revenueData.change}
+              icon={<DollarSignIcon className="w-4 h-4 sm:w-6 sm:h-6" />}
+              trend={revenueData.trend}
+              subtitle={getRevenueSubtitle()}
+              onClick={navigateToRevenue}
+              clickable
+            />
+            {/* Time Period Selector */}
+            <div className="absolute top-2 right-2 z-10">
+              <FormControl size="small" className="w-20">
+                <Select
+                  value={revenueTimePeriod}
+                  onChange={(e) => handleRevenueTimePeriodChange(e.target.value as 'month' | 'year' | 'all')}
+                  displayEmpty
+                  sx={{
+                    fontSize: '0.75rem',
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    backdropFilter: 'blur(4px)',
+                    '& .MuiSelect-select': {
+                      padding: '4px 8px',
+                      fontSize: '0.75rem'
+                    }
+                  }}
+                >
+                  <MenuItem value="month">Month</MenuItem>
+                  <MenuItem value="year">Year</MenuItem>
+                  <MenuItem value="all">All</MenuItem>
+                </Select>
+              </FormControl>
+            </div>
+          </div>
           <StatCard
             title="Active Projects"
             value={stats.projects.active}
@@ -721,7 +878,7 @@ const AdminDashboard: React.FC = () => {
                 <FormControl size="small" className="w-full sm:w-32">
                   <Select
                     value={selectedRange}
-                    onChange={(e) => setSelectedRange(e.target.value)}
+                    onChange={(e) => handleChartRangeChange(e.target.value)}
                     displayEmpty
                   >
                     <MenuItem value="7">7 days</MenuItem>
@@ -731,15 +888,7 @@ const AdminDashboard: React.FC = () => {
                 </FormControl>
               </div>
               <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
-                <LineChart data={[
-                  { date: 'Jun 10', revenue: 3200 },
-                  { date: 'Jun 15', revenue: 4200 },
-                  { date: 'Jun 20', revenue: 5100 },
-                  { date: 'Jun 25', revenue: 6100 },
-                  { date: 'Jul 1', revenue: 7200 },
-                  { date: 'Jul 5', revenue: 8300 },
-                  { date: 'Jul 10', revenue: 9000 },
-                ]}>
+                <LineChart data={revenueChartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                   <XAxis dataKey="date" stroke="#64748b" />
                   <YAxis stroke="#64748b" />

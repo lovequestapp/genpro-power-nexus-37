@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 import {
   Settings,
   Bell,
@@ -22,33 +25,221 @@ import {
   Palette,
   Clock,
   DollarSign,
+  Save,
+  Loader2,
+  Upload,
+  Trash2,
+  AlertTriangle,
 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
-export default function SettingsPage() {
-  const [notifications, setNotifications] = useState({
+interface AppSettings {
+  id?: string;
+  company_name: string;
+  address: string;
+  phone: string;
+  email: string;
+  business_hours: {
+    weekdays: [string, string];
+    weekends: [string, string];
+  };
+  notifications: {
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+    desktop: boolean;
+  };
+  appearance: {
+    theme: string;
+    fontSize: string;
+    colorScheme: string;
+  };
+  security: {
+    twoFactor: boolean;
+    sessionTimeout: string;
+    ipRestriction: boolean;
+  };
+  system: {
+    autoBackup: boolean;
+    backupFrequency: string;
+    dataRetention: string;
+  };
+  billing: {
+    paymentMethod: string;
+    billingCycle: string;
+    taxId: string;
+  };
+  logo_url?: string;
+}
+
+const defaultSettings: AppSettings = {
+  company_name: 'HOU GEN PROS',
+  address: '1234 Generator Lane, Houston, TX 77001',
+  phone: '(555) 123-4567',
+  email: 'info@hougenpros.com',
+  business_hours: {
+    weekdays: ['09:00', '17:00'],
+    weekends: ['10:00', '15:00'],
+  },
+  notifications: {
     email: true,
     push: true,
     sms: false,
     desktop: true,
-  });
-
-  const [appearance, setAppearance] = useState({
+  },
+  appearance: {
     theme: 'system',
     fontSize: 'medium',
     colorScheme: 'default',
-  });
-
-  const [security, setSecurity] = useState({
+  },
+  security: {
     twoFactor: true,
     sessionTimeout: '30',
     ipRestriction: false,
-  });
-
-  const [system, setSystem] = useState({
+  },
+  system: {
     autoBackup: true,
     backupFrequency: 'daily',
     dataRetention: '90',
-  });
+  },
+  billing: {
+    paymentMethod: 'card',
+    billingCycle: 'monthly',
+    taxId: '',
+  },
+};
+
+export default function SettingsPage() {
+  const { toast } = useToast();
+  const [settings, setSettings] = useState<AppSettings>(defaultSettings);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [originalSettings, setOriginalSettings] = useState<AppSettings | null>(null);
+
+  // Load settings from Supabase
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  // Check for changes
+  useEffect(() => {
+    if (originalSettings) {
+      setHasChanges(JSON.stringify(settings) !== JSON.stringify(originalSettings));
+    }
+  }, [settings, originalSettings]);
+
+  const loadSettings = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('app_settings')
+        .select('*')
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+
+      if (data) {
+        const mergedSettings = { ...defaultSettings, ...data };
+        setSettings(mergedSettings);
+        setOriginalSettings(mergedSettings);
+      } else {
+        // No settings found, create default
+        const { data: newSettings, error: createError } = await supabase
+          .from('app_settings')
+          .insert([defaultSettings])
+          .select()
+          .single();
+
+        if (createError) throw createError;
+        setSettings(newSettings);
+        setOriginalSettings(newSettings);
+      }
+    } catch (error) {
+      console.error('Error loading settings:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load settings',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveSettings = async () => {
+    try {
+      setSaving(true);
+      const { error } = await supabase
+        .from('app_settings')
+        .upsert([settings], { onConflict: 'id' });
+
+      if (error) throw error;
+
+      setOriginalSettings(settings);
+      setHasChanges(false);
+      toast({
+        title: 'Success',
+        description: 'Settings saved successfully',
+      });
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to save settings',
+        variant: 'destructive',
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const resetSettings = () => {
+    if (originalSettings) {
+      setSettings(originalSettings);
+      setHasChanges(false);
+      toast({
+        title: 'Settings Reset',
+        description: 'Settings have been reset to their previous state',
+      });
+    }
+  };
+
+  const updateSettings = (path: string, value: any) => {
+    const keys = path.split('.');
+    setSettings(prev => {
+      const newSettings = { ...prev };
+      let current: any = newSettings;
+      for (let i = 0; i < keys.length - 1; i++) {
+        current = current[keys[i]];
+      }
+      current[keys[keys.length - 1]] = value;
+      return newSettings;
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="p-6 flex items-center justify-center min-h-[400px]">
+        <div className="flex items-center gap-2">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span>Loading settings...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6 bg-card text-card-foreground">
@@ -59,10 +250,34 @@ export default function SettingsPage() {
             Manage your application preferences and configurations
           </p>
         </div>
+        <div className="flex gap-2">
+          {hasChanges && (
+            <Button variant="outline" onClick={resetSettings}>
+              Reset
+            </Button>
+          )}
+          <Button 
+            onClick={saveSettings} 
+            disabled={saving || !hasChanges}
+            className="min-w-[120px]"
+          >
+            {saving ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4 mr-2" />
+                Save Changes
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
@@ -76,42 +291,82 @@ export default function SettingsPage() {
           <Card className="p-6">
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold mb-4">Company Information</h2>
+                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                  <Globe className="h-5 w-5" />
+                  Company Information
+                </h2>
                 <div className="grid gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="companyName">Company Name</Label>
-                    <Input id="companyName" defaultValue="HOU GEN PROS" />
+                    <Input 
+                      id="companyName" 
+                      value={settings.company_name}
+                      onChange={(e) => updateSettings('company_name', e.target.value)}
+                    />
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="address">Address</Label>
-                    <Input id="address" defaultValue="1234 Generator Lane, Houston, TX 77001" />
+                    <Textarea 
+                      id="address" 
+                      value={settings.address}
+                      onChange={(e) => updateSettings('address', e.target.value)}
+                      rows={3}
+                    />
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="phone">Phone</Label>
-                    <Input id="phone" defaultValue="(555) 123-4567" />
+                    <Input 
+                      id="phone" 
+                      value={settings.phone}
+                      onChange={(e) => updateSettings('phone', e.target.value)}
+                    />
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" defaultValue="info@hougenpros.com" />
+                    <Input 
+                      id="email" 
+                      type="email"
+                      value={settings.email}
+                      onChange={(e) => updateSettings('email', e.target.value)}
+                    />
                   </div>
                 </div>
               </div>
 
               <div>
-                <h2 className="text-xl font-semibold mb-4">Business Hours</h2>
+                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  Business Hours
+                </h2>
                 <div className="grid gap-4">
                   <div className="grid gap-2">
                     <Label>Weekdays</Label>
                     <div className="flex gap-2">
-                      <Input defaultValue="9:00 AM" />
-                      <Input defaultValue="5:00 PM" />
+                      <Input 
+                        type="time"
+                        value={settings.business_hours.weekdays[0]}
+                        onChange={(e) => updateSettings('business_hours.weekdays.0', e.target.value)}
+                      />
+                      <Input 
+                        type="time"
+                        value={settings.business_hours.weekdays[1]}
+                        onChange={(e) => updateSettings('business_hours.weekdays.1', e.target.value)}
+                      />
                     </div>
                   </div>
                   <div className="grid gap-2">
                     <Label>Weekends</Label>
                     <div className="flex gap-2">
-                      <Input defaultValue="10:00 AM" />
-                      <Input defaultValue="3:00 PM" />
+                      <Input 
+                        type="time"
+                        value={settings.business_hours.weekends[0]}
+                        onChange={(e) => updateSettings('business_hours.weekends.0', e.target.value)}
+                      />
+                      <Input 
+                        type="time"
+                        value={settings.business_hours.weekends[1]}
+                        onChange={(e) => updateSettings('business_hours.weekends.1', e.target.value)}
+                      />
                     </div>
                   </div>
                 </div>
@@ -123,7 +378,10 @@ export default function SettingsPage() {
         {/* Notifications Settings */}
         <TabsContent value="notifications">
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-6">Notification Preferences</h2>
+            <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+              <Bell className="h-5 w-5" />
+              Notification Preferences
+            </h2>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
@@ -133,9 +391,9 @@ export default function SettingsPage() {
                   </p>
                 </div>
                 <Switch
-                  checked={notifications.email}
+                  checked={settings.notifications.email}
                   onCheckedChange={(checked) =>
-                    setNotifications({ ...notifications, email: checked })
+                    updateSettings('notifications.email', checked)
                   }
                 />
               </div>
@@ -147,9 +405,9 @@ export default function SettingsPage() {
                   </p>
                 </div>
                 <Switch
-                  checked={notifications.push}
+                  checked={settings.notifications.push}
                   onCheckedChange={(checked) =>
-                    setNotifications({ ...notifications, push: checked })
+                    updateSettings('notifications.push', checked)
                   }
                 />
               </div>
@@ -161,9 +419,9 @@ export default function SettingsPage() {
                   </p>
                 </div>
                 <Switch
-                  checked={notifications.sms}
+                  checked={settings.notifications.sms}
                   onCheckedChange={(checked) =>
-                    setNotifications({ ...notifications, sms: checked })
+                    updateSettings('notifications.sms', checked)
                   }
                 />
               </div>
@@ -175,9 +433,9 @@ export default function SettingsPage() {
                   </p>
                 </div>
                 <Switch
-                  checked={notifications.desktop}
+                  checked={settings.notifications.desktop}
                   onCheckedChange={(checked) =>
-                    setNotifications({ ...notifications, desktop: checked })
+                    updateSettings('notifications.desktop', checked)
                   }
                 />
               </div>
@@ -188,14 +446,17 @@ export default function SettingsPage() {
         {/* Appearance Settings */}
         <TabsContent value="appearance">
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-6">Appearance Settings</h2>
+            <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+              <Palette className="h-5 w-5" />
+              Appearance Settings
+            </h2>
             <div className="space-y-4">
               <div className="grid gap-2">
                 <Label>Theme</Label>
                 <Select
-                  value={appearance.theme}
+                  value={settings.appearance.theme}
                   onValueChange={(value) =>
-                    setAppearance({ ...appearance, theme: value })
+                    updateSettings('appearance.theme', value)
                   }
                 >
                   <SelectTrigger>
@@ -211,9 +472,9 @@ export default function SettingsPage() {
               <div className="grid gap-2">
                 <Label>Font Size</Label>
                 <Select
-                  value={appearance.fontSize}
+                  value={settings.appearance.fontSize}
                   onValueChange={(value) =>
-                    setAppearance({ ...appearance, fontSize: value })
+                    updateSettings('appearance.fontSize', value)
                   }
                 >
                   <SelectTrigger>
@@ -229,9 +490,9 @@ export default function SettingsPage() {
               <div className="grid gap-2">
                 <Label>Color Scheme</Label>
                 <Select
-                  value={appearance.colorScheme}
+                  value={settings.appearance.colorScheme}
                   onValueChange={(value) =>
-                    setAppearance({ ...appearance, colorScheme: value })
+                    updateSettings('appearance.colorScheme', value)
                   }
                 >
                   <SelectTrigger>
@@ -251,7 +512,10 @@ export default function SettingsPage() {
         {/* Security Settings */}
         <TabsContent value="security">
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-6">Security Settings</h2>
+            <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Security Settings
+            </h2>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
@@ -261,18 +525,18 @@ export default function SettingsPage() {
                   </p>
                 </div>
                 <Switch
-                  checked={security.twoFactor}
+                  checked={settings.security.twoFactor}
                   onCheckedChange={(checked) =>
-                    setSecurity({ ...security, twoFactor: checked })
+                    updateSettings('security.twoFactor', checked)
                   }
                 />
               </div>
               <div className="grid gap-2">
                 <Label>Session Timeout (minutes)</Label>
                 <Select
-                  value={security.sessionTimeout}
+                  value={settings.security.sessionTimeout}
                   onValueChange={(value) =>
-                    setSecurity({ ...security, sessionTimeout: value })
+                    updateSettings('security.sessionTimeout', value)
                   }
                 >
                   <SelectTrigger>
@@ -293,9 +557,9 @@ export default function SettingsPage() {
                   </p>
                 </div>
                 <Switch
-                  checked={security.ipRestriction}
+                  checked={settings.security.ipRestriction}
                   onCheckedChange={(checked) =>
-                    setSecurity({ ...security, ipRestriction: checked })
+                    updateSettings('security.ipRestriction', checked)
                   }
                 />
               </div>
@@ -306,7 +570,10 @@ export default function SettingsPage() {
         {/* System Settings */}
         <TabsContent value="system">
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-6">System Settings</h2>
+            <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+              <Database className="h-5 w-5" />
+              System Settings
+            </h2>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
@@ -316,18 +583,18 @@ export default function SettingsPage() {
                   </p>
                 </div>
                 <Switch
-                  checked={system.autoBackup}
+                  checked={settings.system.autoBackup}
                   onCheckedChange={(checked) =>
-                    setSystem({ ...system, autoBackup: checked })
+                    updateSettings('system.autoBackup', checked)
                   }
                 />
               </div>
               <div className="grid gap-2">
                 <Label>Backup Frequency</Label>
                 <Select
-                  value={system.backupFrequency}
+                  value={settings.system.backupFrequency}
                   onValueChange={(value) =>
-                    setSystem({ ...system, backupFrequency: value })
+                    updateSettings('system.backupFrequency', value)
                   }
                 >
                   <SelectTrigger>
@@ -343,9 +610,9 @@ export default function SettingsPage() {
               <div className="grid gap-2">
                 <Label>Data Retention (days)</Label>
                 <Select
-                  value={system.dataRetention}
+                  value={settings.system.dataRetention}
                   onValueChange={(value) =>
-                    setSystem({ ...system, dataRetention: value })
+                    updateSettings('system.dataRetention', value)
                   }
                 >
                   <SelectTrigger>
@@ -365,11 +632,19 @@ export default function SettingsPage() {
         {/* Billing Settings */}
         <TabsContent value="billing">
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-6">Billing Settings</h2>
+            <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+              <DollarSign className="h-5 w-5" />
+              Billing Settings
+            </h2>
             <div className="space-y-4">
               <div className="grid gap-2">
                 <Label>Payment Method</Label>
-                <Select defaultValue="card">
+                <Select
+                  value={settings.billing.paymentMethod}
+                  onValueChange={(value) =>
+                    updateSettings('billing.paymentMethod', value)
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select payment method" />
                   </SelectTrigger>
@@ -382,7 +657,12 @@ export default function SettingsPage() {
               </div>
               <div className="grid gap-2">
                 <Label>Billing Cycle</Label>
-                <Select defaultValue="monthly">
+                <Select
+                  value={settings.billing.billingCycle}
+                  onValueChange={(value) =>
+                    updateSettings('billing.billingCycle', value)
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select billing cycle" />
                   </SelectTrigger>
@@ -395,17 +675,62 @@ export default function SettingsPage() {
               </div>
               <div className="grid gap-2">
                 <Label>Tax ID</Label>
-                <Input placeholder="Enter tax ID" />
+                <Input 
+                  placeholder="Enter tax ID" 
+                  value={settings.billing.taxId}
+                  onChange={(e) => updateSettings('billing.taxId', e.target.value)}
+                />
               </div>
             </div>
           </Card>
         </TabsContent>
       </Tabs>
 
-      <div className="flex justify-end gap-4">
-        <Button variant="outline">Cancel</Button>
-        <Button>Save Changes</Button>
-      </div>
+      {/* Danger Zone */}
+      <Card className="p-6 border-destructive/20">
+        <div className="flex items-center gap-2 mb-4">
+          <AlertTriangle className="h-5 w-5 text-destructive" />
+          <h2 className="text-xl font-semibold text-destructive">Danger Zone</h2>
+        </div>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium">Reset All Settings</h3>
+              <p className="text-sm text-muted-foreground">
+                Reset all settings to their default values
+              </p>
+            </div>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Reset Settings
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Reset All Settings?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently reset all your settings to their default values.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => {
+                      setSettings(defaultSettings);
+                      setHasChanges(true);
+                    }}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Reset Settings
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 } 
