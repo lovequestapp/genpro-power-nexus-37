@@ -41,6 +41,8 @@ import AdminTeam from '@/pages/admin/Team';
 import AdminSupport from '@/pages/admin/Support';
 import StripeDashboard from '@/pages/admin/StripeDashboard';
 import ProjectDetailPage from '@/pages/admin/ProjectDetailPage';
+import EmailPage from '@/pages/admin/Email';
+import EmailCallback from '@/pages/admin/EmailCallback';
 
 // Customer pages
 import CustomerDashboard from '@/pages/customer/Dashboard';
@@ -108,6 +110,8 @@ function App() {
                   <Route path="customers/:id" element={<CustomerDetails />} />
                   <Route path="projects" element={<AdminProjects />} />
                   <Route path="projects/:id" element={<ProjectDetailPage />} />
+                  <Route path="email" element={<EmailPage />} />
+                  <Route path="email/callback" element={<EmailCallback />} />
                   <Route path="inventory" element={<AdminInventory />} />
                   <Route path="inventory/parts" element={<AdminInventoryParts />} />
                   <Route path="inventory/orders" element={<AdminInventoryOrders />} />

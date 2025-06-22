@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Plus, FileText, CreditCard, Settings, List, Users } from 'lucide-react';
+import { Plus, FileText, CreditCard, Settings, List, Users, ArrowLeft } from 'lucide-react';
 import { BillingInvoiceList } from '@/components/billing/BillingInvoiceList';
 import { BillingInvoiceForm } from '@/components/billing/BillingInvoiceForm';
 import { BillingInvoiceView } from '@/components/billing/BillingInvoiceView';
+import { InvoicePDFViewer } from '@/components/billing/InvoicePDFViewer';
 import { BillingPaymentTracking } from '@/components/billing/BillingPaymentTracking';
 import { BillingItemsManager } from '@/components/billing/BillingItemsManager';
 import { BillingSettings } from '@/components/billing/BillingSettings';
@@ -12,7 +13,7 @@ import { CustomerBillingInfoManager } from '@/components/billing/CustomerBilling
 
 export default function BillingPage() {
   const [activeTab, setActiveTab] = useState('invoices');
-  const [view, setView] = useState<'list' | 'create' | 'edit' | 'view'>('list');
+  const [view, setView] = useState<'list' | 'create' | 'edit' | 'view' | 'pdf'>('list');
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null);
 
   // Handlers for navigation
@@ -23,6 +24,11 @@ export default function BillingPage() {
 
   const handleViewInvoice = useCallback((invoiceId: string) => {
     setView('view');
+    setSelectedInvoiceId(invoiceId);
+  }, []);
+
+  const handleViewPDF = useCallback((invoiceId: string) => {
+    setView('pdf');
     setSelectedInvoiceId(invoiceId);
   }, []);
 
@@ -39,20 +45,54 @@ export default function BillingPage() {
   // Render invoice create/edit/view dialogs
   if (view === 'create' || (view === 'edit' && selectedInvoiceId)) {
     return (
-      <BillingInvoiceForm
-        invoiceId={view === 'edit' ? selectedInvoiceId : undefined}
-        onBack={handleBackToList}
-        onSaved={handleBackToList}
-      />
+      <div className="p-6">
+        <div className="flex items-center mb-6">
+          <Button onClick={handleBackToList} variant="outline" size="sm" className="mr-4">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Invoices
+          </Button>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {view === 'create' ? 'Create New Invoice' : 'Edit Invoice'}
+          </h1>
+        </div>
+        <BillingInvoiceForm
+          invoiceId={view === 'edit' ? selectedInvoiceId : undefined}
+          onBack={handleBackToList}
+          onSaved={handleBackToList}
+        />
+      </div>
     );
   }
+
   if (view === 'view' && selectedInvoiceId) {
     return (
-      <BillingInvoiceView
-        invoiceId={selectedInvoiceId}
-        onBack={handleBackToList}
-        onEdit={() => handleEditInvoice(selectedInvoiceId)}
-      />
+      <div className="p-6">
+        <div className="flex items-center mb-6">
+          <Button onClick={handleBackToList} variant="outline" size="sm" className="mr-4">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Invoices
+          </Button>
+          <h1 className="text-2xl font-bold text-gray-900">Invoice Details</h1>
+        </div>
+        <BillingInvoiceView
+          invoiceId={selectedInvoiceId}
+          onBack={handleBackToList}
+          onEdit={() => handleEditInvoice(selectedInvoiceId)}
+          onViewPDF={() => handleViewPDF(selectedInvoiceId)}
+        />
+      </div>
+    );
+  }
+
+  if (view === 'pdf' && selectedInvoiceId) {
+    return (
+      <div className="p-6">
+        <InvoicePDFViewer
+          invoiceId={selectedInvoiceId}
+          onBack={handleBackToList}
+          onEdit={() => handleEditInvoice(selectedInvoiceId)}
+        />
+      </div>
     );
   }
 

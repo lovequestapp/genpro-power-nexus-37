@@ -30,6 +30,11 @@ export interface Invoice {
   updated_at: string;
   metadata?: Record<string, any>;
   line_items?: InvoiceLineItem[];
+  customer?: {
+    name: string;
+    email: string;
+    address: string;
+  };
 }
 
 export interface InvoiceLineItem {

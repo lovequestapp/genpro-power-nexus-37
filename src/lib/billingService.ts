@@ -15,9 +15,38 @@ import type {
 export async function getInvoices(filters: BillingFilters = {}): Promise<Invoice[]> {
   try {
     let query = supabase.from('invoices').select('*').order('issue_date', { ascending: false });
-    if (filters.status) query = query.eq('status', filters.status);
-    if (filters.customer_id) query = query.eq('customer_id', filters.customer_id);
-    if (filters.search) query = query.ilike('customer_name', `%${filters.search}%`);
+    
+    // Apply status filter
+    if (filters.status && filters.status.length > 0) {
+      query = query.in('status', filters.status);
+    }
+    
+    // Apply customer filter
+    if (filters.customer_id) {
+      query = query.eq('customer_id', filters.customer_id);
+    }
+    
+    // Apply search filter
+    if (filters.search) {
+      query = query.or(`customer_name.ilike.%${filters.search}%,invoice_number.ilike.%${filters.search}%`);
+    }
+    
+    // Apply date filters
+    if (filters.date_from) {
+      query = query.gte('issue_date', filters.date_from);
+    }
+    if (filters.date_to) {
+      query = query.lte('issue_date', filters.date_to);
+    }
+    
+    // Apply amount filters
+    if (filters.amount_min !== undefined) {
+      query = query.gte('total_amount', filters.amount_min);
+    }
+    if (filters.amount_max !== undefined) {
+      query = query.lte('total_amount', filters.amount_max);
+    }
+    
     const { data, error } = await query;
     if (error) {
       console.error('Error fetching invoices:', error);
@@ -79,8 +108,13 @@ export async function getInvoices(filters: BillingFilters = {}): Promise<Invoice
 
 export async function getInvoice(id: string): Promise<Invoice & { line_items: InvoiceLineItem[] }> {
   try {
-    // Get invoice data
-    const { data: invoice, error } = await supabase.from('invoices').select('*').eq('id', id).single();
+    // Get invoice data and join with customer data
+    const { data: invoice, error } = await supabase
+      .from('invoices')
+      .select('*, customer:customers(name, email, address)')
+      .eq('id', id)
+      .single();
+
     if (error || !invoice) {
       console.error('Error fetching invoice:', error);
       throw error || new Error('Invoice not found');

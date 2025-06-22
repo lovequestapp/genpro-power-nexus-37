@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader, Edit, Trash2, CreditCard } from 'lucide-react';
+import { Loader, Edit, Trash2, CreditCard, Download, FileText } from 'lucide-react';
 import { getInvoice, deleteInvoice, getPayments, addPayment } from '@/lib/billingService';
 import type { Invoice, Payment } from '@/types/billing';
 
@@ -8,9 +8,10 @@ interface BillingInvoiceViewProps {
   invoiceId: string;
   onBack: () => void;
   onEdit: () => void;
+  onViewPDF?: () => void;
 }
 
-export function BillingInvoiceView({ invoiceId, onBack, onEdit }: BillingInvoiceViewProps) {
+export function BillingInvoiceView({ invoiceId, onBack, onEdit, onViewPDF }: BillingInvoiceViewProps) {
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,6 +69,11 @@ export function BillingInvoiceView({ invoiceId, onBack, onEdit }: BillingInvoice
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Invoice #{invoice.invoice_number}</h2>
         <div className="flex gap-2">
+          {onViewPDF && (
+            <Button onClick={onViewPDF} variant="outline" className="bg-blue-50 text-blue-700 hover:bg-blue-100">
+              <FileText className="w-4 h-4 mr-1" /> View PDF
+            </Button>
+          )}
           <Button onClick={onEdit} variant="outline"><Edit className="w-4 h-4 mr-1" /> Edit</Button>
           <Button onClick={handleDelete} variant="outline"><Trash2 className="w-4 h-4 mr-1 text-red-600" /> Delete</Button>
           <Button onClick={onBack} variant="outline">Back</Button>

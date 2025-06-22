@@ -14,6 +14,7 @@ import {
   CreditCard,
   X,
   LogOut,
+  Mail,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from './Logo';
@@ -23,6 +24,7 @@ const adminNav = [
   { label: 'Dashboard', icon: <LayoutDashboard />, to: '/admin/dashboard' },
   { label: 'Customers', icon: <Users />, to: '/admin/customers' },
   { label: 'Projects', icon: <ClipboardList />, to: '/admin/projects' },
+  { label: 'Email', icon: <Mail />, to: '/admin/email' },
   { label: 'Inventory', icon: <Package />, to: '/admin/inventory' },
   { label: 'Parts', icon: <Wrench />, to: '/admin/inventory/parts' },
   { label: 'Orders', icon: <FileText />, to: '/admin/inventory/orders' },

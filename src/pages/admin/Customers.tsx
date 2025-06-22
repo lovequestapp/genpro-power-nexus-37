@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { supabaseService } from '@/services/supabase';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -10,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
-import { Edit, Trash, Plus, Search, Filter, Download, Mail, Phone, Building, Calendar, DollarSign, FileText, RefreshCw } from 'lucide-react';
+import { Edit, Trash, Plus, Search, Filter, Download, Mail, Phone, Building, Calendar, DollarSign, FileText, RefreshCw, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import type { Customer } from '@/lib/supabase';
 
@@ -27,6 +28,7 @@ type CustomerFormData = {
 
 export default function CustomersPage() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editCustomer, setEditCustomer] = useState<Customer | null>(null);
@@ -177,6 +179,10 @@ export default function CustomersPage() {
     if (window.confirm(`Are you sure you want to delete ${customer.name}? This action cannot be undone and will permanently remove all customer data.`)) {
       deleteMutation.mutate(customer.id);
     }
+  };
+
+  const handleView = (customer: Customer) => {
+    navigate(`/admin/customers/${customer.id}`);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -424,9 +430,12 @@ export default function CustomersPage() {
                 {isLoading ? (
                   <TableRow><TableCell colSpan={6} className="text-center py-8">Loading customers...</TableCell></TableRow>
                 ) : filteredCustomers.length ? filteredCustomers.map(customer => (
-                  <TableRow key={customer.id}>
+                  <TableRow key={customer.id} className="hover:bg-steel-50 cursor-pointer">
                     <TableCell>
-                      <div>
+                      <div 
+                        className="cursor-pointer hover:text-orange-600 transition-colors"
+                        onClick={() => handleView(customer)}
+                      >
                         <div className="font-medium">{customer.name}</div>
                         {customer.company && <div className="text-sm text-muted-foreground">{customer.company}</div>}
                       </div>
@@ -463,10 +472,37 @@ export default function CustomersPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => handleEdit(customer)}>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleView(customer);
+                          }}
+                          title="View customer details"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEdit(customer);
+                          }}
+                          title="Edit customer"
+                        >
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(customer)}>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(customer);
+                          }}
+                          title="Delete customer"
+                        >
                           <Trash className="w-4 h-4" />
                         </Button>
                       </div>

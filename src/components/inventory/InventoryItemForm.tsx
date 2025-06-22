@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,25 +6,29 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { X, Plus } from 'lucide-react';
-import { InventoryCategory, Supplier, InventoryFormData } from '@/types/inventory';
+import { Plus, X } from 'lucide-react';
 
 interface InventoryItemFormProps {
-  categories: InventoryCategory[];
-  suppliers: Supplier[];
-  item?: InventoryFormData;
-  onSubmit: (data: InventoryFormData) => void;
+  categories: Array<{
+    id: string;
+    name: string;
+    color: string;
+  }>;
+  suppliers: Array<{
+    id: string;
+    name: string;
+  }>;
+  onSubmit: (data: any) => void;
   onCancel: () => void;
 }
 
 export function InventoryItemForm({ 
   categories, 
   suppliers, 
-  item, 
   onSubmit, 
   onCancel 
 }: InventoryItemFormProps) {
-  const [formData, setFormData] = useState<InventoryFormData>({
+  const [formData, setFormData] = useState({
     name: '',
     description: '',
     sku: '',
@@ -36,14 +40,14 @@ export function InventoryItemForm({
     part_number: '',
     quantity: 0,
     min_quantity: 0,
-    max_quantity: undefined,
+    max_quantity: 0,
     unit_cost: 0,
     unit_price: 0,
     location: '',
     shelf_location: '',
     condition: 'new',
-    warranty_period: undefined,
-    weight: undefined,
+    warranty_period: 0,
+    weight: 0,
     dimensions: '',
     image_url: '',
     documents: [],
@@ -53,12 +57,6 @@ export function InventoryItemForm({
   const [newTag, setNewTag] = useState('');
   const [newDocument, setNewDocument] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (item) {
-      setFormData(item);
-    }
-  }, [item]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,7 +105,7 @@ export function InventoryItemForm({
     }
   };
 
-  const handleInputChange = (field: keyof InventoryFormData, value: any) => {
+  const handleChange = (field: keyof typeof formData, value: any) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -162,7 +160,7 @@ export function InventoryItemForm({
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
+                onChange={(e) => handleChange('name', e.target.value)}
                 placeholder="Enter item name"
                 required
               />
@@ -173,7 +171,7 @@ export function InventoryItemForm({
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
+                onChange={(e) => handleChange('description', e.target.value)}
                 placeholder="Enter item description"
                 rows={3}
               />
@@ -185,8 +183,8 @@ export function InventoryItemForm({
                 <Input
                   id="sku"
                   value={formData.sku}
-                  onChange={(e) => handleInputChange('sku', e.target.value)}
-                  placeholder="Auto-generated"
+                  onChange={(e) => handleChange('sku', e.target.value)}
+                  placeholder="Enter SKU"
                 />
               </div>
 
@@ -195,7 +193,7 @@ export function InventoryItemForm({
                 <Input
                   id="barcode"
                   value={formData.barcode}
-                  onChange={(e) => handleInputChange('barcode', e.target.value)}
+                  onChange={(e) => handleChange('barcode', e.target.value)}
                   placeholder="Enter barcode"
                 />
               </div>
@@ -207,7 +205,7 @@ export function InventoryItemForm({
                 <Input
                   id="manufacturer"
                   value={formData.manufacturer}
-                  onChange={(e) => handleInputChange('manufacturer', e.target.value)}
+                  onChange={(e) => handleChange('manufacturer', e.target.value)}
                   placeholder="Enter manufacturer"
                 />
               </div>
@@ -217,7 +215,7 @@ export function InventoryItemForm({
                 <Input
                   id="model"
                   value={formData.model}
-                  onChange={(e) => handleInputChange('model', e.target.value)}
+                  onChange={(e) => handleChange('model', e.target.value)}
                   placeholder="Enter model"
                 />
               </div>
@@ -228,7 +226,7 @@ export function InventoryItemForm({
               <Input
                 id="part_number"
                 value={formData.part_number}
-                onChange={(e) => handleInputChange('part_number', e.target.value)}
+                onChange={(e) => handleChange('part_number', e.target.value)}
                 placeholder="Enter part number"
               />
             </div>
@@ -245,7 +243,7 @@ export function InventoryItemForm({
               <Label htmlFor="category">Category</Label>
               <Select
                 value={formData.category_id}
-                onValueChange={(value) => handleInputChange('category_id', value)}
+                onValueChange={(value) => handleChange('category_id', value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
@@ -270,7 +268,7 @@ export function InventoryItemForm({
               <Label htmlFor="supplier">Supplier</Label>
               <Select
                 value={formData.supplier_id}
-                onValueChange={(value) => handleInputChange('supplier_id', value)}
+                onValueChange={(value) => handleChange('supplier_id', value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select supplier" />
@@ -289,7 +287,7 @@ export function InventoryItemForm({
               <Label htmlFor="condition">Condition</Label>
               <Select
                 value={formData.condition}
-                onValueChange={(value) => handleInputChange('condition', value)}
+                onValueChange={(value) => handleChange('condition', value)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -308,9 +306,9 @@ export function InventoryItemForm({
               <Input
                 id="warranty_period"
                 type="number"
-                value={formData.warranty_period || ''}
-                onChange={(e) => handleInputChange('warranty_period', e.target.value ? parseInt(e.target.value) : undefined)}
-                placeholder="Enter warranty period"
+                value={formData.warranty_period}
+                onChange={(e) => handleChange('warranty_period', parseInt(e.target.value) || 0)}
+                placeholder="0"
               />
             </div>
           </CardContent>
@@ -324,14 +322,14 @@ export function InventoryItemForm({
             <CardTitle>Stock Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="quantity">Current Quantity *</Label>
                 <Input
                   id="quantity"
                   type="number"
                   value={formData.quantity}
-                  onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 0)}
+                  onChange={(e) => handleChange('quantity', parseInt(e.target.value) || 0)}
                   placeholder="0"
                   required
                 />
@@ -343,7 +341,7 @@ export function InventoryItemForm({
                   id="min_quantity"
                   type="number"
                   value={formData.min_quantity}
-                  onChange={(e) => handleInputChange('min_quantity', parseInt(e.target.value) || 0)}
+                  onChange={(e) => handleChange('min_quantity', parseInt(e.target.value) || 0)}
                   placeholder="0"
                   required
                 />
@@ -354,48 +352,56 @@ export function InventoryItemForm({
                 <Input
                   id="max_quantity"
                   type="number"
-                  value={formData.max_quantity || ''}
-                  onChange={(e) => handleInputChange('max_quantity', e.target.value ? parseInt(e.target.value) : undefined)}
-                  placeholder="Optional"
+                  value={formData.max_quantity}
+                  onChange={(e) => handleChange('max_quantity', parseInt(e.target.value) || 0)}
+                  placeholder="0"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="unit_cost">Unit Cost ($) *</Label>
+                <Label htmlFor="unit_cost">Unit Cost *</Label>
                 <Input
                   id="unit_cost"
                   type="number"
                   step="0.01"
                   value={formData.unit_cost}
-                  onChange={(e) => handleInputChange('unit_cost', parseFloat(e.target.value) || 0)}
+                  onChange={(e) => handleChange('unit_cost', parseFloat(e.target.value) || 0)}
                   placeholder="0.00"
                   required
                 />
               </div>
 
               <div>
-                <Label htmlFor="unit_price">Unit Price ($) *</Label>
+                <Label htmlFor="unit_price">Unit Price *</Label>
                 <Input
                   id="unit_price"
                   type="number"
                   step="0.01"
                   value={formData.unit_price}
-                  onChange={(e) => handleInputChange('unit_price', parseFloat(e.target.value) || 0)}
+                  onChange={(e) => handleChange('unit_price', parseFloat(e.target.value) || 0)}
                   placeholder="0.00"
                   required
                 />
               </div>
             </div>
+          </CardContent>
+        </Card>
 
-            <div className="grid grid-cols-2 gap-4">
+        {/* Location Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Location Information</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="location">Location</Label>
                 <Input
                   id="location"
                   value={formData.location}
-                  onChange={(e) => handleInputChange('location', e.target.value)}
+                  onChange={(e) => handleChange('location', e.target.value)}
                   placeholder="e.g., Warehouse A"
                 />
               </div>
@@ -405,108 +411,98 @@ export function InventoryItemForm({
                 <Input
                   id="shelf_location"
                   value={formData.shelf_location}
-                  onChange={(e) => handleInputChange('shelf_location', e.target.value)}
+                  onChange={(e) => handleChange('shelf_location', e.target.value)}
                   placeholder="e.g., A1-B2-C3"
                 />
               </div>
             </div>
           </CardContent>
         </Card>
+      </div>
 
-        {/* Physical Properties */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Physical Properties</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="weight">Weight (kg)</Label>
-                <Input
-                  id="weight"
-                  type="number"
-                  step="0.01"
-                  value={formData.weight || ''}
-                  onChange={(e) => handleInputChange('weight', e.target.value ? parseFloat(e.target.value) : undefined)}
-                  placeholder="0.00"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="dimensions">Dimensions</Label>
-                <Input
-                  id="dimensions"
-                  value={formData.dimensions}
-                  onChange={(e) => handleInputChange('dimensions', e.target.value)}
-                  placeholder="L x W x H cm"
-                />
-              </div>
-            </div>
-
+      {/* Additional Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Additional Information</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="image_url">Image URL</Label>
+              <Label htmlFor="weight">Weight (kg)</Label>
               <Input
-                id="image_url"
-                value={formData.image_url}
-                onChange={(e) => handleInputChange('image_url', e.target.value)}
-                placeholder="https://example.com/image.jpg"
+                id="weight"
+                type="number"
+                step="0.01"
+                value={formData.weight}
+                onChange={(e) => handleChange('weight', parseFloat(e.target.value) || 0)}
+                placeholder="0.00"
               />
             </div>
 
             <div>
-              <Label>Tags</Label>
-              <div className="flex gap-2 mb-2">
-                <Input
-                  value={newTag}
-                  onChange={(e) => setNewTag(e.target.value)}
-                  placeholder="Add tag"
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                />
-                <Button type="button" onClick={addTag} size="sm">
-                  <Plus className="w-4 h-4" />
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {formData.tags?.map((tag) => (
-                  <Badge key={tag} variant="secondary" className="flex items-center gap-1">
-                    {tag}
-                    <X
-                      className="w-3 h-3 cursor-pointer"
-                      onClick={() => removeTag(tag)}
-                    />
-                  </Badge>
-                ))}
-              </div>
+              <Label htmlFor="dimensions">Dimensions</Label>
+              <Input
+                id="dimensions"
+                value={formData.dimensions}
+                onChange={(e) => handleChange('dimensions', e.target.value)}
+                placeholder="L x W x H"
+              />
             </div>
+          </div>
 
-            <div>
-              <Label>Documents</Label>
-              <div className="flex gap-2 mb-2">
-                <Input
-                  value={newDocument}
-                  onChange={(e) => setNewDocument(e.target.value)}
-                  placeholder="Add document URL"
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addDocument())}
-                />
-                <Button type="button" onClick={addDocument} size="sm">
-                  <Plus className="w-4 h-4" />
-                </Button>
-              </div>
-              <div className="space-y-2">
-                {formData.documents?.map((doc) => (
-                  <div key={doc} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                    <span className="text-sm truncate">{doc}</span>
-                    <X
-                      className="w-4 h-4 cursor-pointer"
-                      onClick={() => removeDocument(doc)}
-                    />
-                  </div>
-                ))}
-              </div>
+          <div>
+            <Label>Tags</Label>
+            <div className="flex gap-2 mb-2">
+              <Input
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+                placeholder="Add tag"
+                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+              />
+              <Button type="button" onClick={addTag} size="sm">
+                <Plus className="w-4 h-4" />
+              </Button>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+            <div className="flex flex-wrap gap-2">
+              {formData.tags?.map((tag) => (
+                <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                  {tag}
+                  <X
+                    className="w-3 h-3 cursor-pointer"
+                    onClick={() => removeTag(tag)}
+                  />
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <Label>Documents</Label>
+            <div className="flex gap-2 mb-2">
+              <Input
+                value={newDocument}
+                onChange={(e) => setNewDocument(e.target.value)}
+                placeholder="Add document URL"
+                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addDocument())}
+              />
+              <Button type="button" onClick={addDocument} size="sm">
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="space-y-2">
+              {formData.documents?.map((doc) => (
+                <div key={doc} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span className="text-sm truncate">{doc}</span>
+                  <X
+                    className="w-4 h-4 cursor-pointer"
+                    onClick={() => removeDocument(doc)}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Form Actions */}
       <div className="flex justify-end space-x-4">
@@ -514,7 +510,7 @@ export function InventoryItemForm({
           Cancel
         </Button>
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Creating...' : (item ? 'Update Item' : 'Create Item')}
+          {isSubmitting ? 'Creating...' : 'Create Item'}
         </Button>
       </div>
     </form>
