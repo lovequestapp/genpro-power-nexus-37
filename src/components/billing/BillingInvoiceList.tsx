@@ -1,18 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader, Eye, Edit, Trash2, Download, FileText, Calendar, DollarSign, User, Grid, List, Clock } from 'lucide-react';
+import {
+  Loader, Eye, Edit, Trash2, Download, FileText, Calendar, DollarSign,
+  User, Grid, List, Clock, Filter, X
+} from 'lucide-react';
 import { getInvoices, deleteInvoice, getInvoice } from '@/lib/billingService';
 import { PDFService } from '@/lib/pdfService';
 import { getBillingSettings } from '@/lib/billingService';
-import type { Invoice } from '@/types/billing';
+import type { Invoice, BillingFilters } from '@/types/billing';
 import { useToast } from '@/hooks/use-toast';
+import { useDebounce } from '@/hooks/use-debounce';
 
 interface BillingInvoiceListProps {
   onCreateInvoice: () => void;
   onViewInvoice: (id: string) => void;
   onEditInvoice: (id: string) => void;
+}
+
+interface LocalBillingFilters {
+  status: string[];
+  search: string;
+  date_from: string;
+  date_to: string;
+  amount_min: number | '';
+  amount_max: number | '';
 }
 
 const statusTabs = [
@@ -30,32 +43,51 @@ export function BillingInvoiceList({ onCreateInvoice, onViewInvoice, onEditInvoi
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState<string | null>(null);
-  const [status, setStatus] = useState('all');
-  const [search, setSearch] = useState('');
   const [viewFormat, setViewFormat] = useState<'card' | 'list'>('card');
   const [error, setError] = useState<string | null>(null);
+  
+  // Advanced filter states
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [filters, setFilters] = useState<LocalBillingFilters>({
+    status: ['all'],
+    search: '',
+    date_from: '',
+    date_to: '',
+    amount_min: '',
+    amount_max: '',
+  });
+  
+  const debouncedSearch = useDebounce(filters.search, 500);
+
+  const activeFiltersCount = useMemo(() => {
+    let count = 0;
+    if (debouncedSearch) count++;
+    if (filters.date_from) count++;
+    if (filters.date_to) count++;
+    if (filters.amount_min) count++;
+    if (filters.amount_max) count++;
+    if (filters.status && !filters.status.includes('all') && filters.status.length > 0) count++;
+    return count;
+  }, [filters, debouncedSearch]);
+
 
   const fetchInvoices = async () => {
     setLoading(true);
     setError(null);
     try {
-      let statusFilter: string[] | undefined;
-      let dateFilter: { date_from?: string; date_to?: string } = {};
+      const queryFilters: BillingFilters = {
+        search: debouncedSearch || undefined,
+        date_from: filters.date_from || undefined,
+        date_to: filters.date_to || undefined,
+        amount_min: filters.amount_min === '' ? undefined : filters.amount_min,
+        amount_max: filters.amount_max === '' ? undefined : filters.amount_max,
+      };
 
-      if (status === 'latest') {
-        // Show invoices from the last 30 days
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        dateFilter.date_from = thirtyDaysAgo.toISOString();
-      } else if (status !== 'all') {
-        statusFilter = [status];
+      if (filters.status && !filters.status.includes('all')) {
+        queryFilters.status = filters.status;
       }
 
-      const data = await getInvoices({ 
-        status: statusFilter, 
-        search,
-        ...dateFilter
-      });
+      const data = await getInvoices(queryFilters);
       setInvoices(data);
     } catch (e: any) {
       setError(e.message || 'Failed to load invoices');
@@ -67,11 +99,34 @@ export function BillingInvoiceList({ onCreateInvoice, onViewInvoice, onEditInvoi
     }
     setLoading(false);
   };
+  
+  const handleFilterChange = (key: keyof LocalBillingFilters, value: any) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleStatusChange = (newStatus: string) => {
+    if (newStatus === 'all') {
+      handleFilterChange('status', ['all']);
+    } else {
+      handleFilterChange('status', [newStatus]);
+    }
+  };
+  
+  const resetFilters = () => {
+    setFilters({
+      status: ['all'],
+      search: '',
+      date_from: '',
+      date_to: '',
+      amount_min: '',
+      amount_max: '',
+    });
+  }
 
   useEffect(() => {
     fetchInvoices();
-    // eslint-disable-next-line
-  }, [status, search]);
+  // eslint-disable-next-line
+  }, [debouncedSearch, filters.status, filters.date_from, filters.date_to, filters.amount_min, filters.amount_max]);
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('Delete this invoice?')) return;
@@ -355,93 +410,140 @@ export function BillingInvoiceList({ onCreateInvoice, onViewInvoice, onEditInvoi
   );
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-4">
-          <TabsList className="flex space-x-2">
-            {statusTabs.map(tab => (
-              <TabsTrigger
-                key={tab.value}
-                value={tab.value}
-                className={status === tab.value ? 'bg-blue-100 text-blue-700' : ''}
-                onClick={() => setStatus(tab.value)}
-              >
-                {tab.value === 'latest' && <Clock className="w-3 h-3 mr-1" />}
-                {tab.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-          
-          {/* View Format Toggle */}
-          <div className="flex items-center space-x-2 bg-gray-100 rounded-lg p-1">
+    <div className="bg-gray-50 p-6 rounded-lg">
+      <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <Input
+          placeholder="Search by invoice # or customer..."
+          value={filters.search}
+          onChange={(e) => handleFilterChange('search', e.target.value)}
+          className="max-w-xs"
+        />
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+            className="relative"
+          >
+            <Filter className="w-4 h-4 mr-2" />
+            Advanced
+            {activeFiltersCount > 0 && (
+              <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
+                {activeFiltersCount}
+              </span>
+            )}
+          </Button>
+          <Button 
+            variant="ghost" 
+            onClick={resetFilters} 
+            disabled={activeFiltersCount === 0}
+            className={activeFiltersCount === 0 ? 'text-gray-400' : 'text-gray-700 hover:bg-gray-200'}
+          >
+            <X className="w-4 h-4 mr-2" />
+            Reset
+          </Button>
+          <div className="flex items-center rounded-md border bg-white p-1">
             <Button
+              variant={viewFormat === 'card' ? 'secondary' : 'ghost'}
               size="sm"
-              variant={viewFormat === 'card' ? 'default' : 'ghost'}
               onClick={() => setViewFormat('card')}
-              className="h-8 px-3"
             >
               <Grid className="w-4 h-4" />
             </Button>
             <Button
+              variant={viewFormat === 'list' ? 'secondary' : 'ghost'}
               size="sm"
-              variant={viewFormat === 'list' ? 'default' : 'ghost'}
               onClick={() => setViewFormat('list')}
-              className="h-8 px-3"
             >
               <List className="w-4 h-4" />
             </Button>
           </div>
         </div>
-        
-        <div className="flex items-center space-x-2">
-          <Input
-            placeholder="Search invoices..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="w-64"
-          />
-          <Button onClick={onCreateInvoice} className="bg-blue-600 hover:bg-blue-700">
-            <FileText className="w-4 h-4 mr-2" />
-            New Invoice
-          </Button>
-        </div>
       </div>
-
-      {loading ? (
-        <div className="flex justify-center items-center h-32">
-          <Loader className="animate-spin" />
-          <span className="ml-2">Loading invoices...</span>
-        </div>
-      ) : error ? (
-        <div className="text-red-600 bg-red-50 p-4 rounded-md">
-          <div className="flex items-center">
-            <span className="text-lg mr-2">⚠️</span>
-            {error}
+      
+      {showAdvancedFilters && (
+        <div className="p-4 bg-white border rounded-lg mb-4 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700">From Date</label>
+              <Input
+                type="date"
+                value={filters.date_from}
+                onChange={(e) => handleFilterChange('date_from', e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">To Date</label>
+              <Input
+                type="date"
+                value={filters.date_to}
+                onChange={(e) => handleFilterChange('date_to', e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">Min Amount</label>
+              <Input
+                type="number"
+                placeholder="e.g. 500"
+                value={filters.amount_min}
+                onChange={(e) => handleFilterChange('amount_min', e.target.value === '' ? '' : Number(e.target.value))}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">Max Amount</label>
+              <Input
+                type="number"
+                placeholder="e.g. 2000"
+                value={filters.amount_max}
+                onChange={(e) => handleFilterChange('amount_max', e.target.value === '' ? '' : Number(e.target.value))}
+              />
+            </div>
           </div>
         </div>
-      ) : (
-        <div className="space-y-4">
-          {invoices.length === 0 ? (
-            <div className="text-center py-12">
-              <FileText className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No invoices found</h3>
-              <p className="text-gray-600 mb-4">
-                {search ? 'Try adjusting your search terms' : 
-                 status === 'latest' ? 'No invoices in the last 30 days' :
-                 `No ${status === 'all' ? '' : status} invoices found`}
-              </p>
-              {!search && status === 'all' && (
-                <Button onClick={onCreateInvoice} className="bg-blue-600 hover:bg-blue-700">
-                  <FileText className="w-4 h-4 mr-2" />
-                  Create First Invoice
-                </Button>
-              )}
-            </div>
-          ) : (
-            viewFormat === 'card' ? renderCardView() : renderListView()
-          )}
-        </div>
       )}
+
+      <Tabs defaultValue="all" value={filters.status && filters.status[0]} onValueChange={handleStatusChange}>
+        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 md:grid-cols-7">
+          {statusTabs.map(tab => (
+            <TabsTrigger key={tab.value} value={tab.value}>
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+      
+      <div className="mt-6">
+        {loading ? (
+          <div className="flex justify-center items-center h-32">
+            <Loader className="animate-spin" />
+            <span className="ml-2">Loading invoices...</span>
+          </div>
+        ) : error ? (
+          <div className="text-red-600 bg-red-50 p-4 rounded-md">
+            <div className="flex items-center">
+              <span className="text-lg mr-2">⚠️</span>
+              {error}
+            </div>
+          </div>
+        ) : invoices.length === 0 ? (
+          <div className="text-center py-12">
+            <FileText className="h-16 w-16 mx-auto text-gray-300 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No invoices found</h3>
+            <p className="text-gray-600 mb-4">
+              {filters.search ? 'Try adjusting your search terms' : 
+               filters.date_from ? 'No invoices in the selected date range' :
+               `No ${filters.status.length > 1 ? 'filtered' : ''} invoices found`}
+            </p>
+            {!filters.search && !filters.date_from && (
+              <Button onClick={fetchInvoices} className="bg-blue-600 hover:bg-blue-700">
+                <FileText className="w-4 h-4 mr-2" />
+                Reset Filters
+              </Button>
+            )}
+          </div>
+        ) : (
+          viewFormat === 'card' ? renderCardView() : renderListView()
+        )}
+      </div>
     </div>
   );
 }
