@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -15,6 +16,7 @@ import {
   X,
   LogOut,
   Mail,
+  BarChart3,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from './Logo';
@@ -22,6 +24,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const adminNav = [
   { label: 'Dashboard', icon: <LayoutDashboard />, to: '/admin/dashboard' },
+  { label: 'Analytics', icon: <BarChart3 />, to: '/admin/analytics' },
   { label: 'Customers', icon: <Users />, to: '/admin/customers' },
   { label: 'Projects', icon: <ClipboardList />, to: '/admin/projects' },
   { label: 'Email', icon: <Mail />, to: '/admin/email' },
