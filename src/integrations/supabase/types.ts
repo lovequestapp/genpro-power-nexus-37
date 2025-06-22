@@ -9,6 +9,54 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          address: string | null
+          appearance: Json | null
+          billing: Json | null
+          business_hours: Json | null
+          company_name: string | null
+          email: string | null
+          id: string
+          logo_url: string | null
+          notifications: Json | null
+          phone: string | null
+          security: Json | null
+          system: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          appearance?: Json | null
+          billing?: Json | null
+          business_hours?: Json | null
+          company_name?: string | null
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          notifications?: Json | null
+          phone?: string | null
+          security?: Json | null
+          system?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          appearance?: Json | null
+          billing?: Json | null
+          business_hours?: Json | null
+          company_name?: string | null
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          notifications?: Json | null
+          phone?: string | null
+          security?: Json | null
+          system?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       attachments: {
         Row: {
           comment_id: string | null
@@ -393,6 +441,54 @@ export type Database = {
           },
         ]
       }
+      customer_communications: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          created_by: string | null
+          customer_id: string | null
+          id: string
+          project_id: string | null
+          subject: string | null
+          type: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          customer_id?: string | null
+          id?: string
+          project_id?: string | null
+          subject?: string | null
+          type: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          customer_id?: string | null
+          id?: string
+          project_id?: string | null
+          subject?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_communications_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_communications_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           address: string | null
@@ -434,6 +530,150 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      email_accounts: {
+        Row: {
+          access_token: string | null
+          created_at: string | null
+          email: string
+          id: string
+          is_active: boolean | null
+          last_sync: string | null
+          name: string
+          refresh_token: string | null
+          token_expires_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          access_token?: string | null
+          created_at?: string | null
+          email: string
+          id?: string
+          is_active?: boolean | null
+          last_sync?: string | null
+          name: string
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          access_token?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          is_active?: boolean | null
+          last_sync?: string | null
+          name?: string
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      email_templates: {
+        Row: {
+          body: string
+          category: string
+          created_at: string | null
+          html_body: string | null
+          id: string
+          is_default: boolean | null
+          name: string
+          subject: string
+          updated_at: string | null
+        }
+        Insert: {
+          body: string
+          category: string
+          created_at?: string | null
+          html_body?: string | null
+          id?: string
+          is_default?: boolean | null
+          name: string
+          subject: string
+          updated_at?: string | null
+        }
+        Update: {
+          body?: string
+          category?: string
+          created_at?: string | null
+          html_body?: string | null
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          subject?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      emails: {
+        Row: {
+          bcc_addresses: string | null
+          body: string
+          cc_addresses: string | null
+          created_by: string | null
+          customer_id: string | null
+          delivered_at: string | null
+          gmail_message_id: string | null
+          html_body: string | null
+          id: string
+          project_id: string | null
+          sent_at: string | null
+          status: string
+          subject: string
+          thread_id: string | null
+          to_addresses: string
+        }
+        Insert: {
+          bcc_addresses?: string | null
+          body: string
+          cc_addresses?: string | null
+          created_by?: string | null
+          customer_id?: string | null
+          delivered_at?: string | null
+          gmail_message_id?: string | null
+          html_body?: string | null
+          id?: string
+          project_id?: string | null
+          sent_at?: string | null
+          status?: string
+          subject: string
+          thread_id?: string | null
+          to_addresses: string
+        }
+        Update: {
+          bcc_addresses?: string | null
+          body?: string
+          cc_addresses?: string | null
+          created_by?: string | null
+          customer_id?: string | null
+          delivered_at?: string | null
+          gmail_message_id?: string | null
+          html_body?: string | null
+          id?: string
+          project_id?: string | null
+          sent_at?: string | null
+          status?: string
+          subject?: string
+          thread_id?: string | null
+          to_addresses?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emails_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "emails_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       event_attachments: {
         Row: {
@@ -504,6 +744,130 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "schedule_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_analytics: {
+        Row: {
+          created_at: string | null
+          event_data: Json | null
+          event_type: string
+          form_id: string
+          id: string
+          ip_address: unknown | null
+          referrer: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_data?: Json | null
+          event_type: string
+          form_id: string
+          id?: string
+          ip_address?: unknown | null
+          referrer?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_data?: Json | null
+          event_type?: string
+          form_id?: string
+          id?: string
+          ip_address?: unknown | null
+          referrer?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_analytics_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "form_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_definitions: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          fields: Json
+          id: string
+          is_active: boolean | null
+          name: string
+          settings: Json
+          slug: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          fields?: Json
+          id?: string
+          is_active?: boolean | null
+          name: string
+          settings?: Json
+          slug: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          fields?: Json
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          settings?: Json
+          slug?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      form_submissions: {
+        Row: {
+          created_at: string | null
+          data: Json
+          form_id: string
+          id: string
+          ip_address: unknown | null
+          metadata: Json | null
+          referrer: string | null
+          status: string | null
+          updated_at: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          data?: Json
+          form_id: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          referrer?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          data?: Json
+          form_id?: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          referrer?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_submissions_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "form_definitions"
             referencedColumns: ["id"]
           },
         ]
@@ -1814,6 +2178,60 @@ export type Database = {
           },
         ]
       }
+      schedules: {
+        Row: {
+          created_at: string
+          date: string
+          end_time: string
+          id: string
+          notes: string | null
+          project_id: string | null
+          start_time: string
+          status: string
+          team_member_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          end_time: string
+          id?: string
+          notes?: string | null
+          project_id?: string | null
+          start_time: string
+          status?: string
+          team_member_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          end_time?: string
+          id?: string
+          notes?: string | null
+          project_id?: string | null
+          start_time?: string
+          status?: string
+          team_member_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedules_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "schedules_team_member_id_fkey"
+            columns: ["team_member_id"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stock_movements: {
         Row: {
           created_at: string
@@ -1975,6 +2393,48 @@ export type Database = {
           },
         ]
       }
+      team_members: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          internal_notes: string | null
+          phone_number: string | null
+          role: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          internal_notes?: string | null
+          phone_number?: string | null
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          internal_notes?: string | null
+          phone_number?: string | null
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       tickets: {
         Row: {
           assigned_to: string | null
@@ -2050,6 +2510,51 @@ export type Database = {
           },
         ]
       }
+      time_entries: {
+        Row: {
+          created_at: string
+          end_time: string | null
+          id: number
+          notes: string | null
+          project_id: string | null
+          start_time: string
+          team_member_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_time?: string | null
+          id?: number
+          notes?: string | null
+          project_id?: string | null
+          start_time: string
+          team_member_id: string
+        }
+        Update: {
+          created_at?: string
+          end_time?: string | null
+          id?: number
+          notes?: string | null
+          project_id?: string | null
+          start_time?: string
+          team_member_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_entries_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_entries_team_member_id_fkey"
+            columns: ["team_member_id"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -2072,6 +2577,31 @@ export type Database = {
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_form_analytics_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_views: number
+          total_submissions: number
+          conversion_rate: number
+          today_views: number
+          today_submissions: number
+          this_week_views: number
+          this_week_submissions: number
+          this_month_views: number
+          this_month_submissions: number
+        }[]
+      }
+      get_form_submission_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_submissions: number
+          pending_submissions: number
+          processed_submissions: number
+          today_submissions: number
+          this_week_submissions: number
+          this_month_submissions: number
+        }[]
       }
     }
     Enums: {
