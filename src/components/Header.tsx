@@ -46,7 +46,8 @@ const Header = () => {
               { to: '/services', label: 'Services' },
               { to: '/industries', label: 'Industries' },
               { to: '/emergency', label: 'Emergency' },
-              { to: '/about', label: 'About' }
+              { to: '/about', label: 'About' },
+              { to: '/contact', label: 'Contact' }
             ].map((item) => (
               <Link
                 key={item.to}
@@ -102,7 +103,8 @@ const Header = () => {
                 { to: '/services', label: 'Services' },
                 { to: '/industries', label: 'Industries' },
                 { to: '/emergency', label: 'Emergency' },
-                { to: '/about', label: 'About' }
+                { to: '/about', label: 'About' },
+                { to: '/contact', label: 'Contact' }
               ].map((item, index) => (
                 <Link
                   key={item.to}
