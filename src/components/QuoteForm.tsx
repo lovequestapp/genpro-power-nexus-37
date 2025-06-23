@@ -537,18 +537,18 @@ const QuoteForm = () => {
               <Button 
                 type="submit" 
                 disabled={submitting}
-                className="w-full bg-gradient-to-r from-primary to-steel-700 hover:from-steel-700 hover:to-primary text-white py-3 text-lg font-semibold"
+                className="w-full bg-gradient-to-r from-primary to-steel-700 hover:from-steel-700 hover:to-primary text-white py-3 text-lg font-semibold border-0"
                 size="lg"
               >
                 {submitting ? (
                   <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Submitting Quote Request...
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin text-white" />
+                    <span className="text-white">Submitting Quote Request...</span>
                   </>
                 ) : (
                   <>
-                    <Calculator className="mr-2 h-5 w-5" />
-                    Get My Free Quote
+                    <Calculator className="mr-2 h-5 w-5 text-white" />
+                    <span className="text-white">Get My Free Quote</span>
                   </>
                 )}
               </Button>
