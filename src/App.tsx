@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { Toaster as SonnerToaster } from '@/components/ui/sonner';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { HelmetProvider } from '@/components/HelmetProvider';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import ScrollToTop from '@/components/ScrollToTop';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -81,97 +82,99 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <ThemeProvider>
-            <Router>
-              <ScrollToTop />
-              <Suspense fallback={
-                <div className="min-h-screen flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                </div>
-              }>
-                <Routes>
-                  {/* Public routes */}
-                  <Route path="/" element={<PublicLayout />}>
-                    <Route index element={<Home />} />
-                    <Route path="about" element={<About />} />
-                    <Route path="services" element={<Services />} />
-                    <Route path="products" element={<Products />} />
-                    <Route path="industries" element={<Industries />} />
-                    <Route path="contact" element={<Contact />} />
-                    <Route path="emergency" element={<Emergency />} />
-                    <Route path="get-quote" element={<GetQuote />} />
-                    <Route path="free-estimate" element={<FreeEstimate />} />
-                    <Route path="warranty" element={<Warranty />} />
-                    <Route path="privacy" element={<PrivacyPolicy />} />
-                    <Route path="terms" element={<TermsOfService />} />
-                  </Route>
+      <HelmetProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <ThemeProvider>
+              <Router>
+                <ScrollToTop />
+                <Suspense fallback={
+                  <div className="min-h-screen flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                  </div>
+                }>
+                  <Routes>
+                    {/* Public routes */}
+                    <Route path="/" element={<PublicLayout />}>
+                      <Route index element={<Home />} />
+                      <Route path="about" element={<About />} />
+                      <Route path="services" element={<Services />} />
+                      <Route path="products" element={<Products />} />
+                      <Route path="industries" element={<Industries />} />
+                      <Route path="contact" element={<Contact />} />
+                      <Route path="emergency" element={<Emergency />} />
+                      <Route path="get-quote" element={<GetQuote />} />
+                      <Route path="free-estimate" element={<FreeEstimate />} />
+                      <Route path="warranty" element={<Warranty />} />
+                      <Route path="privacy" element={<PrivacyPolicy />} />
+                      <Route path="terms" element={<TermsOfService />} />
+                    </Route>
 
-                  {/* Auth routes */}
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
-                  <Route path="/reset-password" element={<ResetPassword />} />
+                    {/* Auth routes */}
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
 
-                  {/* Admin routes */}
-                  <Route path="/admin" element={
-                    <ProtectedRoute allowedRoles={['admin']}>
-                      <AdminLayout />
-                    </ProtectedRoute>
-                  }>
-                    <Route index element={<Navigate to="/admin/dashboard" replace />} />
-                    <Route path="dashboard" element={<Dashboard />} />
-                    <Route path="projects" element={<Projects />} />
-                    <Route path="projects/:id" element={<ProjectDetailPage />} />
-                    <Route path="projects/calendar" element={<ProjectsCalendar />} />
-                    <Route path="projects/resources" element={<ProjectsResources />} />
-                    <Route path="customers" element={<Customers />} />
-                    <Route path="customers/:id" element={<CustomerDetails />} />
-                    <Route path="inventory" element={<Inventory />} />
-                    <Route path="inventory/generators" element={<InventoryGenerators />} />
-                    <Route path="inventory/parts" element={<InventoryParts />} />
-                    <Route path="inventory/orders" element={<InventoryOrders />} />
-                    <Route path="schedule" element={<Schedule />} />
-                    <Route path="scheduling" element={<Scheduling />} />
-                    <Route path="billing" element={<Billing />} />
-                    <Route path="weather" element={<Weather />} />
-                    <Route path="support" element={<Support />} />
-                    <Route path="team" element={<Team />} />
-                    <Route path="settings" element={<Settings />} />
-                    <Route path="analytics" element={<Analytics />} />
-                    <Route path="email" element={<Email />} />
-                    <Route path="email/callback" element={<EmailCallback />} />
-                    <Route path="forms" element={<Forms />} />
-                    <Route path="reports" element={<Reports />} />
-                    <Route path="invoice-templates" element={<InvoiceTemplates />} />
-                    <Route path="stripe" element={<StripeDashboard />} />
-                  </Route>
+                    {/* Admin routes */}
+                    <Route path="/admin" element={
+                      <ProtectedRoute allowedRoles={['admin']}>
+                        <AdminLayout />
+                      </ProtectedRoute>
+                    }>
+                      <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                      <Route path="dashboard" element={<Dashboard />} />
+                      <Route path="projects" element={<Projects />} />
+                      <Route path="projects/:id" element={<ProjectDetailPage />} />
+                      <Route path="projects/calendar" element={<ProjectsCalendar />} />
+                      <Route path="projects/resources" element={<ProjectsResources />} />
+                      <Route path="customers" element={<Customers />} />
+                      <Route path="customers/:id" element={<CustomerDetails />} />
+                      <Route path="inventory" element={<Inventory />} />
+                      <Route path="inventory/generators" element={<InventoryGenerators />} />
+                      <Route path="inventory/parts" element={<InventoryParts />} />
+                      <Route path="inventory/orders" element={<InventoryOrders />} />
+                      <Route path="schedule" element={<Schedule />} />
+                      <Route path="scheduling" element={<Scheduling />} />
+                      <Route path="billing" element={<Billing />} />
+                      <Route path="weather" element={<Weather />} />
+                      <Route path="support" element={<Support />} />
+                      <Route path="team" element={<Team />} />
+                      <Route path="settings" element={<Settings />} />
+                      <Route path="analytics" element={<Analytics />} />
+                      <Route path="email" element={<Email />} />
+                      <Route path="email/callback" element={<EmailCallback />} />
+                      <Route path="forms" element={<Forms />} />
+                      <Route path="reports" element={<Reports />} />
+                      <Route path="invoice-templates" element={<InvoiceTemplates />} />
+                      <Route path="stripe" element={<StripeDashboard />} />
+                    </Route>
 
-                  {/* Customer routes */}
-                  <Route path="/customer" element={
-                    <ProtectedRoute allowedRoles={['customer']}>
-                      <CustomerLayout />
-                    </ProtectedRoute>
-                  }>
-                    <Route index element={<Navigate to="/customer/dashboard" replace />} />
-                    <Route path="dashboard" element={<CustomerDashboard />} />
-                    <Route path="projects" element={<CustomerProjects />} />
-                    <Route path="billing" element={<CustomerBilling />} />
-                    <Route path="profile" element={<CustomerProfile />} />
-                    <Route path="support" element={<CustomerSupport />} />
-                  </Route>
+                    {/* Customer routes */}
+                    <Route path="/customer" element={
+                      <ProtectedRoute allowedRoles={['customer']}>
+                        <CustomerLayout />
+                      </ProtectedRoute>
+                    }>
+                      <Route index element={<Navigate to="/customer/dashboard" replace />} />
+                      <Route path="dashboard" element={<CustomerDashboard />} />
+                      <Route path="projects" element={<CustomerProjects />} />
+                      <Route path="billing" element={<CustomerBilling />} />
+                      <Route path="profile" element={<CustomerProfile />} />
+                      <Route path="support" element={<CustomerSupport />} />
+                    </Route>
 
-                  {/* 404 route */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
-              <Toaster />
-              <SonnerToaster />
-            </Router>
-          </ThemeProvider>
-        </AuthProvider>
-      </QueryClientProvider>
+                    {/* 404 route */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Suspense>
+                <Toaster />
+                <SonnerToaster />
+              </Router>
+            </ThemeProvider>
+          </AuthProvider>
+        </QueryClientProvider>
+      </HelmetProvider>
     </ErrorBoundary>
   );
 }
