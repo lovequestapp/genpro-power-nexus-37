@@ -79,3 +79,18 @@
   word-break: break-word;
   overflow-wrap: break-word;
 }
+
+/* Force scroll behavior control */
+html {
+  scroll-behavior: auto !important;
+}
+
+/* Ensure body and html don't interfere with programmatic scrolling */
+html, body {
+  overflow-x: hidden;
+}
+
+/* Additional scroll reset utilities */
+.scroll-reset {
+  scroll-behavior: auto !important;
+}
