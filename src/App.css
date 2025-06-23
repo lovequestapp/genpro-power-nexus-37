@@ -34,3 +34,26 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Prevent hyphenation globally */
+* {
+  hyphens: none;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+}
+
+/* Additional utility classes for hyphenation control */
+.hyphens-none {
+  hyphens: none;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.break-words {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}

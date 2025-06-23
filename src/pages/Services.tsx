@@ -64,7 +64,8 @@ const Services = () => {
     name: 'Generac Authorized',
     code: 'PowerPro Elite Dealer'
   }];
-  return <div className="min-h-screen bg-white">
+  return (
+    <div className="min-h-screen bg-white">
       <SEO 
         title="Generator Services Houston | Installation, Repair & Maintenance | HOU GEN PROS"
         description="Comprehensive generator services in Houston: installation, repair, maintenance, emergency service, and 24/7 support. Generac authorized dealer with same-day service available."
@@ -81,11 +82,11 @@ const Services = () => {
             <Badge className="mb-6 bg-accent text-white border-accent px-4 py-2">
               Houston's Premier Generator Services
             </Badge>
-            <h1 className="text-5xl md:text-6xl font-bold mb-8 leading-tight">
-              Complete Power
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-8 leading-tight hyphens-none">
+              Complete Power{' '}
               <span className="block text-accent">Solutions & Service</span>
             </h1>
-            <p className="text-xl text-white mb-10 leading-relaxed max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl text-white mb-10 leading-relaxed max-w-3xl mx-auto">
               From installation to emergency response, our certified technicians deliver 
               Fortune 500-level service across Greater Houston and surrounding communities.
             </p>
@@ -100,14 +101,14 @@ const Services = () => {
               </Button>
               <Dialog open={isScheduleModalOpen} onOpenChange={setIsScheduleModalOpen}>
                 <DialogTrigger asChild>
-                  <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-4 text-slate-900 bg-white/10 hover:text-primary transition-all duration-300">
+                  <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-4 text-slate-900 bg-white/10 hover:text-primary transition-all duration-300 hyphens-none">
                     <Calendar className="w-5 h-5 mr-2" />
                     Schedule Service
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
-                    <DialogTitle className="text-2xl font-bold text-primary">Schedule Your Service</DialogTitle>
+                    <DialogTitle className="text-2xl font-bold text-primary hyphens-none">Schedule Your Service</DialogTitle>
                   </DialogHeader>
                   <ScheduleServiceForm onClose={() => setIsScheduleModalOpen(false)} />
                 </DialogContent>
@@ -121,8 +122,11 @@ const Services = () => {
       <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-primary mb-6">Comprehensive Generator Services</h2>
-            <p className="text-xl text-steel-600 max-w-3xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-6 hyphens-none">
+              Comprehensive{' '}
+              <span className="block sm:inline">Generator Services</span>
+            </h2>
+            <p className="text-lg sm:text-xl text-steel-600 max-w-3xl mx-auto">
               Expert services delivered by certified technicians with over 15 years of experience in the Houston market.
             </p>
           </div>
@@ -131,7 +135,7 @@ const Services = () => {
             <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 mb-12 h-auto">
               {services.map(service => {
               const IconComponent = service.icon;
-              return <TabsTrigger key={service.id} value={service.id} className="flex items-center gap-2 text-sm p-4">
+              return <TabsTrigger key={service.id} value={service.id} className="flex items-center gap-2 text-sm p-4 hyphens-none">
                     <IconComponent className="w-4 h-4" />
                     {service.title}
                   </TabsTrigger>;
@@ -150,7 +154,7 @@ const Services = () => {
                           <div className="w-16 h-16 bg-accent rounded-lg flex items-center justify-center mb-6">
                             <IconComponent className="w-8 h-8 text-white" />
                           </div>
-                          <Badge className="bg-white/20 text-white border-white/30 px-3 py-1">
+                          <Badge className="bg-white/20 text-white border-white/30 px-3 py-1 hyphens-none">
                             {service.timeline}
                           </Badge>
                         </div>
@@ -158,15 +162,15 @@ const Services = () => {
                       
                       <CardContent className="p-10">
                         <CardHeader className="p-0 mb-8">
-                          <CardTitle className="text-3xl text-primary mb-4">
+                          <CardTitle className="text-2xl sm:text-3xl text-primary mb-4 hyphens-none">
                             {service.title}
                           </CardTitle>
-                          <p className="text-steel-600 text-lg mb-4">{service.description}</p>
-                          <div className="text-3xl font-bold text-accent">{service.price}</div>
+                          <p className="text-steel-600 text-base sm:text-lg mb-4">{service.description}</p>
+                          <div className="text-2xl sm:text-3xl font-bold text-accent">{service.price}</div>
                         </CardHeader>
                         
                         <div className="space-y-6 mb-8">
-                          <h4 className="font-semibold text-primary text-lg">Service Includes:</h4>
+                          <h4 className="font-semibold text-primary text-lg hyphens-none">Service Includes:</h4>
                           <ul className="space-y-3">
                             {service.features.map((feature, idx) => <li key={idx} className="flex items-center text-steel-600">
                                 <CheckCircle className="w-5 h-5 text-accent mr-4 flex-shrink-0" />
@@ -176,13 +180,13 @@ const Services = () => {
                         </div>
                         
                         <div className="flex flex-col sm:flex-row gap-4">
-                          <Button className="bg-primary hover:bg-steel-700 text-white flex-1 py-3">
+                          <Button className="bg-primary hover:bg-steel-700 text-white flex-1 py-3 hyphens-none">
                             <MessageSquare className="w-4 h-4 mr-2" />
                             Get Quote
                           </Button>
                           <Dialog open={isScheduleModalOpen} onOpenChange={setIsScheduleModalOpen}>
                             <DialogTrigger asChild>
-                              <Button variant="outline" className="border-2 border-accent text-accent hover:bg-accent hover:text-white flex-1 py-3 transition-all duration-300">
+                              <Button variant="outline" className="border-2 border-accent text-accent hover:bg-accent hover:text-white flex-1 py-3 transition-all duration-300 hyphens-none">
                                 <Calendar className="w-4 h-4 mr-2" />
                                 Schedule Now
                               </Button>
@@ -202,8 +206,10 @@ const Services = () => {
       <section className="py-20 bg-steel-50">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-primary mb-6">Serving Greater Houston</h2>
-            <p className="text-xl text-steel-600 max-w-3xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-6 hyphens-none">
+              Serving Greater Houston
+            </h2>
+            <p className="text-lg sm:text-xl text-steel-600 max-w-3xl mx-auto">
               Proudly serving Houston and surrounding communities with professional generator services.
             </p>
           </div>
@@ -211,7 +217,7 @@ const Services = () => {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
             {serviceAreas.map((area, index) => <div key={index} className="bg-white p-6 rounded-lg shadow-sm border border-steel-200 text-center hover:shadow-md transition-shadow duration-300">
                 <MapPin className="w-6 h-6 text-accent mx-auto mb-3" />
-                <span className="text-steel-700 font-medium">{area}</span>
+                <span className="text-steel-700 font-medium hyphens-none">{area}</span>
               </div>)}
           </div>
         </div>
@@ -221,8 +227,10 @@ const Services = () => {
       <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-primary mb-6">Licensed & Certified</h2>
-            <p className="text-xl text-steel-600 max-w-3xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-6 hyphens-none">
+              Licensed & Certified
+            </h2>
+            <p className="text-lg sm:text-xl text-steel-600 max-w-3xl mx-auto">
               Fully licensed and certified by leading industry organizations and manufacturers.
             </p>
           </div>
@@ -231,8 +239,8 @@ const Services = () => {
             {certifications.map((cert, index) => <Card key={index} className="text-center hover:shadow-lg transition-shadow duration-300 border-0 shadow-md">
                 <CardContent className="p-8">
                   <Award className="w-16 h-16 text-accent mx-auto mb-6" />
-                  <h3 className="font-bold text-primary mb-3 text-lg">{cert.name}</h3>
-                  <p className="text-steel-600">{cert.code}</p>
+                  <h3 className="font-bold text-primary mb-3 text-lg hyphens-none">{cert.name}</h3>
+                  <p className="text-steel-600 hyphens-none">{cert.code}</p>
                 </CardContent>
               </Card>)}
           </div>
@@ -242,8 +250,8 @@ const Services = () => {
       {/* CTA Section */}
       <section className="py-20 bg-primary text-white">
         <div className="container mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to Get Started?</h2>
-          <p className="text-xl text-white mb-10 max-w-3xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 hyphens-none">Ready to Get Started?</h2>
+          <p className="text-lg sm:text-xl text-white mb-10 max-w-3xl mx-auto">
             Contact our team today for expert consultation and competitive pricing on all generator services.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
@@ -255,13 +263,15 @@ const Services = () => {
               <Phone className="w-5 h-5 mr-2" />
               Call (915) 800-7767
             </Button>
-            <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-4 text-steel-800">
+            <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-4 text-steel-800 hyphens-none">
               <MessageSquare className="w-5 h-5 mr-2" />
               Request Service Quote
             </Button>
           </div>
         </div>
       </section>
-    </div>;
+    </div>
+  );
 };
+
 export default Services;

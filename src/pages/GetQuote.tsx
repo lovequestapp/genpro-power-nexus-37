@@ -28,10 +28,11 @@ const GetQuote = () => {
             <Badge variant="outline" className="mb-6 text-accent border-accent px-6 py-3 text-base">
               Free Generator Quote
             </Badge>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary mb-6">
-              Get Your Custom Generator Quote
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-primary mb-6 hyphens-none break-words leading-tight">
+              Get Your Custom{' '}
+              <span className="block sm:inline">Generator Quote</span>
             </h1>
-            <p className="text-lg text-steel-600 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg text-steel-600 max-w-3xl mx-auto leading-relaxed">
               Complete our comprehensive quote form and receive a detailed estimate within 24 hours. 
               Our licensed & insured Houston Generator Pros are ready to provide you with the best solution for your power needs.
             </p>
@@ -49,7 +50,7 @@ const GetQuote = () => {
                 {/* Why Choose Us */}
                 <Card className="shadow-lg border-steel-200">
                   <CardHeader className="bg-gradient-to-r from-primary to-steel-700 text-white rounded-t-lg">
-                    <CardTitle className="text-lg flex items-center gap-2">
+                    <CardTitle className="text-lg flex items-center gap-2 hyphens-none">
                       <Star className="w-5 h-5" />
                       Why Choose Houston Generator Pros?
                     </CardTitle>
@@ -58,42 +59,42 @@ const GetQuote = () => {
                     <div className="flex items-start space-x-3">
                       <Shield className="w-5 h-5 text-accent mt-0.5" />
                       <div>
-                        <h4 className="font-semibold text-steel-800">Licensed & Insured</h4>
+                        <h4 className="font-semibold text-steel-800 hyphens-none">Licensed & Insured</h4>
                         <p className="text-sm text-steel-600">Full licensing and comprehensive insurance coverage for your peace of mind</p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
                       <Award className="w-5 h-5 text-accent mt-0.5" />
                       <div>
-                        <h4 className="font-semibold text-steel-800">Expert Technicians</h4>
+                        <h4 className="font-semibold text-steel-800 hyphens-none">Expert Technicians</h4>
                         <p className="text-sm text-steel-600">Certified professionals with years of experience in generator systems</p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
                       <CheckCircle className="w-5 h-5 text-accent mt-0.5" />
                       <div>
-                        <h4 className="font-semibold text-steel-800">Quality Guarantee</h4>
+                        <h4 className="font-semibold text-steel-800 hyphens-none">Quality Guarantee</h4>
                         <p className="text-sm text-steel-600">All work backed by our satisfaction guarantee and warranty</p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
                       <Clock className="w-5 h-5 text-accent mt-0.5" />
                       <div>
-                        <h4 className="font-semibold text-steel-800">24/7 Emergency Service</h4>
+                        <h4 className="font-semibold text-steel-800 hyphens-none">24/7 Emergency Service</h4>
                         <p className="text-sm text-steel-600">Round-the-clock support when you need it most</p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
                       <Users className="w-5 h-5 text-accent mt-0.5" />
                       <div>
-                        <h4 className="font-semibold text-steel-800">Local Expertise</h4>
+                        <h4 className="font-semibold text-steel-800 hyphens-none">Local Expertise</h4>
                         <p className="text-sm text-steel-600">Houston-based team with deep knowledge of local requirements</p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
                       <Truck className="w-5 h-5 text-accent mt-0.5" />
                       <div>
-                        <h4 className="font-semibold text-steel-800">Fast Response</h4>
+                        <h4 className="font-semibold text-steel-800 hyphens-none">Fast Response</h4>
                         <p className="text-sm text-steel-600">Quick response times and efficient project completion</p>
                       </div>
                     </div>
@@ -103,7 +104,7 @@ const GetQuote = () => {
                 {/* What's Included */}
                 <Card className="shadow-lg border-steel-200">
                   <CardHeader className="bg-gradient-to-r from-accent to-accent/80 text-white rounded-t-lg">
-                    <CardTitle className="text-lg flex items-center gap-2">
+                    <CardTitle className="text-lg flex items-center gap-2 hyphens-none">
                       <Calculator className="w-5 h-5" />
                       What's Included in Your Quote
                     </CardTitle>
@@ -147,7 +148,7 @@ const GetQuote = () => {
                 {/* Service Areas */}
                 <Card className="shadow-lg border-steel-200">
                   <CardHeader>
-                    <CardTitle className="text-primary flex items-center gap-2">
+                    <CardTitle className="text-primary flex items-center gap-2 hyphens-none">
                       <MapPin className="w-5 h-5" />
                       Service Areas
                     </CardTitle>
@@ -199,7 +200,7 @@ const GetQuote = () => {
                 {/* Contact Info */}
                 <Card className="shadow-lg border-steel-200">
                   <CardHeader className="bg-gradient-to-r from-red-600 to-red-700 text-white rounded-t-lg">
-                    <CardTitle className="text-lg flex items-center gap-2">
+                    <CardTitle className="text-lg flex items-center gap-2 hyphens-none">
                       <Phone className="w-5 h-5" />
                       Need Immediate Help?
                     </CardTitle>
@@ -208,7 +209,7 @@ const GetQuote = () => {
                     <div className="flex items-center space-x-3">
                       <Phone className="w-5 h-5 text-accent" />
                       <div>
-                        <p className="font-semibold text-steel-800">Emergency Service</p>
+                        <p className="font-semibold text-steel-800 hyphens-none">Emergency Service</p>
                         <a 
                           href="tel:+19158007767" 
                           className="text-sm text-steel-600 hover:text-accent transition-colors cursor-pointer"
@@ -220,21 +221,21 @@ const GetQuote = () => {
                     <div className="flex items-center space-x-3">
                       <Mail className="w-5 h-5 text-accent" />
                       <div>
-                        <p className="font-semibold text-steel-800">Email Support</p>
+                        <p className="font-semibold text-steel-800 hyphens-none">Email Support</p>
                         <p className="text-sm text-steel-600">quotes@hougenpros.com</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
                       <MapPin className="w-5 h-5 text-accent" />
                       <div>
-                        <p className="font-semibold text-steel-800">Service Area</p>
+                        <p className="font-semibold text-steel-800 hyphens-none">Service Area</p>
                         <p className="text-sm text-steel-600">Greater Houston & Surrounding Areas</p>
                       </div>
                     </div>
                     <div className="pt-4">
                       <Link 
                         to="/emergency" 
-                        className="inline-flex items-center justify-center w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors"
+                        className="inline-flex items-center justify-center w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors hyphens-none"
                       >
                         Emergency Service Request
                       </Link>
