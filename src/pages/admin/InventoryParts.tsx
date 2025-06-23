@@ -844,10 +844,10 @@ export default function InventoryParts() {
             item={selectedItem}
             open={showStockAdjustment}
             onOpenChange={setShowStockAdjustment}
-            onAdjustment={handleStockAdjustment}
+            onSubmit={handleStockAdjustment}
           />
         )}
       </div>
     </>
   );
-} 
+}
