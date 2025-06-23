@@ -324,6 +324,7 @@ export type Database = {
           requirement: string
           rule_name: string
           updated_at: string | null
+          updated_by: string | null
           verified_at: string | null
           verified_by: string | null
         }
@@ -337,6 +338,7 @@ export type Database = {
           requirement: string
           rule_name: string
           updated_at?: string | null
+          updated_by?: string | null
           verified_at?: string | null
           verified_by?: string | null
         }
@@ -350,6 +352,7 @@ export type Database = {
           requirement?: string
           rule_name?: string
           updated_at?: string | null
+          updated_by?: string | null
           verified_at?: string | null
           verified_by?: string | null
         }
@@ -359,6 +362,13 @@ export type Database = {
             columns: ["checklist_id"]
             isOneToOne: false
             referencedRelation: "project_checklists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checklist_items_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {

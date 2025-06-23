@@ -105,7 +105,8 @@ export const checklistService = {
       const { data: { user } } = await supabase.auth.getUser();
 
       const updatePayload = {
-        ...updateData,
+        is_verified: updateData.is_verified,
+        notes: updateData.notes,
         updated_by: user?.id,
         verified_by: updateData.is_verified ? user?.id : null,
         verified_at: updateData.is_verified ? new Date().toISOString() : null
