@@ -14,9 +14,9 @@ export default function Contact() {
     {
       icon: Phone,
       title: "Phone",
-      primary: "(281) 555-5555",
+      primary: "(915) 800-7767",
       secondary: "24/7 Emergency Service",
-      action: () => window.location.href = 'tel:+12815555555'
+      action: () => window.location.href = 'tel:+19158007767'
     },
     {
       icon: Mail,
@@ -63,7 +63,7 @@ export default function Contact() {
     <div className="min-h-screen bg-white">
       <SEO 
         title="Contact HOU GEN PROS | Houston Generator Installation Company | Get Free Quote"
-        description="Contact HOU GEN PROS for generator installation in Houston. Call us at (281) 555-5555 for free quotes, emergency service, or general inquiries. Serving Houston and surrounding areas."
+        description="Contact HOU GEN PROS for generator installation in Houston. Call us at (915) 800-7767 for free quotes, emergency service, or general inquiries. Serving Houston and surrounding areas."
         keywords="contact HOU GEN PROS, Houston generator company contact, generator installation quote Houston, emergency generator service contact, generator repair contact Houston, free generator consultation Houston"
         canonical="/contact"
         pageType="website"
@@ -78,21 +78,21 @@ export default function Contact() {
             <Badge className="mb-6 bg-accent/20 text-accent border-accent/30 px-6 py-3 text-sm font-semibold">
               Ready to Help 24/7
             </Badge>
-            <h1 className="text-5xl md:text-6xl font-bold mb-8 leading-tight">
+            <h1 className="text-5xl md:text-6xl font-bold mb-8 leading-tight text-white">
               Let's Keep Your Power
               <span className="block text-accent">Always On</span>
             </h1>
-            <p className="text-xl text-white/90 mb-10 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-white mb-10 max-w-3xl mx-auto leading-relaxed">
               Get expert generator solutions for your Houston home or business. Our certified team is ready to provide free consultations, emergency service, and professional installations.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Button 
                 size="lg" 
                 className="bg-accent hover:bg-orange-600 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-                onClick={() => window.location.href = 'tel:+12815555555'}
+                onClick={() => window.location.href = 'tel:+19158007767'}
               >
                 <Phone className="w-5 h-5 mr-3" />
-                Call (281) 555-5555
+                Call (915) 800-7767
               </Button>
               <Button 
                 size="lg" 
@@ -152,7 +152,7 @@ export default function Contact() {
               </p>
               <Button 
                 className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 font-semibold"
-                onClick={() => window.location.href = 'tel:+12815555555'}
+                onClick={() => window.location.href = 'tel:+19158007767'}
               >
                 <Phone className="w-5 h-5 mr-2" />
                 Emergency Call Now
