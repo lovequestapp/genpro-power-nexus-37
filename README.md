@@ -1,73 +1,185 @@
-# Welcome to your Lovable project
+# GenPro Power Nexus - Generator Management System
 
-## Project info
+A comprehensive generator installation and maintenance management system built with React, TypeScript, and modern web technologies.
+
+## 🚀 Live Demo
 
 **URL**: https://lovable.dev/projects/3707c9bc-69cd-464f-a22b-7736c15abedf
 
-## How can I edit this code?
+## 🛠️ Tech Stack
 
-There are several ways of editing your application.
+- **Frontend**: React 18 + TypeScript
+- **Build Tool**: Vite
+- **UI Framework**: shadcn/ui + Tailwind CSS
+- **Charts**: Recharts
+- **Database**: Supabase
+- **Authentication**: Supabase Auth
+- **Forms**: React Hook Form + Zod
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
+- **Styling**: Tailwind CSS + CSS Modules
 
-**Use Lovable**
+## 📋 Prerequisites
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/3707c9bc-69cd-464f-a22b-7736c15abedf) and start prompting.
+- Node.js 18+ (recommended: use [nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
+- npm or yarn
+- Git
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🚀 Quick Start
 
-**Use your preferred IDE**
+### Option 1: Use Lovable (Recommended)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+1. Visit the [Lovable Project](https://lovable.dev/projects/3707c9bc-69cd-464f-a22b-7736c15abedf)
+2. Start prompting to make changes
+3. Changes are automatically committed to this repo
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Option 2: Local Development
 
-Follow these steps:
+```bash
+# Clone the repository
+git clone https://github.com/lovequestapp/genpro-power-nexus-37.git
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Navigate to project directory
+cd genpro-power-nexus-37
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Install dependencies
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The app will be available at `http://localhost:8080` (or next available port)
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🔧 Available Scripts
 
-**Use GitHub Codespaces**
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run build:dev` - Build for development
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🏗️ Project Structure
 
-## What technologies are used for this project?
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # shadcn/ui components
+│   ├── layouts/        # Layout components
+│   ├── inventory/      # Inventory management components
+│   ├── projects/       # Project management components
+│   └── ...
+├── pages/              # Page components
+│   ├── admin/          # Admin dashboard pages
+│   ├── auth/           # Authentication pages
+│   └── ...
+├── services/           # API services and utilities
+├── lib/                # Utility functions and configurations
+├── types/              # TypeScript type definitions
+└── contexts/           # React contexts
+```
 
-This project is built with:
+## 🎯 Key Features
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Admin Dashboard
+- **Revenue Analytics**: Interactive charts with orange/white theme
+- **Schedule Management**: Event tracking and calendar integration
+- **Forms Management**: Submission tracking and form analytics
+- **Inventory System**: Full CRUD operations for items, categories, suppliers
+- **Global Search**: Comprehensive search across all data types
+- **Project Management**: Complete project lifecycle management
 
-## How can I deploy this project?
+### Customer Features
+- **Quote Requests**: Dynamic quote form with real-time calculations
+- **Service Scheduling**: Appointment booking system
+- **Support Tickets**: Customer support and issue tracking
+- **Billing Management**: Invoice generation and payment tracking
 
-Simply open [Lovable](https://lovable.dev/projects/3707c9bc-69cd-464f-a22b-7736c15abedf) and click on Share -> Publish.
+## 🔐 Environment Setup
 
-## Can I connect a custom domain to my Lovable project?
+Create a `.env.local` file in the root directory:
 
-Yes, you can!
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_STRIPE_PUBLISHABLE_KEY=your_stripe_key
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 🐛 Troubleshooting
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+### Common Issues
+
+1. **Port Already in Use**
+   ```bash
+   # Kill process on port 8080
+   lsof -ti:8080 | xargs kill -9
+   ```
+
+2. **Dependencies Issues**
+   ```bash
+   # Clear npm cache
+   npm cache clean --force
+   
+   # Remove node_modules and reinstall
+   rm -rf node_modules package-lock.json
+   npm install
+   ```
+
+3. **TypeScript Errors**
+   ```bash
+   # Check for TypeScript errors
+   npx tsc --noEmit
+   ```
+
+4. **Build Issues**
+   ```bash
+   # Clear Vite cache
+   rm -rf node_modules/.vite
+   npm run dev
+   ```
+
+### Lovable Live Preview Issues
+
+If Lovable is having trouble with the live preview:
+
+1. **Check Dependencies**: Ensure all dependencies are properly installed
+2. **Build Process**: The project uses Vite which should work well with Lovable
+3. **Port Conflicts**: The app automatically finds available ports
+4. **Environment Variables**: Some features require Supabase configuration
+
+## 📱 Responsive Design
+
+The application is fully responsive and works on:
+- Desktop (1920px+)
+- Tablet (768px - 1024px)
+- Mobile (320px - 768px)
+
+## 🎨 Design System
+
+- **Primary Colors**: Orange (#f97316) and White
+- **Typography**: Inter font family
+- **Components**: shadcn/ui component library
+- **Animations**: Framer Motion for smooth interactions
+
+## 🔄 Development Workflow
+
+1. **Make Changes**: Edit files locally or via Lovable
+2. **Test**: Run `npm run dev` to test changes
+3. **Commit**: Changes are auto-committed when using Lovable
+4. **Push**: Manual push required for local changes
+5. **Deploy**: Use Lovable's publish feature
+
+## 📄 License
+
+This project is private and proprietary.
+
+## 🤝 Support
+
+For issues with:
+- **Lovable**: Contact Lovable support
+- **Code**: Check the troubleshooting section above
+- **Features**: Review the project structure and documentation
+
+---
+
+**Built with ❤️ using modern web technologies**
