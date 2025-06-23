@@ -1,30 +1,21 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   Cloud,
-  CloudRain,
-  Sun,
   Wind,
-  Thermometer,
-  Droplets,
-  Eye,
-  Gauge,
-  RefreshCw,
   MapPin,
   Satellite,
   Zap,
   AlertTriangle,
-  TrendingUp,
-  TrendingDown,
   Calendar,
-  Clock
+  Clock,
+  Loader2
 } from 'lucide-react';
 import { WeatherWidget } from '@/components/weather/WeatherWidget';
+import { WeatherService } from '@/services/weatherService';
 import SEO from '@/components/SEO';
 
 const houstonCities = [
@@ -51,32 +42,74 @@ interface WeatherAlert {
   expires: Date;
 }
 
+interface AirQualityData {
+  aqi: number;
+  pm25: number;
+  pm10: number;
+  o3: number;
+  level: string;
+  color: string;
+}
+
 export default function WeatherPage() {
   const [selectedCity, setSelectedCity] = useState(houstonCities[0]);
   const [alerts, setAlerts] = useState<WeatherAlert[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [airQuality, setAirQuality] = useState<AirQualityData | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mock weather alerts
-    setAlerts([
-      {
-        id: '1',
-        type: 'advisory',
-        title: 'Heat Advisory',
-        description: 'Hot temperatures and high humidity may cause heat-related illnesses.',
-        severity: 'moderate',
-        expires: new Date(Date.now() + 6 * 60 * 60 * 1000)
-      },
-      {
-        id: '2',
-        type: 'watch',
-        title: 'Thunderstorm Watch',
-        description: 'Conditions favorable for severe thunderstorms with damaging winds and hail.',
-        severity: 'severe',
-        expires: new Date(Date.now() + 12 * 60 * 60 * 1000)
-      }
-    ]);
+    loadWeatherData();
   }, [selectedCity]);
+
+  const loadWeatherData = async () => {
+    try {
+      setLoading(true);
+      const weatherData = await WeatherService.getWeatherData(
+        selectedCity.lat, 
+        selectedCity.lon, 
+        selectedCity.name
+      );
+
+      // Transform alerts from API
+      if (weatherData.alerts && weatherData.alerts.length > 0) {
+        const transformedAlerts = weatherData.alerts.map((alert, index) => ({
+          id: index.toString(),
+          type: 'warning' as const,
+          title: alert.headline,
+          description: alert.desc,
+          severity: alert.severity.toLowerCase() as 'minor' | 'moderate' | 'severe' | 'extreme',
+          expires: new Date(Date.now() + 12 * 60 * 60 * 1000) // Default 12 hours
+        }));
+        setAlerts(transformedAlerts);
+      } else {
+        setAlerts([]);
+      }
+
+      // Set air quality data
+      if (weatherData.airQuality) {
+        const qualityInfo = WeatherService.getAirQualityLevel(weatherData.airQuality.aqi);
+        setAirQuality({
+          ...weatherData.airQuality,
+          ...qualityInfo
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load weather data:', error);
+      // Set default mock alerts on error
+      setAlerts([
+        {
+          id: '1',
+          type: 'advisory',
+          title: 'Heat Advisory',
+          description: 'Hot temperatures and high humidity may cause heat-related illnesses.',
+          severity: 'moderate',
+          expires: new Date(Date.now() + 6 * 60 * 60 * 1000)
+        }
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCityChange = (cityName: string) => {
     const city = houstonCities.find(c => c.name === cityName);
@@ -165,9 +198,6 @@ export default function WeatherPage() {
                             <span>Expires: {alert.expires.toLocaleString()}</span>
                           </div>
                         </div>
-                        <Button variant="ghost" size="sm">
-                          View Details
-                        </Button>
                       </div>
                     </div>
                   ))}
@@ -194,29 +224,39 @@ export default function WeatherPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-green-600">42</div>
-                      <div className="text-sm text-muted-foreground">AQI</div>
-                      <Badge variant="outline" className="mt-2 bg-green-50 text-green-700">
-                        Good
-                      </Badge>
+                  {loading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="w-6 h-6 animate-spin" />
                     </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>PM2.5</span>
-                        <span className="font-medium">8 μg/m³</span>
+                  ) : airQuality ? (
+                    <div className="space-y-4">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-green-600">{airQuality.aqi}</div>
+                        <div className="text-sm text-muted-foreground">AQI</div>
+                        <Badge variant="outline" className={`mt-2 ${airQuality.color}`}>
+                          {airQuality.level}
+                        </Badge>
                       </div>
-                      <div className="flex justify-between text-sm">
-                        <span>PM10</span>
-                        <span className="font-medium">15 μg/m³</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Ozone</span>
-                        <span className="font-medium">62 μg/m³</span>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>PM2.5</span>
+                          <span className="font-medium">{airQuality.pm25.toFixed(1)} μg/m³</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>PM10</span>
+                          <span className="font-medium">{airQuality.pm10.toFixed(1)} μg/m³</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Ozone</span>
+                          <span className="font-medium">{airQuality.o3.toFixed(1)} μg/m³</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground">Air quality data unavailable</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -265,10 +305,6 @@ export default function WeatherPage() {
                       <span className="text-sm">Nearest Storm</span>
                       <span className="font-medium">25 mi NE</span>
                     </div>
-                    <Button variant="outline" size="sm" className="w-full">
-                      <Zap className="w-4 h-4 mr-2" />
-                      Track Storms
-                    </Button>
                   </div>
                 </CardContent>
               </Card>
