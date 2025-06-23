@@ -1,3 +1,4 @@
+
 import { motion } from 'framer-motion';
 import { useTheme } from '@/components/ThemeProvider';
 import { cn } from '@/lib/utils';
@@ -190,7 +191,7 @@ const Products = () => {
         pageType="website"
       />
       <Header />
-      <div className="section-padding bg-white">
+      <div className="section-padding bg-white pt-24 sm:pt-32">
         <div className="container mx-auto container-padding">
           <div className="max-w-3xl mx-auto text-center mb-16">
             <motion.div
@@ -201,10 +202,11 @@ const Products = () => {
               <Badge variant="outline" className="mb-6 text-accent border-accent">
                 Generac Home Generators - In Stock Now!
               </Badge>
-              <h1 className="text-gradient mb-6">
-                Brand New Generac Generators
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary mb-6 leading-tight hyphens-none">
+                Brand New Generac{' '}
+                <span className="block sm:inline">Generators</span>
               </h1>
-              <p className="text-xl text-steel-600">
+              <p className="text-lg sm:text-xl text-steel-600">
                 Whole home backup power for Houston & surrounding areas. Professional installation available with 3-5 hour setup and 5-year manufacturer warranty.
               </p>
             </motion.div>
@@ -223,7 +225,7 @@ const Products = () => {
             className="mt-16 text-center"
           >
             <div className="max-w-2xl mx-auto">
-              <h3 className="text-2xl font-bold text-steel-800 mb-4">
+              <h3 className="text-2xl font-bold text-steel-800 mb-4 hyphens-none">
                 Need Help Choosing?
               </h3>
               <p className="text-steel-600 mb-8">

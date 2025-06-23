@@ -105,8 +105,11 @@ const QualityGuarantee = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg mb-6">Our Quality Guarantee</h2>
-          <p className="text-xl text-white max-w-3xl mx-auto">Experience uninterrupted power with our comprehensive generator solutions</p>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white drop-shadow-lg mb-6 leading-tight hyphens-none">
+            Our Quality{' '}
+            <span className="block sm:inline">Guarantee</span>
+          </h2>
+          <p className="text-lg sm:text-xl text-white max-w-3xl mx-auto">Experience uninterrupted power with our comprehensive generator solutions</p>
         </motion.div>
 
         {/* Main Visualization */}
