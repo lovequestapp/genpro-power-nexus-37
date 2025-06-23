@@ -193,6 +193,61 @@ export type Database = {
           budget?: number | null;
         };
       };
+      project_checklists: {
+        Row: {
+          id: string;
+          project_id: string;
+          checklist_type: string;
+          created_at: string;
+          updated_at: string;
+          created_by: string | null;
+          updated_by: string | null;
+        };
+        Insert: {
+          project_id: string;
+          checklist_type?: string;
+          created_by?: string | null;
+          updated_by?: string | null;
+        };
+        Update: {
+          checklist_type?: string;
+          updated_by?: string | null;
+        };
+      };
+      checklist_items: {
+        Row: {
+          id: string;
+          checklist_id: string;
+          rule_name: string;
+          requirement: string;
+          is_verified: boolean;
+          notes: string | null;
+          verified_by: string | null;
+          verified_at: string | null;
+          order_index: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          checklist_id: string;
+          rule_name: string;
+          requirement: string;
+          is_verified?: boolean;
+          notes?: string | null;
+          verified_by?: string | null;
+          verified_at?: string | null;
+          order_index: number;
+        };
+        Update: {
+          rule_name?: string;
+          requirement?: string;
+          is_verified?: boolean;
+          notes?: string | null;
+          verified_by?: string | null;
+          verified_at?: string | null;
+          order_index?: number;
+        };
+      };
       project_notes: {
         Row: {
           id: string;
@@ -299,3 +354,5 @@ export type Notification = Database['public']['Tables']['notifications']['Row'];
 export type Generator = Database['public']['Tables']['generators']['Row'];
 export type Project = Database['public']['Tables']['projects']['Row'];
 export type Customer = Database['public']['Tables']['customers']['Row'];
+export type ProjectChecklistDB = Database['public']['Tables']['project_checklists']['Row'];
+export type ChecklistItemDB = Database['public']['Tables']['checklist_items']['Row'];

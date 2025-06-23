@@ -313,6 +313,63 @@ export type Database = {
         }
         Relationships: []
       }
+      checklist_items: {
+        Row: {
+          checklist_id: string
+          created_at: string | null
+          id: string
+          is_verified: boolean | null
+          notes: string | null
+          order_index: number
+          requirement: string
+          rule_name: string
+          updated_at: string | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          checklist_id: string
+          created_at?: string | null
+          id?: string
+          is_verified?: boolean | null
+          notes?: string | null
+          order_index: number
+          requirement: string
+          rule_name: string
+          updated_at?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          checklist_id?: string
+          created_at?: string | null
+          id?: string
+          is_verified?: boolean | null
+          notes?: string | null
+          order_index?: number
+          requirement?: string
+          rule_name?: string
+          updated_at?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_items_checklist_id_fkey"
+            columns: ["checklist_id"]
+            isOneToOne: false
+            referencedRelation: "project_checklists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checklist_items_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           company: string | null
@@ -1698,6 +1755,58 @@ export type Database = {
           {
             foreignKeyName: "project_audit_log_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_checklists: {
+        Row: {
+          checklist_type: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          project_id: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          checklist_type?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          project_id: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          checklist_type?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          project_id?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_checklists_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_checklists_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_checklists_updated_by_fkey"
+            columns: ["updated_by"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]

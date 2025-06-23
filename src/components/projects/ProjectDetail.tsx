@@ -9,6 +9,7 @@ import { ProjectTimeline } from './ProjectTimeline';
 import { MilestoneManager } from './MilestoneManager';
 import { ProjectAuditTrail } from './ProjectAuditTrail';
 import { StatusWorkflowManager } from './StatusWorkflowManager';
+import { ProjectChecklist } from './ProjectChecklist';
 import type { Project, Customer, Generator, Profile } from '@/lib/supabase';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -316,14 +317,22 @@ export function ProjectDetail({ project, onProjectUpdate }: ProjectDetailProps) 
       />
 
       {/* Enhanced Tabs Section */}
-      <Tabs defaultValue="milestones" className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
+      <Tabs defaultValue="checklist" className="w-full">
+        <TabsList className="grid w-full grid-cols-7">
+          <TabsTrigger value="checklist">Checklist</TabsTrigger>
           <TabsTrigger value="milestones">Milestones</TabsTrigger>
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
           <TabsTrigger value="audit">Audit Trail</TabsTrigger>
           <TabsTrigger value="notes">Notes</TabsTrigger>
           <TabsTrigger value="attachments">Attachments</TabsTrigger>
         </TabsList>
+        
+        <TabsContent value="checklist" className="mt-6">
+          <ProjectChecklist 
+            projectId={currentProject.id}
+            projectName={currentProject.name}
+          />
+        </TabsContent>
         
         <TabsContent value="milestones" className="mt-6">
           <MilestoneManager 
