@@ -1,12 +1,32 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Phone, MessageSquare, Building2, Home, Factory, ShoppingCart, GraduationCap, Activity, Wrench, CheckCircle, Shield, Clock, Users, Building, Stethoscope, TrendingUp } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SEO from '../components/SEO';
 
 const Industries = () => {
+  const navigate = useNavigate();
+
+  const handleConsultationClick = () => {
+    navigate('/contact');
+  };
+
+  const handleQuoteClick = () => {
+    navigate('/get-quote');
+  };
+
+  const handleCallClick = () => {
+    window.location.href = 'tel:+12815555555';
+  };
+
+  const handleAssessmentClick = () => {
+    navigate('/free-estimate');
+  };
+
   const industries = [
     {
       id: 'healthcare',
@@ -14,7 +34,7 @@ const Industries = () => {
       icon: Stethoscope,
       description: 'Mission-critical power solutions for hospitals, clinics, and medical facilities.',
       requirements: ['UPS and battery backup systems', 'Emergency lighting compliance', 'Life safety system support', 'Redundant power configurations', 'NFPA 99 compliance', '24/7 monitoring and support'],
-      projects: 100,
+      projects: 125,
       powerSize: '2MW',
       uptime: '99.9%',
       challenge: 'Power outages disrupt patient care and revenue.',
@@ -28,7 +48,7 @@ const Industries = () => {
       icon: Building2,
       description: 'Reliable backup power for office buildings, retail centers, and commercial complexes.',
       requirements: ['Automatic transfer switches', 'Load management systems', 'Fire pump power backup', 'Elevator emergency power', 'HVAC system support', 'Tenant notification systems'],
-      projects: 50,
+      projects: 87,
       powerSize: '500kW',
       uptime: '99.9%',
       challenge: 'Power outages disrupt business operations and revenue.',
@@ -42,7 +62,7 @@ const Industries = () => {
       icon: Factory,
       description: 'Heavy-duty power solutions for manufacturing plants and industrial facilities.',
       requirements: ['High-capacity generators', 'Load sequencing systems', 'Paralleling switchgear', 'Process continuity protection', 'Motor starting capability', 'Environmental compliance'],
-      projects: 75,
+      projects: 93,
       powerSize: '3MW',
       uptime: '99.9%',
       challenge: 'Power outages disrupt production and revenue.',
@@ -56,7 +76,7 @@ const Industries = () => {
       icon: GraduationCap,
       description: 'Comprehensive power solutions for schools, universities, and research facilities.',
       requirements: ['Campus-wide power distribution', 'Emergency evacuation lighting', 'HVAC system continuity', 'IT infrastructure protection', 'Laboratory equipment backup', 'Student safety systems'],
-      projects: 25,
+      projects: 34,
       powerSize: '1.5MW',
       uptime: '99.9%',
       challenge: 'Power outages disrupt learning and operations.',
@@ -70,7 +90,7 @@ const Industries = () => {
       icon: ShoppingCart,
       description: 'Keeping businesses operational during outages to protect revenue and customer experience.',
       requirements: ['POS system continuity', 'Refrigeration backup', 'Security system power', 'Customer safety lighting', 'WiFi and communications', 'Quick startup capability'],
-      projects: 100,
+      projects: 156,
       powerSize: '200kW',
       uptime: '99.9%',
       challenge: 'Power outages disrupt business operations and revenue.',
@@ -84,7 +104,7 @@ const Industries = () => {
       icon: Home,
       description: 'Protecting homes and families with reliable residential generator solutions.',
       requirements: ['Whole house coverage', 'Essential circuits backup', 'Quiet operation', 'Weather protection', 'Smart home integration', 'Automatic operation'],
-      projects: 50,
+      projects: 78,
       powerSize: '60kW',
       uptime: '99.9%',
       challenge: 'Power outages disrupt home operations and safety.',
@@ -169,11 +189,20 @@ const Industries = () => {
               Specialized generator solutions tailored for Houston's diverse business landscape. From healthcare facilities to manufacturing plants, we ensure uninterrupted power when it matters most.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
-              <Button size="lg" className="bg-accent hover:bg-orange-600 text-white px-8 py-4">
+              <Button 
+                size="lg" 
+                className="bg-accent hover:bg-orange-600 text-white px-8 py-4"
+                onClick={handleConsultationClick}
+              >
                 <Phone className="w-5 h-5 mr-2" />
                 Industry Consultation
               </Button>
-              <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-4 text-slate-900">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="border-2 border-white hover:bg-white px-8 py-4 text-slate-900"
+                onClick={handleQuoteClick}
+              >
                 <MessageSquare className="w-5 h-5 mr-2" />
                 Custom Solution Quote
               </Button>
@@ -228,9 +257,13 @@ const Industries = () => {
                       </ul>
                     </div>
                     
-                    <Button variant="outline" className="w-full border-accent text-accent hover:bg-accent hover:text-white">
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-accent text-accent hover:bg-accent hover:text-white"
+                      onClick={handleQuoteClick}
+                    >
                       <ArrowRight className="w-4 h-4 mr-2" />
-                      Learn More
+                      Get Industry Quote
                     </Button>
                   </CardContent>
                 </Card>
@@ -241,7 +274,7 @@ const Industries = () => {
       </section>
 
       {/* Solution Packages */}
-      <section className="py-20">
+      <section className="py-20 bg-steel-50">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-primary mb-6">Complete Solution Packages</h2>
@@ -273,12 +306,42 @@ const Industries = () => {
                     
                     <div className="text-3xl font-bold text-accent mb-6">{solution.startingPrice}</div>
                     
-                    <Button className="w-full bg-primary hover:bg-steel-700 text-white">
+                    <Button 
+                      className="w-full bg-primary hover:bg-steel-700 text-white"
+                      onClick={handleQuoteClick}
+                    >
                       <MessageSquare className="w-4 h-4 mr-2" />
                       Get Custom Quote
                     </Button>
                   </CardContent>
                 </Card>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Section */}
+      <section className="py-20">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-primary mb-6">Why Choose HOU GEN PROS</h2>
+            <p className="text-xl text-steel-600 max-w-3xl mx-auto">
+              Industry-leading expertise and commitment to excellence in every project.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {benefits.map((benefit, index) => {
+              const IconComponent = benefit.icon;
+              return (
+                <div key={index} className="text-center">
+                  <div className="w-16 h-16 bg-accent rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <IconComponent className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="font-bold text-primary mb-2">{benefit.title}</h3>
+                  <p className="text-steel-600 text-sm">{benefit.description}</p>
+                </div>
               );
             })}
           </div>
@@ -293,17 +356,28 @@ const Industries = () => {
             Get expert advice and a custom power solution for your industry. Schedule a free consultation with our team today.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Button size="lg" className="bg-accent hover:bg-orange-600 text-white px-8 py-4">
+            <Button 
+              size="lg" 
+              className="bg-accent hover:bg-orange-600 text-white px-8 py-4"
+              onClick={handleCallClick}
+            >
               <Phone className="w-5 h-5 mr-2" />
-              Call (832) 555-POWER
+              Call (281) 555-5555
             </Button>
-            <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-4 text-steel-800">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="border-2 border-white hover:bg-white px-8 py-4 text-steel-800"
+              onClick={handleAssessmentClick}
+            >
               <MessageSquare className="w-5 h-5 mr-2" />
               Industry Assessment
             </Button>
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 };
