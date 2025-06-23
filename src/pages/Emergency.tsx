@@ -225,13 +225,16 @@ const Emergency = () => {
           </p>
           <Button 
             size="lg" 
-            className="bg-yellow-400 hover:bg-yellow-500 text-red-800 px-12 py-6 text-xl font-bold"
+            className="bg-yellow-400 hover:bg-yellow-500 text-red-800 px-4 sm:px-8 lg:px-12 py-3 sm:py-4 lg:py-6 text-sm sm:text-lg lg:text-xl font-bold w-full sm:w-auto max-w-sm sm:max-w-none mx-auto"
             onClick={() => window.location.href = 'tel:+19158007767'}
           >
-            <Phone className="w-6 h-6 mr-3" />
-            CALL EMERGENCY LINE: (915) 800-7767
+            <Phone className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 mr-2 sm:mr-3 flex-shrink-0" />
+            <span className="break-words hyphens-none">
+              <span className="block sm:inline">CALL EMERGENCY LINE:</span>{' '}
+              <span className="block sm:inline">(915) 800-7767</span>
+            </span>
           </Button>
-          <p className="text-white/80 mt-4">Available 24 hours a day, 7 days a week</p>
+          <p className="text-white/80 mt-4 text-sm sm:text-base">Available 24 hours a day, 7 days a week</p>
         </div>
       </section>
     </div>
