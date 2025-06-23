@@ -845,6 +845,10 @@ export default function InventoryParts() {
             open={showStockAdjustment}
             onOpenChange={setShowStockAdjustment}
             onSubmit={handleStockAdjustment}
+            onCancel={() => {
+              setShowStockAdjustment(false);
+              setSelectedItem(null);
+            }}
           />
         )}
       </div>
