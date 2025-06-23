@@ -17,6 +17,7 @@ import {
   LogOut,
   Mail,
   BarChart3,
+  Cloud,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from './Logo';
@@ -32,6 +33,7 @@ const adminNav = [
   { label: 'Orders', icon: <FileText />, to: '/admin/inventory/orders' },
   { label: 'Stripe', icon: <CreditCard />, to: '/admin/stripe' },
   { label: 'Schedule', icon: <Calendar />, to: '/admin/schedule' },
+  { label: 'Weather', icon: <Cloud />, to: '/admin/weather' },
   { label: 'Support', icon: <LifeBuoy />, to: '/admin/support' },
   { label: 'Analytics', icon: <BarChart3 />, to: '/admin/analytics' },
   { label: 'Email', icon: <Mail />, to: '/admin/email' },

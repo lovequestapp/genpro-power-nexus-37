@@ -103,6 +103,7 @@ import { getRevenueStats } from '@/lib/billingService';
 import { getScheduleStats, getScheduleEvents } from '@/lib/schedulingService';
 import { getFormSubmissionStats, getFormDefinitions } from '@/lib/formsService';
 import SEO from '../../components/SEO';
+import { WeatherWidget } from '@/components/weather/WeatherWidget';
 
 const sidebarItems = [
   { label: 'Overview', icon: AccountBalanceWallet },
@@ -953,8 +954,8 @@ const AdminDashboard: React.FC = () => {
             />
           </div>
 
-          {/* Schedule and Forms Widgets */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          {/* Schedule, Forms, and Weather Widgets */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
             {/* Schedule Widget */}
             <Card className="p-3 sm:p-4 lg:p-6 bg-white border-0 shadow-lg">
               <div className="flex items-center justify-between mb-4">
@@ -1091,6 +1092,11 @@ const AdminDashboard: React.FC = () => {
                 )}
               </div>
             </Card>
+
+            {/* Weather Widget */}
+            <div className="lg:row-span-2">
+              <WeatherWidget />
+            </div>
           </div>
 
           {/* Charts and Recent Activity */}
@@ -1330,3 +1336,5 @@ const AdminDashboard: React.FC = () => {
 };
 
 export default AdminDashboard;
+
+</edits_to_apply>
