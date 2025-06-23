@@ -1,477 +1,479 @@
 
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { CheckCircle, Calendar as CalendarIcon, Clock, MapPin, Phone, Mail, User, Wrench, AlertTriangle, Settings, Truck } from 'lucide-react';
-import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { Calendar, Clock, User, Phone, Mail, MapPin, Wrench, CheckCircle, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ScheduleServiceFormProps {
-  onClose: () => void;
-}
-
-interface FormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  address: string;
-  city: string;
-  zipCode: string;
-  serviceType: string;
-  preferredDate: Date | undefined;
-  preferredTime: string;
-  urgency: string;
-  description: string;
+  onClose?: () => void;
 }
 
 const ScheduleServiceForm = ({ onClose }: ScheduleServiceFormProps) => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
-  
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { errors, isValid }
-  } = useForm<FormData>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    zipCode: '',
+    serviceType: '',
+    preferredDate: '',
+    preferredTime: '',
+    urgency: '',
+    description: '',
+    generatorBrand: '',
+    generatorModel: '',
+    lastServiceDate: ''
+  });
 
-  const watchedDate = watch('preferredDate');
-  const watchedServiceType = watch('serviceType');
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const serviceTypes = [
-    { value: 'installation', label: 'Generator Installation', icon: Settings, color: 'bg-blue-500' },
-    { value: 'maintenance', label: 'Preventive Maintenance', icon: Wrench, color: 'bg-green-500' },
-    { value: 'emergency', label: 'Emergency Service', icon: AlertTriangle, color: 'bg-red-500' },
-    { value: 'rental', label: 'Generator Rental', icon: Truck, color: 'bg-purple-500' }
+    { value: 'installation', label: 'Generator Installation' },
+    { value: 'maintenance', label: 'Preventive Maintenance' },
+    { value: 'repair', label: 'Generator Repair' },
+    { value: 'emergency', label: 'Emergency Service' },
+    { value: 'inspection', label: 'Safety Inspection' },
+    { value: 'consultation', label: 'Consultation' }
   ];
 
   const timeSlots = [
-    '8:00 AM - 10:00 AM',
-    '10:00 AM - 12:00 PM',
-    '12:00 PM - 2:00 PM',
-    '2:00 PM - 4:00 PM',
-    '4:00 PM - 6:00 PM'
+    { value: 'morning', label: '8:00 AM - 12:00 PM' },
+    { value: 'afternoon', label: '12:00 PM - 5:00 PM' },
+    { value: 'evening', label: '5:00 PM - 8:00 PM' },
+    { value: 'anytime', label: 'Anytime' }
   ];
 
   const urgencyLevels = [
-    { value: 'low', label: 'Standard (7-14 days)', color: 'bg-green-100 text-green-800' },
-    { value: 'medium', label: 'Priority (3-5 days)', color: 'bg-yellow-100 text-yellow-800' },
-    { value: 'high', label: 'Urgent (1-2 days)', color: 'bg-orange-100 text-orange-800' },
-    { value: 'emergency', label: 'Emergency (Same day)', color: 'bg-red-100 text-red-800' }
+    { value: 'routine', label: 'Routine - Within 1-2 weeks' },
+    { value: 'priority', label: 'Priority - Within 3-5 days' },
+    { value: 'urgent', label: 'Urgent - Within 24-48 hours' },
+    { value: 'emergency', label: 'Emergency - Same day' }
   ];
 
-  const onSubmit = async (data: FormData) => {
-    console.log('Scheduling service with data:', data);
+  const handleInputChange = (name: string, value: string) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    // Required fields
+    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
+    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+    if (!formData.email.trim()) newErrors.email = 'Email is required';
+    if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
+    if (!formData.address.trim()) newErrors.address = 'Address is required';
+    if (!formData.city.trim()) newErrors.city = 'City is required';
+    if (!formData.zipCode.trim()) newErrors.zipCode = 'ZIP code is required';
+    if (!formData.serviceType) newErrors.serviceType = 'Service type is required';
+    if (!formData.preferredDate) newErrors.preferredDate = 'Preferred date is required';
+    if (!formData.urgency) newErrors.urgency = 'Urgency level is required';
+
+    // Email validation
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    // Phone validation
+    if (formData.phone && !/^[\+]?[1-9][\d]{0,15}$/.test(formData.phone.replace(/[\s\-\(\)]/g, ''))) {
+      newErrors.phone = 'Please enter a valid phone number';
+    }
+
+    // Date validation (should be in the future)
+    if (formData.preferredDate) {
+      const selectedDate = new Date(formData.preferredDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (selectedDate < today) {
+        newErrors.preferredDate = 'Please select a future date';
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    setIsSubmitted(true);
-    toast({
-      title: "Service Scheduled Successfully!",
-      description: "We'll contact you within 2 hours to confirm your appointment.",
-    });
-  };
+    if (!validateForm()) {
+      toast({
+        title: "Please fix the errors",
+        description: "Please correct the highlighted fields and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  const nextStep = () => {
-    if (currentStep < 3) setCurrentStep(currentStep + 1);
-  };
+    setIsSubmitting(true);
 
-  const prevStep = () => {
-    if (currentStep > 1) setCurrentStep(currentStep - 1);
-  };
+    try {
+      // Simulate API call - replace with actual service call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Here you would typically make an API call to submit the form
+      console.log('Form submitted:', formData);
+      
+      toast({
+        title: "Service scheduled successfully!",
+        description: "We'll contact you within 2 hours to confirm your appointment.",
+        action: (
+          <div className="flex items-center">
+            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+            <span>Success</span>
+          </div>
+        ),
+      });
 
-  if (isSubmitted) {
-    return (
-      <div className="text-center py-8">
-        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <CheckCircle className="w-10 h-10 text-green-600" />
-        </div>
-        <h3 className="text-2xl font-bold text-primary mb-4">Service Request Submitted!</h3>
-        <p className="text-steel-600 mb-6 text-lg">
-          Thank you for choosing Houston Generator Pros. We'll contact you within 2 hours to confirm your appointment details.
-        </p>
-        <div className="bg-steel-50 rounded-lg p-4 mb-6">
-          <p className="text-sm text-steel-700">
-            <strong>Next Steps:</strong> Our team will call you at the provided number to confirm your preferred date and time, 
-            discuss specific requirements, and provide a detailed service estimate.
-          </p>
-        </div>
-        <Button onClick={onClose} className="bg-primary hover:bg-steel-700 px-8">
-          Close
-        </Button>
-      </div>
-    );
-  }
+      // Reset form
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        address: '',
+        city: '',
+        zipCode: '',
+        serviceType: '',
+        preferredDate: '',
+        preferredTime: '',
+        urgency: '',
+        description: '',
+        generatorBrand: '',
+        generatorModel: '',
+        lastServiceDate: ''
+      });
+
+      // Close modal after short delay
+      setTimeout(() => {
+        onClose?.();
+      }, 1500);
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast({
+        title: "Error scheduling service",
+        description: "There was a problem submitting your request. Please try again or call us directly.",
+        variant: "destructive",
+        action: (
+          <div className="flex items-center">
+            <AlertCircle className="w-4 h-4 text-red-500 mr-2" />
+            <span>Error</span>
+          </div>
+        ),
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {/* Progress Bar */}
-      <div className="flex items-center mb-8">
-        {[1, 2, 3].map((step) => (
-          <div key={step} className="flex items-center flex-1">
-            <div className={cn(
-              "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium",
-              currentStep >= step 
-                ? "bg-primary text-white" 
-                : "bg-steel-200 text-steel-500"
-            )}>
-              {step}
+    <Card className="w-full max-w-2xl mx-auto">
+      <CardContent className="p-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Contact Information */}
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2 mb-4">
+              <User className="w-5 h-5 text-primary" />
+              <h3 className="text-lg font-semibold text-primary">Contact Information</h3>
             </div>
-            {step < 3 && (
-              <div className={cn(
-                "flex-1 h-1 mx-4",
-                currentStep > step ? "bg-primary" : "bg-steel-200"
-              )} />
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Step 1: Contact Information */}
-      {currentStep === 1 && (
-        <div className="space-y-6">
-          <div className="text-center mb-6">
-            <h3 className="text-xl font-bold text-primary mb-2">Contact Information</h3>
-            <p className="text-steel-600">Let us know how to reach you</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="firstName" className="flex items-center mb-2">
-                <User className="w-4 h-4 mr-2" />
-                First Name *
-              </Label>
-              <Input
-                id="firstName"
-                {...register('firstName', { required: 'First name is required' })}
-                className={errors.firstName ? 'border-red-500' : ''}
-              />
-              {errors.firstName && (
-                <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="lastName" className="flex items-center mb-2">
-                <User className="w-4 h-4 mr-2" />
-                Last Name *
-              </Label>
-              <Input
-                id="lastName"
-                {...register('lastName', { required: 'Last name is required' })}
-                className={errors.lastName ? 'border-red-500' : ''}
-              />
-              {errors.lastName && (
-                <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <Label htmlFor="email" className="flex items-center mb-2">
-              <Mail className="w-4 h-4 mr-2" />
-              Email Address *
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              {...register('email', { 
-                required: 'Email is required',
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: 'Invalid email address'
-                }
-              })}
-              className={errors.email ? 'border-red-500' : ''}
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="phone" className="flex items-center mb-2">
-              <Phone className="w-4 h-4 mr-2" />
-              Phone Number *
-            </Label>
-            <Input
-              id="phone"
-              type="tel"
-              placeholder="(713) 555-0123"
-              {...register('phone', { required: 'Phone number is required' })}
-              className={errors.phone ? 'border-red-500' : ''}
-            />
-            {errors.phone && (
-              <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="address" className="flex items-center mb-2">
-              <MapPin className="w-4 h-4 mr-2" />
-              Service Address *
-            </Label>
-            <Input
-              id="address"
-              placeholder="1234 Main Street"
-              {...register('address', { required: 'Address is required' })}
-              className={errors.address ? 'border-red-500' : ''}
-            />
-            {errors.address && (
-              <p className="text-red-500 text-sm mt-1">{errors.address.message}</p>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="city">City *</Label>
-              <Input
-                id="city"
-                placeholder="Houston"
-                {...register('city', { required: 'City is required' })}
-                className={errors.city ? 'border-red-500' : ''}
-              />
-              {errors.city && (
-                <p className="text-red-500 text-sm mt-1">{errors.city.message}</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="zipCode">ZIP Code *</Label>
-              <Input
-                id="zipCode"
-                placeholder="77001"
-                {...register('zipCode', { required: 'ZIP code is required' })}
-                className={errors.zipCode ? 'border-red-500' : ''}
-              />
-              {errors.zipCode && (
-                <p className="text-red-500 text-sm mt-1">{errors.zipCode.message}</p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Step 2: Service Details */}
-      {currentStep === 2 && (
-        <div className="space-y-6">
-          <div className="text-center mb-6">
-            <h3 className="text-xl font-bold text-primary mb-2">Service Details</h3>
-            <p className="text-steel-600">Tell us what type of service you need</p>
-          </div>
-
-          <div>
-            <Label className="text-base font-medium mb-4 block">Service Type *</Label>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {serviceTypes.map((service) => {
-                const IconComponent = service.icon;
-                return (
-                  <Card
-                    key={service.value}
-                    className={cn(
-                      "cursor-pointer transition-all duration-200 hover:shadow-md",
-                      watchedServiceType === service.value
-                        ? "ring-2 ring-primary border-primary"
-                        : "border-steel-200"
-                    )}
-                    onClick={() => setValue('serviceType', service.value)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-center space-x-3">
-                        <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", service.color)}>
-                          <IconComponent className="w-5 h-5 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-medium text-steel-900">{service.label}</h4>
-                        </div>
-                        {watchedServiceType === service.value && (
-                          <CheckCircle className="w-5 h-5 text-primary" />
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-            <input type="hidden" {...register('serviceType', { required: 'Service type is required' })} />
-            {errors.serviceType && (
-              <p className="text-red-500 text-sm mt-2">{errors.serviceType.message}</p>
-            )}
-          </div>
-
-          <div>
-            <Label className="text-base font-medium mb-4 block">Urgency Level *</Label>
-            <div className="space-y-2">
-              {urgencyLevels.map((level) => (
-                <Card
-                  key={level.value}
-                  className={cn(
-                    "cursor-pointer transition-all duration-200 hover:shadow-sm",
-                    watch('urgency') === level.value
-                      ? "ring-2 ring-primary border-primary"
-                      : "border-steel-200"
-                  )}
-                  onClick={() => setValue('urgency', level.value)}
-                >
-                  <CardContent className="p-3">
-                    <div className="flex items-center justify-between">
-                      <Badge className={cn("text-xs", level.color)}>
-                        {level.label}
-                      </Badge>
-                      {watch('urgency') === level.value && (
-                        <CheckCircle className="w-4 h-4 text-primary" />
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            <input type="hidden" {...register('urgency', { required: 'Urgency level is required' })} />
-            {errors.urgency && (
-              <p className="text-red-500 text-sm mt-2">{errors.urgency.message}</p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="description" className="text-base font-medium mb-2 block">
-              Additional Details
-            </Label>
-            <Textarea
-              id="description"
-              placeholder="Please describe your generator needs, any specific requirements, or questions you may have..."
-              rows={4}
-              {...register('description')}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Step 3: Schedule */}
-      {currentStep === 3 && (
-        <div className="space-y-6">
-          <div className="text-center mb-6">
-            <h3 className="text-xl font-bold text-primary mb-2">Schedule Your Service</h3>
-            <p className="text-steel-600">Choose your preferred date and time</p>
-          </div>
-
-          <div>
-            <Label className="flex items-center text-base font-medium mb-4">
-              <CalendarIcon className="w-4 h-4 mr-2" />
-              Preferred Date *
-            </Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !watchedDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {watchedDate ? format(watchedDate, "PPP") : "Select a date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={watchedDate}
-                  onSelect={(date) => setValue('preferredDate', date)}
-                  disabled={(date) => date < new Date()}
-                  initialFocus
+              <div className="space-y-2">
+                <Label htmlFor="firstName">First Name *</Label>
+                <Input
+                  id="firstName"
+                  value={formData.firstName}
+                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                  className={errors.firstName ? 'border-red-500' : ''}
+                  placeholder="Enter your first name"
                 />
-              </PopoverContent>
-            </Popover>
-            {errors.preferredDate && (
-              <p className="text-red-500 text-sm mt-1">Please select a preferred date</p>
-            )}
-          </div>
-
-          <div>
-            <Label className="flex items-center text-base font-medium mb-4">
-              <Clock className="w-4 h-4 mr-2" />
-              Preferred Time *
-            </Label>
-            <Select onValueChange={(value) => setValue('preferredTime', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select preferred time" />
-              </SelectTrigger>
-              <SelectContent>
-                {timeSlots.map((slot) => (
-                  <SelectItem key={slot} value={slot}>
-                    {slot}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <input type="hidden" {...register('preferredTime', { required: 'Preferred time is required' })} />
-            {errors.preferredTime && (
-              <p className="text-red-500 text-sm mt-1">{errors.preferredTime.message}</p>
-            )}
-          </div>
-
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5" />
+                {errors.firstName && <p className="text-sm text-red-500">{errors.firstName}</p>}
               </div>
-              <div className="ml-3">
-                <h4 className="text-sm font-medium text-blue-800">What happens next?</h4>
-                <ul className="mt-2 text-sm text-blue-700 space-y-1">
-                  <li>• We'll call you within 2 hours to confirm your appointment</li>
-                  <li>• Our certified technician will arrive at your scheduled time</li>
-                  <li>• Free assessment and detailed estimate provided on-site</li>
-                  <li>• No obligation - get expert advice for your power needs</li>
-                </ul>
+              
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last Name *</Label>
+                <Input
+                  id="lastName"
+                  value={formData.lastName}
+                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  className={errors.lastName ? 'border-red-500' : ''}
+                  placeholder="Enter your last name"
+                />
+                {errors.lastName && <p className="text-sm text-red-500">{errors.lastName}</p>}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  className={errors.email ? 'border-red-500' : ''}
+                  placeholder="your.email@example.com"
+                />
+                {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number *</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  className={errors.phone ? 'border-red-500' : ''}
+                  placeholder="(555) 123-4567"
+                />
+                {errors.phone && <p className="text-sm text-red-500">{errors.phone}</p>}
               </div>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* Navigation Buttons */}
-      <div className="flex justify-between pt-6 border-t">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={prevStep}
-          disabled={currentStep === 1}
-          className="px-6"
-        >
-          Previous
-        </Button>
+          {/* Location Information */}
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2 mb-4">
+              <MapPin className="w-5 h-5 text-primary" />
+              <h3 className="text-lg font-semibold text-primary">Service Location</h3>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="address">Street Address *</Label>
+              <Input
+                id="address"
+                value={formData.address}
+                onChange={(e) => handleInputChange('address', e.target.value)}
+                className={errors.address ? 'border-red-500' : ''}
+                placeholder="123 Main Street"
+              />
+              {errors.address && <p className="text-sm text-red-500">{errors.address}</p>}
+            </div>
 
-        {currentStep < 3 ? (
-          <Button
-            type="button"
-            onClick={nextStep}
-            className="bg-primary hover:bg-steel-700 px-6"
-          >
-            Next Step
-          </Button>
-        ) : (
-          <Button
-            type="submit"
-            className="bg-accent hover:bg-orange-600 text-white px-8"
-          >
-            Schedule Service
-          </Button>
-        )}
-      </div>
-    </form>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="city">City *</Label>
+                <Input
+                  id="city"
+                  value={formData.city}
+                  onChange={(e) => handleInputChange('city', e.target.value)}
+                  className={errors.city ? 'border-red-500' : ''}
+                  placeholder="Houston"
+                />
+                {errors.city && <p className="text-sm text-red-500">{errors.city}</p>}
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="zipCode">ZIP Code *</Label>
+                <Input
+                  id="zipCode"
+                  value={formData.zipCode}
+                  onChange={(e) => handleInputChange('zipCode', e.target.value)}
+                  className={errors.zipCode ? 'border-red-500' : ''}
+                  placeholder="77001"
+                />
+                {errors.zipCode && <p className="text-sm text-red-500">{errors.zipCode}</p>}
+              </div>
+            </div>
+          </div>
+
+          {/* Service Details */}
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2 mb-4">
+              <Wrench className="w-5 h-5 text-primary" />
+              <h3 className="text-lg font-semibold text-primary">Service Details</h3>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="serviceType">Service Type *</Label>
+              <Select value={formData.serviceType} onValueChange={(value) => handleInputChange('serviceType', value)}>
+                <SelectTrigger className={errors.serviceType ? 'border-red-500' : ''}>
+                  <SelectValue placeholder="Select service type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {serviceTypes.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.serviceType && <p className="text-sm text-red-500">{errors.serviceType}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="urgency">Urgency Level *</Label>
+              <Select value={formData.urgency} onValueChange={(value) => handleInputChange('urgency', value)}>
+                <SelectTrigger className={errors.urgency ? 'border-red-500' : ''}>
+                  <SelectValue placeholder="Select urgency level" />
+                </SelectTrigger>
+                <SelectContent>
+                  {urgencyLevels.map((level) => (
+                    <SelectItem key={level.value} value={level.value}>
+                      {level.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.urgency && <p className="text-sm text-red-500">{errors.urgency}</p>}
+            </div>
+          </div>
+
+          {/* Scheduling */}
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2 mb-4">
+              <Calendar className="w-5 h-5 text-primary" />
+              <h3 className="text-lg font-semibold text-primary">Preferred Schedule</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="preferredDate">Preferred Date *</Label>
+                <Input
+                  id="preferredDate"
+                  type="date"
+                  value={formData.preferredDate}
+                  onChange={(e) => handleInputChange('preferredDate', e.target.value)}
+                  className={errors.preferredDate ? 'border-red-500' : ''}
+                  min={new Date().toISOString().split('T')[0]}
+                />
+                {errors.preferredDate && <p className="text-sm text-red-500">{errors.preferredDate}</p>}
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="preferredTime">Preferred Time</Label>
+                <Select value={formData.preferredTime} onValueChange={(value) => handleInputChange('preferredTime', value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select preferred time" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {timeSlots.map((slot) => (
+                      <SelectItem key={slot.value} value={slot.value}>
+                        {slot.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          {/* Generator Information (Optional) */}
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2 mb-4">
+              <Wrench className="w-5 h-5 text-primary" />
+              <h3 className="text-lg font-semibold text-primary">Generator Information (Optional)</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="generatorBrand">Generator Brand</Label>
+                <Input
+                  id="generatorBrand"
+                  value={formData.generatorBrand}
+                  onChange={(e) => handleInputChange('generatorBrand', e.target.value)}
+                  placeholder="e.g., Generac, Kohler"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="generatorModel">Generator Model</Label>
+                <Input
+                  id="generatorModel"
+                  value={formData.generatorModel}
+                  onChange={(e) => handleInputChange('generatorModel', e.target.value)}
+                  placeholder="e.g., Guardian 22kW"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="lastServiceDate">Last Service Date</Label>
+              <Input
+                id="lastServiceDate"
+                type="date"
+                value={formData.lastServiceDate}
+                onChange={(e) => handleInputChange('lastServiceDate', e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Additional Details */}
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="description">Additional Details</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => handleInputChange('description', e.target.value)}
+                placeholder="Please describe your specific needs, any issues you're experiencing, or additional information that would help us prepare for your service call..."
+                rows={4}
+              />
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex flex-col sm:flex-row gap-4 pt-6">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-primary hover:bg-steel-700 text-white flex-1"
+            >
+              {isSubmitting ? (
+                <>
+                  <Clock className="w-4 h-4 mr-2 animate-spin" />
+                  Scheduling Service...
+                </>
+              ) : (
+                <>
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Schedule Service
+                </>
+              )}
+            </Button>
+            
+            {onClose && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                disabled={isSubmitting}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+            )}
+          </div>
+
+          <div className="text-sm text-steel-600 bg-steel-50 p-4 rounded-lg">
+            <p className="mb-2">
+              <strong>What happens next?</strong>
+            </p>
+            <ul className="space-y-1 text-sm">
+              <li>• We'll contact you within 2 hours to confirm your appointment</li>
+              <li>• Our technician will arrive at your scheduled time</li>
+              <li>• All work comes with our satisfaction guarantee</li>
+              <li>• Emergency services available 24/7</li>
+            </ul>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 
