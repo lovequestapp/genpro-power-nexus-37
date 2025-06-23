@@ -79,7 +79,7 @@ export default function Contact() {
               Let's Keep Your Power
               <span className="block text-accent">Always On</span>
             </h1>
-            <p className="text-xl text-white/90 mb-10 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-white mb-10 max-w-3xl mx-auto leading-relaxed">
               Get expert generator solutions for your Houston home or business. Our certified team is ready to provide free consultations, emergency service, and professional installations.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
