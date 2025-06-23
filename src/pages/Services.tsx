@@ -90,9 +90,13 @@ const Services = () => {
               Fortune 500-level service across Greater Houston and surrounding communities.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
-              <Button size="lg" className="bg-accent hover:bg-orange-600 text-white px-8 py-4">
+              <Button 
+                size="lg" 
+                className="bg-accent hover:bg-orange-600 text-white px-8 py-4"
+                onClick={() => window.location.href = 'tel:+19158007767'}
+              >
                 <Phone className="w-5 h-5 mr-2" />
-                (713) 999-GENERATOR
+                (915) 800-7767
               </Button>
               <Dialog open={isScheduleModalOpen} onOpenChange={setIsScheduleModalOpen}>
                 <DialogTrigger asChild>
@@ -243,9 +247,13 @@ const Services = () => {
             Contact our team today for expert consultation and competitive pricing on all generator services.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Button size="lg" className="bg-accent hover:bg-orange-600 text-white px-8 py-4">
+            <Button 
+              size="lg" 
+              className="bg-accent hover:bg-orange-600 text-white px-8 py-4"
+              onClick={() => window.location.href = 'tel:+19158007767'}
+            >
               <Phone className="w-5 h-5 mr-2" />
-              Call (713) 999-GENERATOR
+              Call (915) 800-7767
             </Button>
             <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-4 text-steel-800">
               <MessageSquare className="w-5 h-5 mr-2" />

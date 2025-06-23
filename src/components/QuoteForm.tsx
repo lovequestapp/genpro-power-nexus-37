@@ -219,7 +219,7 @@ const QuoteForm = () => {
       if (error instanceof Error) {
         toast.error(error.message);
       } else {
-        toast.error('There was an error submitting the form. Please try again or contact us directly at (555) 123-4567.');
+        toast.error('There was an error submitting the form. Please try again or contact us directly at (915) 800-7767.');
       }
     } finally {
       setSubmitting(false);
@@ -363,7 +363,14 @@ const QuoteForm = () => {
                     </p>
                   )}
                   <p className="text-sm">
-                    You can also contact us directly at (555) 123-4567 for immediate assistance.
+                    You can also contact us directly at{' '}
+                    <a 
+                      href="tel:+19158007767" 
+                      className="text-green-600 hover:text-green-700 underline cursor-pointer"
+                    >
+                      (915) 800-7767
+                    </a>{' '}
+                    for immediate assistance.
                   </p>
                 </div>
               </AlertDescription>

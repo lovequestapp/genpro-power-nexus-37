@@ -209,7 +209,12 @@ const GetQuote = () => {
                       <Phone className="w-5 h-5 text-accent" />
                       <div>
                         <p className="font-semibold text-steel-800">Emergency Service</p>
-                        <p className="text-sm text-steel-600">(555) 123-4567</p>
+                        <a 
+                          href="tel:+19158007767" 
+                          className="text-sm text-steel-600 hover:text-accent transition-colors cursor-pointer"
+                        >
+                          (915) 800-7767
+                        </a>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
