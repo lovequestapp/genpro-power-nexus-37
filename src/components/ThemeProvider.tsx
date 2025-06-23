@@ -1,18 +1,11 @@
-
 import { ThemeProvider as NextThemesProvider, useTheme as useNextTheme } from 'next-themes';
 
-interface ThemeProviderProps {
-  children: React.ReactNode;
-  defaultTheme?: string;
-  storageKey?: string;
-}
-
-export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return (
-    <NextThemesProvider attribute="class" defaultTheme="system" enableSystem {...props}>
+    <NextThemesProvider attribute="class" defaultTheme="system" enableSystem>
       {children}
     </NextThemesProvider>
   );
 }
 
-export const useTheme = useNextTheme;
+export const useTheme = useNextTheme; 

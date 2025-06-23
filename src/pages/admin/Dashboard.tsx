@@ -1,512 +1,1332 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Users,
-  ClipboardList,
-  Package,
-  DollarSign,
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  CircularProgress,
+  Alert as MuiAlert,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Chip,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  Grid as MuiGrid
+} from '@mui/material';
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Refresh as RefreshIcon,
+  Warning as WarningIcon,
+  CheckCircle as CheckCircleIcon,
+  Error as ErrorIcon,
+  AccountBalanceWallet,
+  Assignment,
+  Group,
+  Settings as SettingsIcon,
+  SupportAgent,
+  Sync,
+  Notifications,
+  Person,
+  Brightness4 as SunIcon,
+  Brightness7 as MoonIcon,
+  Download as DownloadIcon,
+  Mail as MailIcon,
+  TrendingUp as TrendingUpIcon,
+  TrendingDown as TrendingDownIcon,
+  AttachMoney as DollarSignIcon,
+  Build as WrenchIcon,
+  Inventory as PackageIcon,
+  People as UsersIcon,
+  CreditCard,
+  Menu as MenuIcon,
+} from '@mui/icons-material';
+import { supabaseService } from '@/services/supabase';
+import { supabase } from '@/lib/supabase';
+import { Generator, Customer, Service, Bill, Alert } from '@/types';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { motion } from 'framer-motion';
+import AnimatedCircuitBackground from '@/components/AnimatedCircuitBackground';
+import {
+  CircleIcon,
+  BarChart3Icon,
+  CalendarIcon,
+  AlertCircleIcon,
+  ClipboardListIcon,
+  TruckIcon,
+  StarIcon,
+  UserCheckIcon,
+  MapPinIcon,
   TrendingUp,
   TrendingDown,
+  Users,
+  DollarSign,
+  RefreshCw,
+  AlertCircle,
   Calendar,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  Wrench,
-  Star,
-  Phone,
-  Mail,
-  MapPin,
-  Activity,
-  Eye,
-  Download,
-  Filter,
-  Search,
-  Settings,
-  Plus,
   ArrowRight,
-  BarChart3,
-  PieChart,
-  LineChart
+  FileText,
+  Clock,
+  CheckCircle,
+  AlertTriangle,
+  Plus,
 } from 'lucide-react';
-import { WeatherWidget } from '@/components/weather/WeatherWidget';
-import SEO from '@/components/SEO';
+import { Progress } from '@/components/ui/progress';
+import {
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { DashboardStats, Project as DashboardProject } from '@/types/dashboard';
+import { Badge } from '@/components/ui/badge';
+import { UserIcon } from 'lucide-react';
+import { Avatar } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
+import { Link } from 'react-router-dom';
+import { getRevenueStats } from '@/lib/billingService';
+import { getScheduleStats, getScheduleEvents } from '@/lib/schedulingService';
+import { getFormSubmissionStats, getFormDefinitions } from '@/lib/formsService';
+import SEO from '../../components/SEO';
 
-// Mock data for demonstration
-const dashboardStats = [
-  {
-    title: 'Total Customers',
-    value: '1,234',
-    change: '+12%',
-    trend: 'up' as const,
-    icon: Users,
-    color: 'text-blue-600'
-  },
-  {
-    title: 'Active Projects',
-    value: '89',
-    change: '+5%',
-    trend: 'up' as const,
-    icon: ClipboardList,
-    color: 'text-green-600'
-  },
-  {
-    title: 'Inventory Items',
-    value: '456',
-    change: '-2%',
-    trend: 'down' as const,
-    icon: Package,
-    color: 'text-orange-600'
-  },
-  {
-    title: 'Monthly Revenue',
-    value: '$78,542',
-    change: '+18%',
-    trend: 'up' as const,
-    icon: DollarSign,
-    color: 'text-purple-600'
-  }
+const sidebarItems = [
+  { label: 'Overview', icon: AccountBalanceWallet },
+  { label: 'Stripe', icon: CreditCard },
+  { label: 'Projects', icon: Assignment },
+  { label: 'Support', icon: SupportAgent },
+  { label: 'Team', icon: Group },
+  { label: 'Settings', icon: SettingsIcon },
 ];
 
-const recentProjects = [
-  {
-    id: 1,
-    name: 'Commercial Generator Installation',
-    customer: 'ABC Corp',
-    status: 'In Progress',
-    priority: 'High',
-    dueDate: '2024-01-15',
-    progress: 65
-  },
-  {
-    id: 2,
-    name: 'Residential Backup System',
-    customer: 'John Smith',
-    status: 'Planning',
-    priority: 'Medium',
-    dueDate: '2024-01-20',
-    progress: 25
-  },
-  {
-    id: 3,
-    name: 'Emergency Repair Service',
-    customer: 'Houston Medical',
-    status: 'Urgent',
-    priority: 'Critical',
-    dueDate: '2024-01-10',
-    progress: 90
-  }
-];
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  change?: number;
+  icon: React.ReactNode;
+  trend?: 'up' | 'down' | 'neutral';
+  subtitle?: string;
+  onClick?: () => void;
+  clickable?: boolean;
+}
 
-const recentTickets = [
-  {
-    id: 1,
-    title: 'Generator not starting',
-    customer: 'Tech Solutions Inc',
-    priority: 'High',
-    status: 'Open',
-    created: '2 hours ago'
-  },
-  {
-    id: 2,
-    title: 'Maintenance request',
-    customer: 'Green Energy Co',
-    priority: 'Medium',
-    status: 'In Progress',
-    created: '1 day ago'
-  },
-  {
-    id: 3,
-    title: 'Installation question',
-    customer: 'Home Owner',
-    priority: 'Low',
-    status: 'Resolved',
-    created: '3 days ago'
-  }
-];
+interface LocalProject {
+  id: string;
+  title: string;
+  customer: string;
+  status: 'in-progress' | 'pending' | 'completed';
+  progress: number;
+  dueDate: string;
+  address: string;
+  technicians: string[];
+}
 
-const upcomingTasks = [
-  {
-    id: 1,
-    title: 'Site inspection at ABC Corp',
-    time: '9:00 AM',
-    type: 'Inspection',
-    priority: 'High'
-  },
-  {
-    id: 2,
-    title: 'Generator maintenance check',
-    time: '11:30 AM',
-    type: 'Maintenance',
-    priority: 'Medium'
-  },
-  {
-    id: 3,
-    title: 'Customer consultation call',
-    time: '2:00 PM',
-    type: 'Meeting',
-    priority: 'Medium'
-  },
-  {
-    id: 4,
-    title: 'Parts delivery coordination',
-    time: '4:15 PM',
-    type: 'Logistics',
-    priority: 'Low'
-  }
-];
+const StatCard = ({ title, value, change, icon, trend, subtitle, onClick, clickable = false }: StatCardProps) => {
+  const cardContent = (
+    <>
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <div className="text-steel-500 p-2 sm:p-3 rounded-lg bg-slate-50">{icon}</div>
+        {typeof change !== 'undefined' && (
+          <div
+            className={`flex items-center ${
+              trend === 'up'
+                ? 'text-green-500'
+                : trend === 'down'
+                ? 'text-red-500'
+                : 'text-steel-500'
+            }`}
+          >
+            <span className="text-xs sm:text-sm font-medium">
+              {change >= 0 ? '+' : ''}
+              {change}%
+            </span>
+            {trend === 'up' ? (
+              <TrendingUpIcon className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
+            ) : trend === 'down' ? (
+              <TrendingDownIcon className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
+            ) : (
+              <CircleIcon className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
+            )}
+          </div>
+        )}
+      </div>
+      <div className="space-y-1">
+        <h3 className="text-xl sm:text-2xl font-bold text-steel-900">
+          {typeof value === 'number' ? value.toLocaleString() : value}
+        </h3>
+        <p className="text-xs sm:text-sm text-steel-600">{title}</p>
+        {subtitle && (
+          <p className="text-xs text-steel-400">{subtitle}</p>
+        )}
+      </div>
+    </>
+  );
 
-const getPriorityColor = (priority: string) => {
-  switch (priority.toLowerCase()) {
-    case 'critical':
-    case 'urgent':
-      return 'bg-red-100 text-red-800';
-    case 'high':
-      return 'bg-orange-100 text-orange-800';
-    case 'medium':
-      return 'bg-yellow-100 text-yellow-800';
-    case 'low':
-      return 'bg-green-100 text-green-800';
-    default:
-      return 'bg-gray-100 text-gray-800';
+  if (clickable && onClick) {
+    return (
+      <Paper 
+        elevation={3}
+        className="p-4 sm:p-6 lg:p-8 bg-white rounded-xl shadow-lg border-none text-steel-900 hover:shadow-xl transition-all duration-200 cursor-pointer hover:scale-105 hover:bg-slate-50 relative group"
+        onClick={onClick}
+        sx={{
+          '&:hover': {
+            transform: 'scale(1.02)',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+          }
+        }}
+      >
+        {cardContent}
+        <div className="absolute top-2 right-2 sm:top-4 sm:right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+          <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-steel-400" />
+        </div>
+      </Paper>
+    );
   }
+
+  return (
+    <Paper 
+      elevation={3}
+      className="p-4 sm:p-6 lg:p-8 bg-white rounded-xl shadow-lg border-none text-steel-900 hover:shadow-xl transition-shadow"
+      sx={{
+        '&:hover': {
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+        }
+      }}
+    >
+      {cardContent}
+    </Paper>
+  );
 };
 
-const getStatusColor = (status: string) => {
-  switch (status.toLowerCase()) {
-    case 'completed':
-    case 'resolved':
-      return 'bg-green-100 text-green-800';
-    case 'in progress':
-      return 'bg-blue-100 text-blue-800';
-    case 'planning':
-      return 'bg-purple-100 text-purple-800';
-    case 'urgent':
-      return 'bg-red-100 text-red-800';
-    case 'open':
-      return 'bg-orange-100 text-orange-800';
-    default:
-      return 'bg-gray-100 text-gray-800';
-  }
+const ProjectCard = ({ project }: { project: LocalProject }) => {
+  const statusColors = {
+    'pending': 'bg-yellow-100 text-yellow-800',
+    'in-progress': 'bg-blue-100 text-blue-800',
+    'completed': 'bg-green-100 text-green-800',
+  };
+
+  return (
+    <Card className="p-4 sm:p-6 lg:p-8 bg-white rounded-xl shadow-lg border-none text-steel-900 hover:shadow-xl transition-shadow">
+      <div className="flex items-start justify-between mb-3 sm:mb-4">
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-steel-900 text-sm sm:text-base truncate">
+            {project.title}
+          </h3>
+          <p className="text-xs sm:text-sm text-steel-500 truncate">{project.customer}</p>
+          <div className="flex items-center gap-1 text-xs text-steel-400 mt-1">
+            <MapPinIcon className="w-3 h-3" />
+            <span className="truncate">{project.address}</span>
+          </div>
+        </div>
+        <span
+          className={`px-2 py-0.5 rounded-full text-xs font-medium ml-2 flex-shrink-0 ${
+            statusColors[project.status]
+          }`}
+        >
+          {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+        </span>
+      </div>
+      <div className="space-y-2">
+        <div className="flex justify-between text-xs sm:text-sm">
+          <span className="text-steel-500">Progress</span>
+          <span className="font-medium text-steel-700">
+            {project.progress}%
+          </span>
+        </div>
+        <Progress value={project.progress} className="h-2" />
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0 text-xs sm:text-sm mt-3 sm:mt-4">
+          <div className="flex items-center gap-2">
+            <CalendarIcon className="w-3 h-3 sm:w-4 sm:h-4 text-steel-400" />
+            <span className="text-steel-500">Due: {project.dueDate}</span>
+          </div>
+          <div className="flex -space-x-1 sm:-space-x-2">
+            {project.technicians.slice(0, 3).map((tech, index) => (
+              <div
+                key={index}
+                className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-accent/10 flex items-center justify-center text-xs font-medium text-accent ring-2 ring-white"
+                title={tech}
+              >
+                {tech.charAt(0)}
+              </div>
+            ))}
+            {project.technicians.length > 3 && (
+              <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-slate-200 flex items-center justify-center text-xs font-medium text-slate-600 ring-2 ring-white">
+                +{project.technicians.length - 3}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
 };
 
-export default function Dashboard() {
+// Add new interfaces for HGP-specific features
+interface HGPStats {
+  totalGenerators: number;
+  activeProjects: number;
+  pendingMaintenance: number;
+  revenueThisMonth: number;
+  customerSatisfaction: number;
+}
+
+interface Notification {
+  id: string;
+  type: 'alert' | 'info' | 'success' | 'warning' | 'error';
+  message: string;
+  timestamp: Date;
+  read: boolean;
+}
+
+// Mock Stripe data
+const stripeMock = {
+  revenue: 154320,
+  revenueChange: 8.2,
+  revenueTrend: 'up',
+  customers: 312,
+  payouts: [
+    { id: 'po_1', amount: 12000, date: '2024-07-10' },
+    { id: 'po_2', amount: 8000, date: '2024-07-03' },
+  ],
+  transactions: [
+    { id: 'txn_1', customer: 'Sarah Johnson', amount: 1200, status: 'succeeded', date: '2024-07-09' },
+    { id: 'txn_2', customer: 'Michael Chen', amount: 3500, status: 'pending', date: '2024-07-08' },
+    { id: 'txn_3', customer: 'Emily Rodriguez', amount: 2000, status: 'refunded', date: '2024-07-07' },
+    { id: 'txn_4', customer: 'David Lee', amount: 500, status: 'succeeded', date: '2024-07-06' },
+  ],
+  refunds: 2,
+  disputes: 1,
+  revenueChart: [
+    { date: 'Jun 10', revenue: 3200 },
+    { date: 'Jun 15', revenue: 4200 },
+    { date: 'Jun 20', revenue: 5100 },
+    { date: 'Jun 25', revenue: 6100 },
+    { date: 'Jul 1', revenue: 7200 },
+    { date: 'Jul 5', revenue: 8300 },
+    { date: 'Jul 10', revenue: 9000 },
+  ],
+};
+
+function StripeCard({ title, value, icon, trend, change, subtitle, color }) {
+  return (
+    <div className={`rounded-2xl p-4 sm:p-6 bg-gradient-to-br from-white/70 to-white/30 shadow-xl border border-white/30 backdrop-blur-lg flex flex-col gap-2 min-w-[150px] sm:min-w-[180px] relative overflow-hidden`}> 
+      <div className="flex items-center gap-2 sm:gap-3 mb-2">
+        <div className={`p-2 sm:p-3 rounded-full bg-gradient-to-br from-${color}-100 to-${color}-200 shadow-lg`}>{icon}</div>
+        <span className="text-sm sm:text-lg font-bold text-gray-900">{title}</span>
+      </div>
+      <div className="flex items-end gap-2">
+        <span className="text-2xl sm:text-3xl font-extrabold text-gray-900">{value}</span>
+        {trend && (
+          <span className={`flex items-center gap-1 text-xs sm:text-sm font-semibold ${trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>{trend === 'up' ? <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" /> : <TrendingDown className="w-3 h-3 sm:w-4 sm:h-4" />}{change}%</span>
+        )}
+      </div>
+      {subtitle && <span className="text-xs text-gray-500 mt-1">{subtitle}</span>}
+      <div className={`absolute right-0 bottom-0 w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-br from-${color}-200/30 to-transparent rounded-full blur-2xl`} />
+    </div>
+  );
+}
+
+function StripeDashboard() {
+  return (
+    <div className="w-full grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-10">
+      <StripeCard
+        title="Total Revenue"
+        value={`$${stripeMock.revenue.toLocaleString()}`}
+        icon={<DollarSign className="w-4 h-4 sm:w-6 sm:h-6 text-green-600" />}
+        trend={stripeMock.revenueTrend}
+        change={stripeMock.revenueChange}
+        color="green"
+        subtitle="Last 30 days"
+      />
+      <StripeCard
+        title="Active Customers"
+        value={stripeMock.customers}
+        icon={<Users className="w-4 h-4 sm:w-6 sm:h-6 text-blue-600" />}
+        trend={null}
+        change={null}
+        color="blue"
+        subtitle="All time"
+      />
+      <StripeCard
+        title="Upcoming Payout"
+        value={`$${stripeMock.payouts[0].amount.toLocaleString()}`}
+        icon={<CreditCard className="w-4 h-4 sm:w-6 sm:h-6 text-purple-600" />}
+        trend={null}
+        change={null}
+        color="purple"
+        subtitle={`On ${stripeMock.payouts[0].date}`}
+      />
+      <StripeCard
+        title="Refunds/Disputes"
+        value={`${stripeMock.refunds} / ${stripeMock.disputes}`}
+        icon={<AlertCircle className="w-4 h-4 sm:w-6 sm:h-6 text-red-600" />}
+        trend={null}
+        change={null}
+        color="red"
+        subtitle="This month"
+      />
+    </div>
+  );
+}
+
+function StripeRevenueChart() {
+  return (
+    <div className="rounded-2xl p-4 sm:p-6 bg-gradient-to-br from-white/70 to-white/30 shadow-xl border border-white/30 backdrop-blur-lg mb-6 sm:mb-10">
+      <h3 className="text-base sm:text-lg font-bold mb-4 text-gray-900 flex items-center gap-2"><TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" /> Revenue Trend</h3>
+      <ResponsiveContainer width="100%" height={200} className="sm:h-[220px]">
+        <LineChart data={stripeMock.revenueChart}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+          <XAxis dataKey="date" stroke="#888" />
+          <YAxis stroke="#888" />
+          <Tooltip />
+          <Line type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} dot={{ r: 4, fill: '#10b981' }} activeDot={{ r: 6 }} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+function StripeTransactions() {
+  return (
+    <div className="rounded-2xl p-4 sm:p-6 bg-gradient-to-br from-white/70 to-white/30 shadow-xl border border-white/30 backdrop-blur-lg mb-6 sm:mb-10">
+      <h3 className="text-base sm:text-lg font-bold mb-4 text-gray-900 flex items-center gap-2"><RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" /> Recent Transactions</h3>
+      <div className="divide-y divide-gray-200">
+        {stripeMock.transactions.map(txn => (
+          <div key={txn.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 gap-2 sm:gap-0">
+            <div className="flex-1 min-w-0">
+              <div className="font-semibold text-gray-900 text-sm truncate">{txn.customer}</div>
+              <div className="text-xs text-gray-500">{txn.date}</div>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className={`font-bold text-xs sm:text-sm ${txn.status === 'succeeded' ? 'text-green-600' : txn.status === 'pending' ? 'text-yellow-600' : 'text-red-600'}`}>{txn.status}</span>
+              <span className="font-semibold text-gray-900 text-sm">${txn.amount.toLocaleString()}</span>
+              <button className="px-2 py-1 rounded bg-blue-100 text-blue-700 text-xs font-bold hover:bg-blue-200 transition-all flex items-center gap-1"><ArrowRight className="w-3 h-3" /> Details</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const AdminDashboard: React.FC = () => {
+  console.log('AdminDashboard: Component rendering...');
+  
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedRange, setSelectedRange] = useState("30");
+  const [revenueTimePeriod, setRevenueTimePeriod] = useState<'month' | 'year' | 'all'>('month');
+  const [revenueData, setRevenueData] = useState({
+    totalRevenue: 0,
+    paidInvoices: 0,
+    change: 0,
+    trend: 'neutral' as 'up' | 'down' | 'neutral'
+  });
+  const [revenueChartData, setRevenueChartData] = useState<Array<{ date: string; revenue: number }>>([]);
+  const [stats, setStats] = useState<DashboardStats>({
+    revenue: { total: 0, change: 0, trend: 'neutral' },
+    projects: { total: 0, active: 0, completed: 0, change: 0 },
+    inventory: { total: 0, lowStock: 0, value: 0, change: 0 },
+    leads: { total: 0, new: 0, converted: 0, change: 0 },
+    technicians: { total: 0, available: 0, assigned: 0 },
+    customerSatisfaction: { rating: 0, responses: 0, change: 0 }
+  });
+  const [recentProjects, setRecentProjects] = useState<LocalProject[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [scheduleStats, setScheduleStats] = useState({
+    totalEvents: 0,
+    upcomingEvents: 0,
+    overdueEvents: 0,
+    completedEvents: 0
+  });
+  const [recentSchedules, setRecentSchedules] = useState<any[]>([]);
+  const [formsStats, setFormsStats] = useState({
+    totalSubmissions: 0,
+    newSubmissions: 0,
+    completedSubmissions: 0,
+    totalForms: 0
+  });
+  const [recentForms, setRecentForms] = useState<any[]>([]);
+
+  console.log('AdminDashboard: State initialized, loading =', loading);
+
+  // Navigation handlers
+  const navigateToProjects = () => {
+    window.location.href = '/admin/projects';
+  };
+
+  const navigateToCustomers = () => {
+    window.location.href = '/admin/customers';
+  };
+
+  const navigateToGenerators = () => {
+    window.location.href = '/admin/generators';
+  };
+
+  const navigateToRevenue = () => {
+    window.location.href = '/admin/billing';
+  };
+
+  const navigateToSchedule = () => {
+    window.location.href = '/admin/schedule';
+  };
+
+  const navigateToForms = () => {
+    window.location.href = '/admin/forms';
+  };
+
+  const navigateToProject = (projectId: string) => {
+    window.location.href = `/admin/projects/${projectId}`;
+  };
+
+  // Load revenue data
+  const loadRevenueData = async (timePeriod: 'month' | 'year' | 'all') => {
+    try {
+      console.log('Loading revenue data for period:', timePeriod);
+      const revenueStats = await getRevenueStats(timePeriod);
+      console.log('Revenue stats received:', revenueStats);
+      setRevenueData(revenueStats);
+      
+      // Update the main stats object
+      setStats(prev => ({
+        ...prev,
+        revenue: {
+          total: revenueStats.totalRevenue,
+          change: revenueStats.change,
+          trend: revenueStats.trend
+        }
+      }));
+    } catch (error) {
+      console.error('Error loading revenue data:', error);
+    }
+  };
+
+  // Load revenue chart data
+  const loadRevenueChartData = async (days: number) => {
+    try {
+      console.log('Loading revenue chart data for', days, 'days');
+      
+      // Get paid invoices for the specified period
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+      
+      const { data: invoices, error } = await supabase
+        .from('invoices')
+        .select('total_amount, paid_date')
+        .eq('status', 'paid')
+        .gte('paid_date', startDate.toISOString().split('T')[0])
+        .lte('paid_date', endDate.toISOString().split('T')[0])
+        .order('paid_date', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching revenue chart data:', error);
+        return;
+      }
+
+      // Group revenue by date
+      const revenueByDate = new Map<string, number>();
+      
+      invoices?.forEach(invoice => {
+        if (invoice.paid_date && invoice.total_amount) {
+          const date = new Date(invoice.paid_date).toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric' 
+          });
+          revenueByDate.set(date, (revenueByDate.get(date) || 0) + invoice.total_amount);
+        }
+      });
+
+      // Convert to chart data format
+      const chartData = Array.from(revenueByDate.entries()).map(([date, revenue]) => ({
+        date,
+        revenue: Math.round(revenue)
+      }));
+
+      console.log('Revenue chart data:', chartData);
+      setRevenueChartData(chartData);
+    } catch (error) {
+      console.error('Error loading revenue chart data:', error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Load revenue data
+        await loadRevenueData(revenueTimePeriod);
+        
+        // Load revenue chart data
+        await loadRevenueChartData(parseInt(selectedRange));
+
+        // Fetch projects
+        console.log('Fetching projects...');
+        const projects = await supabaseService.getProjects();
+        console.log('Projects fetched:', projects?.length || 0, projects);
+        
+        // Fetch customers
+        console.log('Fetching customers...');
+        const customers = await supabaseService.getCustomers();
+        console.log('Customers fetched:', customers?.length || 0, customers);
+        
+        // Fetch generators
+        console.log('Fetching generators...');
+        const generators = await supabaseService.getGenerators();
+        console.log('Generators fetched:', generators?.length || 0, generators);
+        
+        // Fetch schedule data
+        console.log('Fetching schedule data...');
+        const scheduleStatsData = await getScheduleStats();
+        const recentSchedulesData = await getScheduleEvents({ 
+          date_range: {
+            start: new Date().toISOString(),
+            end: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+          }
+        });
+        console.log('Schedule data fetched:', scheduleStatsData, recentSchedulesData?.length || 0);
+        
+        // Fetch forms data
+        console.log('Fetching forms data...');
+        const formsStatsData = await getFormSubmissionStats();
+        const formsData = await getFormDefinitions();
+        console.log('Forms data fetched:', formsStatsData, formsData?.length || 0);
+        
+        // Calculate stats
+        const activeProjects = projects?.filter(p => p.status === 'in_progress').length || 0;
+        const completedProjects = projects?.filter(p => p.status === 'completed').length || 0;
+        const activeCustomers = customers?.filter(c => c.status === 'active').length || 0;
+        
+        console.log('Calculated stats:', {
+          totalProjects: projects?.length || 0,
+          activeProjects,
+          completedProjects,
+          totalCustomers: customers?.length || 0,
+          activeCustomers,
+          totalGenerators: generators?.length || 0
+        });
+        
+        setStats(prev => ({
+          ...prev,
+          projects: { 
+            total: projects?.length || 0, 
+            active: activeProjects, 
+            completed: completedProjects, 
+            change: 12 
+          },
+          inventory: { 
+            total: generators?.length || 0, 
+            lowStock: 3, 
+            value: 45000, 
+            change: -2.1 
+          },
+          leads: { 
+            total: customers?.length || 0, 
+            new: 5, 
+            converted: 3, 
+            change: 15 
+          },
+          technicians: { 
+            total: 8, 
+            available: 5, 
+            assigned: 3 
+          },
+          customerSatisfaction: { 
+            rating: 4.8, 
+            responses: 24, 
+            change: 0.2 
+          }
+        }));
+        
+        // Set recent projects
+        const recent = await Promise.all(
+          (projects?.slice(0, 5) || []).map(async (p) => {
+            try {
+              // Calculate real progress from milestones
+              const progress = await supabaseService.calculateProjectProgress(p.id);
+              
+              // Map project status to LocalProject status
+              let mappedStatus: 'in-progress' | 'pending' | 'completed';
+              if (p.status === 'in_progress') mappedStatus = 'in-progress';
+              else if (p.status === 'completed') mappedStatus = 'completed';
+              else mappedStatus = 'pending';
+              
+              return {
+                id: p.id,
+                title: p.name,
+                customer: p.owner_name || 'Unassigned',
+                status: mappedStatus,
+                progress: progress.overall_progress,
+                dueDate: p.created_at || '2024-07-15',
+                address: p.address || 'No address',
+                technicians: p.technicians || []
+              };
+            } catch (error) {
+              console.error('Error calculating progress for project:', p.id, error);
+              // Fallback to status-based progress
+              let fallbackProgress = 0;
+              let mappedStatus: 'in-progress' | 'pending' | 'completed';
+              
+              if (p.status === 'completed') {
+                fallbackProgress = 100;
+                mappedStatus = 'completed';
+              } else if (p.status === 'in_progress') {
+                fallbackProgress = 50;
+                mappedStatus = 'in-progress';
+              } else {
+                fallbackProgress = 10;
+                mappedStatus = 'pending';
+              }
+              
+              return {
+                id: p.id,
+                title: p.name,
+                customer: p.owner_name || 'Unassigned',
+                status: mappedStatus,
+                progress: fallbackProgress,
+                dueDate: p.created_at || '2024-07-15',
+                address: p.address || 'No address',
+                technicians: p.technicians || []
+              };
+            }
+          })
+        );
+        
+        setRecentProjects(recent);
+        
+        // Set schedule data
+        setScheduleStats({
+          totalEvents: scheduleStatsData.total_events,
+          upcomingEvents: scheduleStatsData.upcoming_events,
+          overdueEvents: scheduleStatsData.overdue_events,
+          completedEvents: scheduleStatsData.completed_events
+        });
+        
+        // Set recent schedules (next 7 days)
+        setRecentSchedules(recentSchedulesData.slice(0, 5).map(event => ({
+          id: event.id,
+          title: event.title,
+          startTime: event.start_time,
+          endTime: event.end_time,
+          type: event.event_type,
+          priority: event.priority,
+          status: event.status,
+          location: event.location
+        })));
+        
+        // Set forms data
+        setFormsStats({
+          totalSubmissions: formsStatsData.total_submissions,
+          newSubmissions: formsStatsData.new_submissions,
+          completedSubmissions: formsStatsData.completed_submissions,
+          totalForms: formsData.length
+        });
+        
+        // Set recent forms (active forms)
+        setRecentForms(formsData.slice(0, 5).map(form => ({
+          id: form.id,
+          name: form.name,
+          slug: form.slug,
+          isActive: form.is_active,
+          submissions: 0 // This would need to be calculated from submissions
+        })));
+        
+        // Mock notifications
+        setNotifications([
+          {
+            id: '1',
+            type: 'info',
+            message: 'New project "Generator Installation" has been assigned',
+            timestamp: new Date(),
+            read: false
+          },
+          {
+            id: '2',
+            type: 'warning',
+            message: 'Maintenance due for Generator #G-001 in 3 days',
+            timestamp: new Date(Date.now() - 3600000),
+            read: false
+          },
+          {
+            id: '3',
+            type: 'success',
+            message: 'Project "Emergency Backup System" completed successfully',
+            timestamp: new Date(Date.now() - 7200000),
+            read: true
+          }
+        ]);
+        
+        console.log('AdminDashboard: Data fetched successfully');
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching dashboard data:', err);
+        setError('Failed to load dashboard data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [revenueTimePeriod]);
+
+  // Handle revenue time period change
+  const handleRevenueTimePeriodChange = (newPeriod: 'month' | 'year' | 'all') => {
+    setRevenueTimePeriod(newPeriod);
+    loadRevenueData(newPeriod);
+  };
+
+  const handleChartRangeChange = (newRange: string) => {
+    setSelectedRange(newRange);
+    loadRevenueChartData(parseInt(newRange));
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <h2 className="text-2xl font-bold text-slate-800">Loading Dashboard...</h2>
+          <p className="text-slate-600 mt-2">Fetching your data</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-slate-800">Error Loading Dashboard</h2>
+          <p className="text-slate-600 mt-2">{error}</p>
+          <Button onClick={() => window.location.reload()} className="mt-4">
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const getRevenueSubtitle = () => {
+    switch (revenueTimePeriod) {
+      case 'month':
+        return 'This month';
+      case 'year':
+        return 'This year';
+      case 'all':
+        return 'All time';
+      default:
+        return 'This month';
+    }
+  };
+
   return (
     <>
-      <SEO 
-        title="Admin Dashboard | HOU GEN PROS" 
-        description="Comprehensive admin dashboard for managing customers, projects, inventory, and business operations." 
-        canonical="/admin/dashboard" 
-        pageType="website" 
-        keywords="admin, dashboard, management, generator, houston" 
-        schema={null} 
-      />
+      <SEO title="Admin Dashboard | HOU GEN PROS" description="Admin dashboard home page." canonical="/admin/dashboard" pageType="website" keywords="admin, dashboard" schema={null} />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 sm:p-6 lg:p-8">
-        <div className="max-w-7xl mx-auto space-y-6">
+        <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-slate-800">Dashboard</h1>
-              <p className="text-slate-600 mt-1">Welcome back! Here's what's happening with your business today.</p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800">Admin Dashboard</h1>
+              <p className="text-slate-600 mt-1 sm:mt-2 text-sm sm:text-base">Welcome back! Here's what's happening with your business.</p>
             </div>
-            <div className="flex items-center gap-3">
-              <Button variant="outline" size="sm">
-                <Download className="w-4 h-4 mr-2" />
-                Export
+            <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<RefreshIcon />}
+                onClick={() => window.location.reload()}
+                className="text-xs sm:text-sm"
+                sx={{
+                  fontSize: '0.75rem',
+                  '@media (min-width: 640px)': {
+                    fontSize: '0.875rem'
+                  }
+                }}
+              >
+                <span className="hidden sm:inline">Refresh</span>
+                <span className="sm:hidden">↻</span>
               </Button>
-              <Button size="sm">
-                <Plus className="w-4 h-4 mr-2" />
-                Quick Action
+              <Button
+                variant="contained"
+                size="small"
+                startIcon={<AddIcon />}
+                component={Link}
+                to="/admin/projects/new"
+                className="text-xs sm:text-sm"
+                sx={{
+                  fontSize: '0.75rem',
+                  '@media (min-width: 640px)': {
+                    fontSize: '0.875rem'
+                  }
+                }}
+              >
+                <span className="hidden sm:inline">New Project</span>
+                <span className="sm:hidden">+</span>
               </Button>
             </div>
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-            {dashboardStats.map((stat, index) => (
-              <Card key={index} className="relative overflow-hidden">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                      <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
-                      <div className="flex items-center mt-2">
-                        {stat.trend === 'up' ? (
-                          <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
-                        ) : (
-                          <TrendingDown className="w-4 h-4 text-red-500 mr-1" />
+          {/* Stats Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
+            <div className="relative">
+              <StatCard
+                title="Total Revenue"
+                value={`$${revenueData.totalRevenue.toLocaleString()}`}
+                change={revenueData.change}
+                icon={<DollarSignIcon className="w-4 h-4 sm:w-6 sm:h-6" />}
+                trend={revenueData.trend}
+                subtitle={getRevenueSubtitle()}
+                onClick={navigateToRevenue}
+                clickable
+              />
+              {/* Time Period Selector */}
+              <div className="absolute top-2 right-2 z-10">
+                <FormControl size="small" className="w-20">
+                  <Select
+                    value={revenueTimePeriod}
+                    onChange={(e) => handleRevenueTimePeriodChange(e.target.value as 'month' | 'year' | 'all')}
+                    displayEmpty
+                    sx={{
+                      fontSize: '0.75rem',
+                      backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                      backdropFilter: 'blur(4px)',
+                      '& .MuiSelect-select': {
+                        padding: '4px 8px',
+                        fontSize: '0.75rem'
+                      }
+                    }}
+                  >
+                    <MenuItem value="month">Month</MenuItem>
+                    <MenuItem value="year">Year</MenuItem>
+                    <MenuItem value="all">All</MenuItem>
+                  </Select>
+                </FormControl>
+              </div>
+            </div>
+            <StatCard
+              title="Active Projects"
+              value={stats.projects.active}
+              change={stats.projects.change}
+              icon={<Assignment className="w-4 h-4 sm:w-6 sm:h-6" />}
+              trend="up"
+              subtitle={`${stats.projects.total} total`}
+              onClick={navigateToProjects}
+              clickable
+            />
+            <StatCard
+              title="Customers"
+              value={stats.leads.total}
+              change={stats.leads.change}
+              icon={<Group className="w-4 h-4 sm:w-6 sm:h-6" />}
+              trend="up"
+              subtitle={`${stats.leads.new} new this month`}
+              onClick={navigateToCustomers}
+              clickable
+            />
+            <StatCard
+              title="Generators"
+              value={stats.inventory.total}
+              change={stats.inventory.change}
+              icon={<WrenchIcon className="w-4 h-4 sm:w-6 sm:h-6" />}
+              trend="neutral"
+              subtitle={`${stats.inventory.lowStock} need maintenance`}
+              onClick={navigateToGenerators}
+              clickable
+            />
+          </div>
+
+          {/* Schedule and Forms Widgets */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            {/* Schedule Widget */}
+            <Card className="p-3 sm:p-4 lg:p-6 bg-white border-0 shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-orange-100 rounded-lg">
+                    <Calendar className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <h3 className="text-base sm:text-lg font-semibold text-slate-800">Schedule Overview</h3>
+                </div>
+                <Button
+                  variant="text"
+                  size="small"
+                  onClick={navigateToSchedule}
+                  className="text-xs sm:text-sm text-orange-600 hover:text-orange-700"
+                >
+                  View All
+                </Button>
+              </div>
+              
+              {/* Schedule Stats */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="text-center p-3 bg-orange-50 rounded-lg">
+                  <div className="text-lg font-bold text-orange-600">{scheduleStats.upcomingEvents}</div>
+                  <div className="text-xs text-slate-600">Upcoming</div>
+                </div>
+                <div className="text-center p-3 bg-red-50 rounded-lg">
+                  <div className="text-lg font-bold text-red-600">{scheduleStats.overdueEvents}</div>
+                  <div className="text-xs text-slate-600">Overdue</div>
+                </div>
+              </div>
+              
+              {/* Recent Schedule Events */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-slate-700 mb-3">Upcoming Events</h4>
+                {recentSchedules.length > 0 ? (
+                  recentSchedules.map((event) => (
+                    <div 
+                      key={event.id} 
+                      className="flex items-center justify-between p-2 bg-slate-50 rounded-lg hover:bg-slate-100 cursor-pointer transition-colors"
+                      onClick={() => navigateToSchedule()}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <h5 className="font-medium text-slate-800 text-sm truncate">{event.title}</h5>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Clock className="w-3 h-3 text-slate-400" />
+                          <span className="text-xs text-slate-500">
+                            {new Date(event.startTime).toLocaleDateString()} {new Date(event.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge 
+                          variant={event.priority === 'high' ? 'destructive' : event.priority === 'medium' ? 'secondary' : 'outline'} 
+                          className="text-xs"
+                        >
+                          {event.priority}
+                        </Badge>
+                        {event.location && (
+                          <MapPinIcon className="w-3 h-3 text-slate-400" />
                         )}
-                        <span className={`text-sm font-medium ${
-                          stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
-                        }`}>
-                          {stat.change}
-                        </span>
-                        <span className="text-sm text-gray-500 ml-1">vs last month</span>
                       </div>
                     </div>
-                    <div className={`p-3 rounded-full bg-slate-100 ${stat.color}`}>
-                      <stat.icon className="w-6 h-6" />
-                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-slate-500">
+                    <Calendar className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+                    <p className="text-sm">No upcoming events</p>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                )}
+              </div>
+            </Card>
+
+            {/* Forms Widget */}
+            <Card className="p-3 sm:p-4 lg:p-6 bg-white border-0 shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <FileText className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <h3 className="text-base sm:text-lg font-semibold text-slate-800">Forms Overview</h3>
+                </div>
+                <Button
+                  variant="text"
+                  size="small"
+                  onClick={navigateToForms}
+                  className="text-xs sm:text-sm text-blue-600 hover:text-blue-700"
+                >
+                  View All
+                </Button>
+              </div>
+              
+              {/* Forms Stats */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="text-center p-3 bg-blue-50 rounded-lg">
+                  <div className="text-lg font-bold text-blue-600">{formsStats.newSubmissions}</div>
+                  <div className="text-xs text-slate-600">New</div>
+                </div>
+                <div className="text-center p-3 bg-green-50 rounded-lg">
+                  <div className="text-lg font-bold text-green-600">{formsStats.completedSubmissions}</div>
+                  <div className="text-xs text-slate-600">Completed</div>
+                </div>
+              </div>
+              
+              {/* Recent Forms */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-slate-700 mb-3">Active Forms</h4>
+                {recentForms.length > 0 ? (
+                  recentForms.map((form) => (
+                    <div 
+                      key={form.id} 
+                      className="flex items-center justify-between p-2 bg-slate-50 rounded-lg hover:bg-slate-100 cursor-pointer transition-colors"
+                      onClick={() => navigateToForms()}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <h5 className="font-medium text-slate-800 text-sm truncate">{form.name}</h5>
+                        <p className="text-xs text-slate-500 truncate">{form.slug}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge 
+                          variant={form.isActive ? 'default' : 'secondary'} 
+                          className="text-xs"
+                        >
+                          {form.isActive ? 'Active' : 'Inactive'}
+                        </Badge>
+                        <CheckCircle className="w-3 h-3 text-green-500" />
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-slate-500">
+                    <FileText className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+                    <p className="text-sm">No active forms</p>
+                  </div>
+                )}
+              </div>
+            </Card>
           </div>
 
-          {/* Main Content Grid */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            {/* Left Column - Charts and Analytics */}
-            <div className="xl:col-span-2 space-y-6">
-              {/* Weather Widget */}
-              <WeatherWidget />
+          {/* Charts and Recent Activity */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            {/* Revenue Chart */}
+            <div className="lg:col-span-2">
+              <Card className="p-3 sm:p-4 lg:p-6 bg-white border-0 shadow-lg">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4">
+                  <h3 className="text-base sm:text-lg font-semibold text-slate-800">Revenue Trend</h3>
+                  <FormControl size="small" className="w-full sm:w-32">
+                    <Select
+                      value={selectedRange}
+                      onChange={(e) => handleChartRangeChange(e.target.value)}
+                      displayEmpty
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderColor: '#f97316',
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#ea580c',
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#f97316',
+                          },
+                        },
+                        '& .MuiSelect-select': {
+                          color: '#1e293b',
+                        },
+                      }}
+                    >
+                      <MenuItem value="7">7 days</MenuItem>
+                      <MenuItem value="30">30 days</MenuItem>
+                      <MenuItem value="90">90 days</MenuItem>
+                    </Select>
+                  </FormControl>
+                </div>
+                <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
+                  <LineChart data={revenueChartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis 
+                      dataKey="date" 
+                      stroke="#64748b" 
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis 
+                      stroke="#64748b" 
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value) => `$${value.toLocaleString()}`}
+                    />
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: 'white',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      }}
+                      labelStyle={{ color: '#1e293b', fontWeight: '600' }}
+                      formatter={(value: any) => [`$${value.toLocaleString()}`, 'Revenue']}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="revenue" 
+                      stroke="#f97316" 
+                      strokeWidth={3} 
+                      dot={{ 
+                        r: 5, 
+                        fill: '#f97316',
+                        stroke: 'white',
+                        strokeWidth: 2
+                      }} 
+                      activeDot={{ 
+                        r: 7,
+                        fill: '#ea580c',
+                        stroke: 'white',
+                        strokeWidth: 2
+                      }}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </Card>
+            </div>
 
-              {/* Recent Projects */}
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <ClipboardList className="w-5 h-5" />
-                    Recent Projects
-                  </CardTitle>
-                  <Button variant="ghost" size="sm">
+            {/* Recent Projects */}
+            <div>
+              <Card className="p-3 sm:p-4 lg:p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-base sm:text-lg font-semibold text-slate-800">Recent Projects</h3>
+                  <Button
+                    variant="text"
+                    size="small"
+                    component={Link}
+                    to="/admin/projects"
+                    className="text-xs sm:text-sm"
+                  >
                     View All
-                    <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {recentProjects.map((project) => (
-                      <div key={project.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-medium text-gray-900">{project.name}</h4>
-                            <Badge variant="outline" className={getPriorityColor(project.priority)}>
-                              {project.priority}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-gray-600 mb-2">{project.customer}</p>
-                          <div className="flex items-center gap-4">
-                            <Badge variant="secondary" className={getStatusColor(project.status)}>
-                              {project.status}
-                            </Badge>
-                            <span className="text-sm text-gray-500">Due: {project.dueDate}</span>
-                          </div>
-                          <div className="mt-3">
-                            <div className="flex items-center justify-between text-sm mb-1">
-                              <span>Progress</span>
-                              <span>{project.progress}%</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                              <div 
-                                className="bg-blue-600 h-2 rounded-full" 
-                                style={{ width: `${project.progress}%` }}
-                              ></div>
-                            </div>
-                          </div>
+                </div>
+                <div className="space-y-3 sm:space-y-4">
+                  {recentProjects.map((project) => (
+                    <div 
+                      key={project.id} 
+                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-slate-50 rounded-lg hover:bg-slate-100 cursor-pointer transition-colors gap-2 sm:gap-0"
+                      onClick={() => navigateToProject(project.id)}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-slate-800 text-sm truncate">{project.title}</h4>
+                        <p className="text-xs sm:text-sm text-slate-600 truncate">{project.customer}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Progress value={project.progress} className="w-12 sm:w-16 h-2" />
+                          <span className="text-xs text-slate-500">{project.progress}%</span>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Performance Analytics */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5" />
-                    Performance Analytics
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Tabs defaultValue="revenue" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger value="revenue">Revenue</TabsTrigger>
-                      <TabsTrigger value="projects">Projects</TabsTrigger>
-                      <TabsTrigger value="efficiency">Efficiency</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="revenue" className="mt-4">
-                      <div className="h-64 flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border">
-                        <div className="text-center">
-                          <LineChart className="w-16 h-16 mx-auto mb-4 text-blue-500" />
-                          <h3 className="text-lg font-semibold mb-2">Revenue Analytics</h3>
-                          <p className="text-gray-600">Monthly revenue: $78,542 (+18%)</p>
-                        </div>
-                      </div>
-                    </TabsContent>
-                    <TabsContent value="projects" className="mt-4">
-                      <div className="h-64 flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 rounded-lg border">
-                        <div className="text-center">
-                          <PieChart className="w-16 h-16 mx-auto mb-4 text-green-500" />
-                          <h3 className="text-lg font-semibold mb-2">Project Distribution</h3>
-                          <p className="text-gray-600">89 active projects across all categories</p>
-                        </div>
-                      </div>
-                    </TabsContent>
-                    <TabsContent value="efficiency" className="mt-4">
-                      <div className="h-64 flex items-center justify-center bg-gradient-to-br from-orange-50 to-red-50 rounded-lg border">
-                        <div className="text-center">
-                          <BarChart3 className="w-16 h-16 mx-auto mb-4 text-orange-500" />
-                          <h3 className="text-lg font-semibold mb-2">Team Efficiency</h3>
-                          <p className="text-gray-600">Average completion rate: 92%</p>
-                        </div>
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </CardContent>
+                      <Badge variant={project.status === 'completed' ? 'default' : 'secondary'} className="text-xs">
+                        {project.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
               </Card>
             </div>
+          </div>
 
-            {/* Right Column - Activity and Tasks */}
-            <div className="space-y-6">
-              {/* Recent Tickets */}
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5" />
-                    Support Tickets
-                  </CardTitle>
-                  <Button variant="ghost" size="sm">
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {recentTickets.map((ticket) => (
-                      <div key={ticket.id} className="p-3 border rounded-lg hover:bg-gray-50">
-                        <div className="flex items-start justify-between mb-2">
-                          <h4 className="font-medium text-sm">{ticket.title}</h4>
-                          <Badge variant="outline" className={getPriorityColor(ticket.priority)}>
-                            {ticket.priority}
-                          </Badge>
-                        </div>
-                        <p className="text-xs text-gray-600 mb-2">{ticket.customer}</p>
-                        <div className="flex items-center justify-between">
-                          <Badge variant="secondary" className={getStatusColor(ticket.status)}>
-                            {ticket.status}
-                          </Badge>
-                          <span className="text-xs text-gray-500">{ticket.created}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Today's Schedule */}
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <Calendar className="w-5 h-5" />
-                    Today's Schedule
-                  </CardTitle>
-                  <Button variant="ghost" size="sm">
-                    <Eye className="w-4 h-4" />
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {upcomingTasks.map((task) => (
-                      <div key={task.id} className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50">
-                        <div className="flex-shrink-0">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-1">
-                            <h4 className="font-medium text-sm">{task.title}</h4>
-                            <span className="text-xs text-gray-500">{task.time}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline">
-                              {task.type}
-                            </Badge>
-                            <Badge variant="secondary" className={getPriorityColor(task.priority)}>
-                              {task.priority}
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Quick Actions */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Settings className="w-5 h-5" />
-                    Quick Actions
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-3">
-                    <Button variant="outline" size="sm" className="h-16 flex-col">
-                      <Users className="w-5 h-5 mb-1" />
-                      <span className="text-xs">New Customer</span>
-                    </Button>
-                    <Button variant="outline" size="sm" className="h-16 flex-col">
-                      <ClipboardList className="w-5 h-5 mb-1" />
-                      <span className="text-xs">New Project</span>
-                    </Button>
-                    <Button variant="outline" size="sm" className="h-16 flex-col">
-                      <Package className="w-5 h-5 mb-1" />
-                      <span className="text-xs">Add Inventory</span>
-                    </Button>
-                    <Button variant="outline" size="sm" className="h-16 flex-col">
-                      <Wrench className="w-5 h-5 mb-1" />
-                      <span className="text-xs">Schedule Service</span>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* System Status */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Activity className="w-5 h-5" />
-                    System Status
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">API Services</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-xs text-green-600">Operational</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Database</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-xs text-green-600">Healthy</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Backup Systems</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                        <span className="text-xs text-yellow-600">Scheduled</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">External APIs</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-xs text-green-600">Connected</span>
-                      </div>
+          {/* Notifications and Quick Actions */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            {/* Notifications */}
+            <Card className="p-3 sm:p-4 lg:p-6">
+              <h3 className="text-base sm:text-lg font-semibold text-slate-800 mb-3 sm:mb-4">Recent Notifications</h3>
+              <div className="space-y-2 sm:space-y-3">
+                {notifications.map((notification) => (
+                  <div key={notification.id} className={`flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg ${
+                    notification.read ? 'bg-slate-50' : 'bg-blue-50'
+                  }`}>
+                    <div className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${
+                      notification.type === 'warning' ? 'bg-yellow-500' :
+                      notification.type === 'success' ? 'bg-green-500' :
+                      notification.type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+                    }`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs sm:text-sm text-slate-800">{notification.message}</p>
+                      <p className="text-xs text-slate-500 mt-1">
+                        {notification.timestamp.toLocaleTimeString()}
+                      </p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Quick Actions */}
+            <Card className="p-3 sm:p-4 lg:p-6">
+              <h3 className="text-base sm:text-lg font-semibold text-slate-800 mb-3 sm:mb-4">Quick Actions</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  startIcon={<AddIcon />}
+                  component={Link}
+                  to="/admin/projects/new"
+                  className="text-xs sm:text-sm"
+                >
+                  <span className="hidden sm:inline">New Project</span>
+                  <span className="sm:hidden">New Project</span>
+                </Button>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  startIcon={<Person />}
+                  component={Link}
+                  to="/admin/customers/new"
+                  className="text-xs sm:text-sm"
+                >
+                  <span className="hidden sm:inline">Add Customer</span>
+                  <span className="sm:hidden">Add Customer</span>
+                </Button>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  startIcon={<WrenchIcon />}
+                  component={Link}
+                  to="/admin/generators/new"
+                  className="text-xs sm:text-sm"
+                >
+                  <span className="hidden sm:inline">Add Generator</span>
+                  <span className="sm:hidden">Add Generator</span>
+                </Button>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  startIcon={<Calendar />}
+                  component={Link}
+                  to="/admin/schedule"
+                  className="text-xs sm:text-sm"
+                >
+                  <span className="hidden sm:inline">Schedule</span>
+                  <span className="sm:hidden">Schedule</span>
+                </Button>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  startIcon={<FileText />}
+                  component={Link}
+                  to="/admin/forms"
+                  className="text-xs sm:text-sm"
+                >
+                  <span className="hidden sm:inline">Forms</span>
+                  <span className="sm:hidden">Forms</span>
+                </Button>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  startIcon={<SettingsIcon />}
+                  component={Link}
+                  to="/admin/settings"
+                  className="text-xs sm:text-sm"
+                >
+                  <span className="hidden sm:inline">Settings</span>
+                  <span className="sm:hidden">Settings</span>
+                </Button>
+              </div>
+            </Card>
           </div>
         </div>
       </div>
     </>
   );
-}
+};
+
+export default AdminDashboard;
