@@ -1680,6 +1680,63 @@ export const supabaseService = {
     }
   },
 
+  async updateInventoryCategory(id: string, updates: {
+    name?: string;
+    description?: string;
+    color?: string;
+    icon?: string;
+  }) {
+    try {
+      console.log('Updating inventory category:', id, updates);
+      
+      const response = await fetch(`${supabaseUrl}/rest/v1/inventory_categories?id=eq.${id}`, {
+        method: 'PATCH',
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify(updates)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+      }
+
+      const data = await response.json();
+      console.log('Inventory category updated successfully:', data);
+      return data[0];
+    } catch (error) {
+      console.error('Error updating inventory category:', error);
+      throw error;
+    }
+  },
+
+  async deleteInventoryCategory(id: string) {
+    try {
+      console.log('Deleting inventory category:', id);
+      
+      const response = await fetch(`${supabaseUrl}/rest/v1/inventory_categories?id=eq.${id}`, {
+        method: 'DELETE',
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+      }
+
+      console.log('Inventory category deleted successfully');
+    } catch (error) {
+      console.error('Error deleting inventory category:', error);
+      throw error;
+    }
+  },
+
   // Suppliers
   async getSuppliers() {
     try {
@@ -1741,6 +1798,69 @@ export const supabaseService = {
       return data[0];
     } catch (error) {
       console.error('Error creating supplier:', error);
+      throw error;
+    }
+  },
+
+  async updateSupplier(id: string, updates: {
+    name?: string;
+    contact_name?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    website?: string;
+    rating?: number;
+    terms?: string;
+    payment_terms?: string;
+    notes?: string;
+  }) {
+    try {
+      console.log('Updating supplier:', id, updates);
+      
+      const response = await fetch(`${supabaseUrl}/rest/v1/suppliers?id=eq.${id}`, {
+        method: 'PATCH',
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify(updates)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+      }
+
+      const data = await response.json();
+      console.log('Supplier updated successfully:', data);
+      return data[0];
+    } catch (error) {
+      console.error('Error updating supplier:', error);
+      throw error;
+    }
+  },
+
+  async deleteSupplier(id: string) {
+    try {
+      console.log('Deleting supplier:', id);
+      
+      const response = await fetch(`${supabaseUrl}/rest/v1/suppliers?id=eq.${id}`, {
+        method: 'DELETE',
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+      }
+
+      console.log('Supplier deleted successfully');
+    } catch (error) {
+      console.error('Error deleting supplier:', error);
       throw error;
     }
   },
@@ -2024,7 +2144,7 @@ export const supabaseService = {
     end_date?: string;
   }) {
     try {
-      console.log('Fetching stock movements:', { itemId, filters });
+      console.log('Fetching stock movements with filters:', { itemId, filters });
       
       let url = `${supabaseUrl}/rest/v1/stock_movements?select=*,item:inventory_items(*)&order=created_at.desc`;
       
@@ -2061,6 +2181,43 @@ export const supabaseService = {
       return data;
     } catch (error) {
       console.error('Error fetching stock movements:', error);
+      throw error;
+    }
+  },
+
+  async createStockMovement(movement: {
+    item_id: string;
+    movement_type: 'in' | 'out' | 'adjustment';
+    quantity: number;
+    reference_type?: string;
+    reference_id?: string;
+    notes?: string;
+    location_from?: string;
+    location_to?: string;
+  }) {
+    try {
+      console.log('Creating stock movement:', movement);
+      
+      const response = await fetch(`${supabaseUrl}/rest/v1/stock_movements`, {
+        method: 'POST',
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify(movement)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+      }
+
+      const data = await response.json();
+      console.log('Stock movement created successfully:', data);
+      return data[0];
+    } catch (error) {
+      console.error('Error creating stock movement:', error);
       throw error;
     }
   },

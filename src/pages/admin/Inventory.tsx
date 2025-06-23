@@ -27,11 +27,16 @@ import {
   Settings,
   Users,
   Building,
-  Loader2
+  Loader2,
+  Database
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { supabaseService } from '@/services/supabase';
 import { useToast } from '@/hooks/use-toast';
 import { InventoryItemForm } from '@/components/inventory/InventoryItemForm';
+import { CategoryForm } from '@/components/inventory/CategoryForm';
+import { SupplierForm } from '@/components/inventory/SupplierForm';
+import { StockAdjustmentDialog } from '@/components/inventory/StockAdjustmentDialog';
+import { populateSampleData } from '@/services/sampleInventoryData';
 
 interface InventoryItem {
   id: string;
@@ -103,8 +108,11 @@ export default function Inventory() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [showItemForm, setShowItemForm] = useState(false);
-  const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
+  const [showCategoryForm, setShowCategoryForm] = useState(false);
+  const [showSupplierForm, setShowSupplierForm] = useState(false);
   const [showStockAdjustment, setShowStockAdjustment] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<InventoryCategory | null>(null);
+  const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
@@ -121,59 +129,31 @@ export default function Inventory() {
       setError(null);
       
       // Load categories
-      const { data: categoriesData, error: categoriesError } = await supabase
-        .from('inventory_categories')
-        .select('*')
-        .order('name');
-      
-      if (categoriesError) {
-        console.error('Error loading categories:', categoriesError);
-        // Create default categories if table doesn't exist
-        setCategories([
-          { id: '1', name: 'Electronics', description: 'Electronic components', color: '#3B82F6', created_at: new Date().toISOString() },
-          { id: '2', name: 'Tools', description: 'Hand and power tools', color: '#10B981', created_at: new Date().toISOString() },
-          { id: '3', name: 'Parts', description: 'Replacement parts', color: '#F59E0B', created_at: new Date().toISOString() }
-        ]);
-      } else {
+      try {
+        const categoriesData = await supabaseService.getInventoryCategories();
         setCategories(categoriesData || []);
+      } catch (error) {
+        console.error('Error loading categories:', error);
+        // Create default categories if none exist
+        if (categories.length === 0) {
+          await createDefaultCategories();
+        }
       }
 
       // Load suppliers
-      const { data: suppliersData, error: suppliersError } = await supabase
-        .from('suppliers')
-        .select('*')
-        .order('name');
-      
-      if (suppliersError) {
-        console.error('Error loading suppliers:', suppliersError);
-        // Create default suppliers if table doesn't exist
-        setSuppliers([
-          { id: '1', name: 'ABC Electronics', contact_name: 'John Doe', email: 'john@abc.com', rating: 4.5, created_at: new Date().toISOString() },
-          { id: '2', name: 'XYZ Tools', contact_name: 'Jane Smith', email: 'jane@xyz.com', rating: 4.2, created_at: new Date().toISOString() }
-        ]);
-      } else {
+      try {
+        const suppliersData = await supabaseService.getSuppliers();
         setSuppliers(suppliersData || []);
+      } catch (error) {
+        console.error('Error loading suppliers:', error);
+        // Create default suppliers if none exist
+        if (suppliers.length === 0) {
+          await createDefaultSuppliers();
+        }
       }
 
       // Calculate stats
-      const { data: itemsData } = await supabase
-        .from('inventory_items')
-        .select('*');
-      
-      const itemsList = itemsData || [];
-      const totalValue = itemsList.reduce((sum, item) => sum + (item.quantity * item.unit_cost), 0);
-      const lowStockItems = itemsList.filter(item => item.quantity <= item.min_quantity).length;
-      const outOfStockItems = itemsList.filter(item => item.quantity === 0).length;
-      
-      setStats({
-        total_items: itemsList.length,
-        total_value: totalValue,
-        low_stock_items: lowStockItems,
-        out_of_stock_items: outOfStockItems,
-        categories_count: categoriesData?.length || 3,
-        suppliers_count: suppliersData?.length || 2,
-        recent_movements: []
-      });
+      await calculateStats();
 
     } catch (error) {
       console.error('Error loading inventory data:', error);
@@ -188,97 +168,92 @@ export default function Inventory() {
     }
   };
 
+  const createDefaultCategories = async () => {
+    try {
+      const defaultCategories = [
+        { name: 'Electronics', description: 'Electronic components and devices', color: '#3B82F6' },
+        { name: 'Tools', description: 'Hand and power tools', color: '#10B981' },
+        { name: 'Parts', description: 'Replacement parts and components', color: '#F59E0B' },
+        { name: 'Supplies', description: 'General supplies and consumables', color: '#EF4444' }
+      ];
+
+      for (const category of defaultCategories) {
+        await supabaseService.createInventoryCategory(category);
+      }
+      
+      const categoriesData = await supabaseService.getInventoryCategories();
+      setCategories(categoriesData || []);
+    } catch (error) {
+      console.error('Error creating default categories:', error);
+    }
+  };
+
+  const createDefaultSuppliers = async () => {
+    try {
+      const defaultSuppliers = [
+        { name: 'ABC Electronics', contact_name: 'John Doe', email: 'john@abc.com', rating: 4.5 },
+        { name: 'XYZ Tools', contact_name: 'Jane Smith', email: 'jane@xyz.com', rating: 4.2 },
+        { name: 'Global Parts Co', contact_name: 'Mike Johnson', email: 'mike@globalparts.com', rating: 4.0 }
+      ];
+
+      for (const supplier of defaultSuppliers) {
+        await supabaseService.createSupplier(supplier);
+      }
+      
+      const suppliersData = await supabaseService.getSuppliers();
+      setSuppliers(suppliersData || []);
+    } catch (error) {
+      console.error('Error creating default suppliers:', error);
+    }
+  };
+
+  const calculateStats = async () => {
+    try {
+      const itemsData = await supabaseService.getInventoryItems();
+      const itemsList = itemsData || [];
+      const totalValue = itemsList.reduce((sum, item) => sum + (item.quantity * item.unit_cost), 0);
+      const lowStockItems = itemsList.filter(item => item.quantity <= item.min_quantity).length;
+      const outOfStockItems = itemsList.filter(item => item.quantity === 0).length;
+      
+      setStats({
+        total_items: itemsList.length,
+        total_value: totalValue,
+        low_stock_items: lowStockItems,
+        out_of_stock_items: outOfStockItems,
+        categories_count: categories.length,
+        suppliers_count: suppliers.length,
+        recent_movements: []
+      });
+    } catch (error) {
+      console.error('Error calculating stats:', error);
+    }
+  };
+
   const loadInventoryItems = async () => {
     try {
-      let query = supabase
-        .from('inventory_items')
-        .select(`
-          *,
-          category:inventory_categories(*),
-          supplier:suppliers(*)
-        `)
-        .order('name');
-
-      if (searchTerm) {
-        query = query.or(`name.ilike.%${searchTerm}%,sku.ilike.%${searchTerm}%,barcode.ilike.%${searchTerm}%`);
-      }
-
-      const { data, error } = await query;
-      
-      if (error) {
-        console.error('Error loading inventory items:', error);
-        // Create sample data if table doesn't exist
-        setItems([
-          {
-            id: '1',
-            name: 'Generator Control Panel',
-            description: 'Main control panel for industrial generators',
-            sku: 'GCP-001',
-            quantity: 15,
-            min_quantity: 5,
-            unit_cost: 250.00,
-            unit_price: 350.00,
-            location: 'Warehouse A',
-            status: 'in_stock',
-            condition: 'new',
-            manufacturer: 'GenPro',
-            model: 'GCP-2024',
-            category: { id: '1', name: 'Electronics', color: '#3B82F6' },
-            supplier: { id: '1', name: 'ABC Electronics' },
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          },
-          {
-            id: '2',
-            name: 'Fuel Filter Assembly',
-            description: 'High-quality fuel filter for diesel generators',
-            sku: 'FF-002',
-            quantity: 3,
-            min_quantity: 10,
-            unit_cost: 45.00,
-            unit_price: 65.00,
-            location: 'Warehouse B',
-            status: 'low_stock',
-            condition: 'new',
-            manufacturer: 'FilterMax',
-            model: 'FF-500',
-            category: { id: '3', name: 'Parts', color: '#F59E0B' },
-            supplier: { id: '2', name: 'XYZ Tools' },
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }
-        ]);
-      } else {
-        setItems(data || []);
-      }
+      const itemsData = await supabaseService.getInventoryItems({ search: searchTerm });
+      setItems(itemsData || []);
     } catch (error) {
       console.error('Error loading inventory items:', error);
-      setError('Failed to load inventory items');
+      toast({
+        title: "Error",
+        description: "Failed to load inventory items",
+        variant: "destructive",
+      });
     }
   };
 
   const handleCreateItem = async (itemData: any) => {
     try {
-      const { data, error } = await supabase
-        .from('inventory_items')
-        .insert([itemData])
-        .select()
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
+      await supabaseService.createInventoryItem(itemData);
       toast({
         title: "Success",
         description: "Inventory item created successfully",
       });
-      
       setShowItemForm(false);
-      loadInventoryData();
-      loadInventoryItems();
+      await loadInventoryData();
     } catch (error) {
-      console.error('Error creating inventory item:', error);
+      console.error('Error creating item:', error);
       toast({
         title: "Error",
         description: "Failed to create inventory item",
@@ -288,65 +263,216 @@ export default function Inventory() {
   };
 
   const handleDeleteItem = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this item?')) return;
-    
+    if (!confirm('Are you sure you want to delete this item?')) {
+      return;
+    }
+
     try {
-      const { error } = await supabase
-        .from('inventory_items')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        throw error;
-      }
-
+      await supabaseService.deleteInventoryItem(id);
       toast({
         title: "Success",
-        description: "Item deleted successfully",
+        description: "Inventory item deleted successfully",
       });
-      
-      loadInventoryData();
-      loadInventoryItems();
+      await loadInventoryData();
     } catch (error) {
-      console.error('Error deleting inventory item:', error);
+      console.error('Error deleting item:', error);
       toast({
         title: "Error",
-        description: "Failed to delete item",
+        description: "Failed to delete inventory item",
         variant: "destructive",
       });
     }
   };
 
-  const handleBarcodeScan = async (barcode: string) => {
+  const handleCreateCategory = async (categoryData: any) => {
     try {
-      // Find item by barcode
-      const { data: item } = await supabase
-        .from('inventory_items')
-        .select('*')
-        .eq('barcode', barcode)
-        .single();
-
-      if (item) {
-        setSelectedItem(item);
-        setShowStockAdjustment(true);
-        toast({
-          title: "Item Found",
-          description: `Found item: ${item.name}`,
-        });
-      } else {
-        toast({
-          title: "Item Not Found",
-          description: "No item found with this barcode",
-          variant: "destructive",
-        });
-      }
+      await supabaseService.createInventoryCategory(categoryData);
+      toast({
+        title: "Success",
+        description: "Category created successfully",
+      });
+      setShowCategoryForm(false);
+      await loadInventoryData();
     } catch (error) {
-      console.error('Error processing barcode scan:', error);
+      console.error('Error creating category:', error);
       toast({
         title: "Error",
-        description: "Failed to process barcode scan",
+        description: "Failed to create category",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleUpdateCategory = async (categoryData: any) => {
+    if (!editingCategory) return;
+    
+    try {
+      await supabaseService.updateInventoryCategory(editingCategory.id, categoryData);
+      toast({
+        title: "Success",
+        description: "Category updated successfully",
+      });
+      setShowCategoryForm(false);
+      setEditingCategory(null);
+      await loadInventoryData();
+    } catch (error) {
+      console.error('Error updating category:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update category",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this category?')) {
+      return;
+    }
+
+    try {
+      await supabaseService.deleteInventoryCategory(id);
+      toast({
+        title: "Success",
+        description: "Category deleted successfully",
+      });
+      await loadInventoryData();
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete category",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCreateSupplier = async (supplierData: any) => {
+    try {
+      await supabaseService.createSupplier(supplierData);
+      toast({
+        title: "Success",
+        description: "Supplier created successfully",
+      });
+      setShowSupplierForm(false);
+      await loadInventoryData();
+    } catch (error) {
+      console.error('Error creating supplier:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create supplier",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUpdateSupplier = async (supplierData: any) => {
+    if (!editingSupplier) return;
+    
+    try {
+      await supabaseService.updateSupplier(editingSupplier.id, supplierData);
+      toast({
+        title: "Success",
+        description: "Supplier updated successfully",
+      });
+      setShowSupplierForm(false);
+      setEditingSupplier(null);
+      await loadInventoryData();
+    } catch (error) {
+      console.error('Error updating supplier:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update supplier",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteSupplier = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this supplier?')) {
+      return;
+    }
+
+    try {
+      await supabaseService.deleteSupplier(id);
+      toast({
+        title: "Success",
+        description: "Supplier deleted successfully",
+      });
+      await loadInventoryData();
+    } catch (error) {
+      console.error('Error deleting supplier:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete supplier",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleStockAdjustment = async (adjustmentData: any) => {
+    try {
+      // Create stock movement record
+      await supabaseService.createStockMovement({
+        item_id: adjustmentData.item_id,
+        movement_type: adjustmentData.movement_type,
+        quantity: adjustmentData.adjustment,
+        reference_type: adjustmentData.reason,
+        notes: adjustmentData.notes
+      });
+
+      // Update item quantity
+      const item = items.find(i => i.id === adjustmentData.item_id);
+      if (item) {
+        let newQuantity;
+        if (adjustmentData.movement_type === 'in') {
+          newQuantity = item.quantity + adjustmentData.adjustment;
+        } else if (adjustmentData.movement_type === 'out') {
+          newQuantity = item.quantity - adjustmentData.adjustment;
+        } else {
+          newQuantity = adjustmentData.adjustment;
+        }
+
+        await supabaseService.updateInventoryItem(adjustmentData.item_id, {
+          quantity: newQuantity
+        });
+      }
+
+      toast({
+        title: "Success",
+        description: "Stock adjustment applied successfully",
+      });
+      setShowStockAdjustment(false);
+      setSelectedItem(null);
+      await loadInventoryData();
+    } catch (error) {
+      console.error('Error applying stock adjustment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to apply stock adjustment",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePopulateSampleData = async () => {
+    try {
+      setLoading(true);
+      await populateSampleData();
+      toast({
+        title: "Success",
+        description: "Sample inventory data populated successfully",
+      });
+      await loadInventoryData();
+    } catch (error) {
+      console.error('Error populating sample data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to populate sample data",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -398,10 +524,6 @@ export default function Inventory() {
           <Button onClick={() => setShowItemForm(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Add Item
-          </Button>
-          <Button variant="outline" onClick={() => setShowBarcodeScanner(true)}>
-            <Barcode className="h-4 w-4 mr-2" />
-            Scan Barcode
           </Button>
         </div>
       </div>
@@ -707,7 +829,11 @@ export default function Inventory() {
                         <div className="text-gray-500">
                           <Package className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                           <p>No inventory items found</p>
-                          <p className="text-sm">Add your first item to get started</p>
+                          <p className="text-sm mb-4">Add your first item to get started</p>
+                          <Button onClick={handlePopulateSampleData} disabled={loading}>
+                            <Database className="w-4 h-4 mr-2" />
+                            {loading ? 'Populating...' : 'Populate Sample Data'}
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -723,7 +849,10 @@ export default function Inventory() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Categories</CardTitle>
-                <Button size="sm">
+                <Button size="sm" onClick={() => {
+                  setEditingCategory(null);
+                  setShowCategoryForm(true);
+                }}>
                   <Plus className="w-4 h-4 mr-2" />
                   Add Category
                 </Button>
@@ -734,18 +863,39 @@ export default function Inventory() {
                 {categories.length > 0 ? (
                   categories.map((category) => (
                     <Card key={category.id} className="p-4">
-                      <div className="flex items-center space-x-3">
-                        <div 
-                          className="w-8 h-8 rounded-full flex items-center justify-center"
-                          style={{ backgroundColor: category.color + '20' }}
-                        >
-                          <span style={{ color: category.color }}>📦</span>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div 
+                            className="w-8 h-8 rounded-full flex items-center justify-center"
+                            style={{ backgroundColor: category.color + '20' }}
+                          >
+                            <span style={{ color: category.color }}>{category.icon || '📦'}</span>
+                          </div>
+                          <div>
+                            <h3 className="font-medium">{category.name}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {category.description}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-medium">{category.name}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {category.description}
-                          </p>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setEditingCategory(category);
+                              setShowCategoryForm(true);
+                            }}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteCategory(category.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         </div>
                       </div>
                     </Card>
@@ -767,7 +917,10 @@ export default function Inventory() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Suppliers</CardTitle>
-                <Button size="sm">
+                <Button size="sm" onClick={() => {
+                  setEditingSupplier(null);
+                  setShowSupplierForm(true);
+                }}>
                   <Plus className="w-4 h-4 mr-2" />
                   Add Supplier
                 </Button>
@@ -778,37 +931,58 @@ export default function Inventory() {
                 {suppliers.length > 0 ? (
                   suppliers.map((supplier) => (
                     <Card key={supplier.id} className="p-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center space-x-2">
-                          <Building className="w-4 h-4 text-muted-foreground" />
-                          <h3 className="font-medium">{supplier.name}</h3>
-                        </div>
-                        {supplier.contact_name && (
-                          <p className="text-sm text-muted-foreground">
-                            Contact: {supplier.contact_name}
-                          </p>
-                        )}
-                        {supplier.email && (
-                          <p className="text-sm text-muted-foreground">
-                            {supplier.email}
-                          </p>
-                        )}
-                        <div className="flex items-center space-x-2">
-                          <div className="flex items-center space-x-1">
-                            {[...Array(5)].map((_, i) => (
-                              <span
-                                key={i}
-                                className={`w-2 h-2 rounded-full ${
-                                  i < Math.floor(supplier.rating) 
-                                    ? 'bg-yellow-400' 
-                                    : 'bg-gray-200'
-                                }`}
-                              />
-                            ))}
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <Building className="w-4 h-4 text-muted-foreground" />
+                            <h3 className="font-medium">{supplier.name}</h3>
                           </div>
-                          <span className="text-sm text-muted-foreground">
-                            {supplier.rating.toFixed(1)}
-                          </span>
+                          {supplier.contact_name && (
+                            <p className="text-sm text-muted-foreground">
+                              Contact: {supplier.contact_name}
+                            </p>
+                          )}
+                          {supplier.email && (
+                            <p className="text-sm text-muted-foreground">
+                              {supplier.email}
+                            </p>
+                          )}
+                          <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-1">
+                              {[...Array(5)].map((_, i) => (
+                                <span
+                                  key={i}
+                                  className={`w-2 h-2 rounded-full ${
+                                    i < Math.floor(supplier.rating) 
+                                      ? 'bg-yellow-400' 
+                                      : 'bg-gray-200'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-sm text-muted-foreground">
+                              {supplier.rating.toFixed(1)}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setEditingSupplier(supplier);
+                              setShowSupplierForm(true);
+                            }}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteSupplier(supplier.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         </div>
                       </div>
                     </Card>
@@ -825,52 +999,6 @@ export default function Inventory() {
           </Card>
         </TabsContent>
       </Tabs>
-
-      {/* Barcode Scanner Dialog */}
-      <Dialog open={showBarcodeScanner} onOpenChange={setShowBarcodeScanner}>
-        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Scan Barcode</DialogTitle>
-            <DialogDescription>
-              Scan a barcode to find or add inventory items
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="text-center py-8">
-              <Barcode className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-              <p className="text-gray-500">Barcode scanner not implemented</p>
-              <p className="text-sm text-gray-400">Manual entry available</p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="barcode">Barcode</Label>
-              <Input
-                id="barcode"
-                placeholder="Enter barcode manually"
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleBarcodeScan(e.currentTarget.value);
-                    setShowBarcodeScanner(false);
-                  }
-                }}
-              />
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowBarcodeScanner(false)}>
-                Cancel
-              </Button>
-              <Button onClick={() => {
-                const input = document.getElementById('barcode') as HTMLInputElement;
-                if (input?.value) {
-                  handleBarcodeScan(input.value);
-                  setShowBarcodeScanner(false);
-                }
-              }}>
-                Scan
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Add Item Dialog */}
       <Dialog open={showItemForm} onOpenChange={setShowItemForm}>
@@ -890,51 +1018,33 @@ export default function Inventory() {
         </DialogContent>
       </Dialog>
 
+      {/* Category Form Dialog */}
+      <CategoryForm
+        category={editingCategory}
+        onSubmit={editingCategory ? handleUpdateCategory : handleCreateCategory}
+        onCancel={() => setShowCategoryForm(false)}
+        open={showCategoryForm}
+        onOpenChange={setShowCategoryForm}
+      />
+
+      {/* Supplier Form Dialog */}
+      <SupplierForm
+        supplier={editingSupplier}
+        onSubmit={editingSupplier ? handleUpdateSupplier : handleCreateSupplier}
+        onCancel={() => setShowSupplierForm(false)}
+        open={showSupplierForm}
+        onOpenChange={setShowSupplierForm}
+      />
+
       {/* Stock Adjustment Dialog */}
       {selectedItem && (
-        <Dialog open={showStockAdjustment} onOpenChange={setShowStockAdjustment}>
-          <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Adjust Stock</DialogTitle>
-              <DialogDescription>
-                Adjust stock levels for {selectedItem.name}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label>Current Quantity</Label>
-                <p className="text-lg font-semibold">{selectedItem.quantity}</p>
-              </div>
-              <div>
-                <Label htmlFor="adjustment">Adjustment (+/-)</Label>
-                <Input
-                  id="adjustment"
-                  type="number"
-                  placeholder="Enter quantity change"
-                />
-              </div>
-              <div>
-                <Label htmlFor="notes">Notes</Label>
-                <Textarea
-                  id="notes"
-                  placeholder="Reason for adjustment"
-                />
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setShowStockAdjustment(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={() => {
-                  // Handle stock adjustment
-                  setShowStockAdjustment(false);
-                  setSelectedItem(null);
-                }}>
-                  Apply
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <StockAdjustmentDialog
+          item={selectedItem}
+          onSubmit={handleStockAdjustment}
+          onCancel={() => setShowStockAdjustment(false)}
+          open={showStockAdjustment}
+          onOpenChange={setShowStockAdjustment}
+        />
       )}
     </div>
   );

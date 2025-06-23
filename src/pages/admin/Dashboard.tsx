@@ -81,6 +81,10 @@ import {
   Calendar,
   ArrowRight,
   FileText,
+  Clock,
+  CheckCircle,
+  AlertTriangle,
+  Plus,
 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import {
@@ -96,6 +100,8 @@ import { Avatar } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { getRevenueStats } from '@/lib/billingService';
+import { getScheduleStats, getScheduleEvents } from '@/lib/schedulingService';
+import { getFormSubmissionStats, getFormDefinitions } from '@/lib/formsService';
 import SEO from '../../components/SEO';
 
 const sidebarItems = [
@@ -441,6 +447,20 @@ const AdminDashboard: React.FC = () => {
   });
   const [recentProjects, setRecentProjects] = useState<LocalProject[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [scheduleStats, setScheduleStats] = useState({
+    totalEvents: 0,
+    upcomingEvents: 0,
+    overdueEvents: 0,
+    completedEvents: 0
+  });
+  const [recentSchedules, setRecentSchedules] = useState<any[]>([]);
+  const [formsStats, setFormsStats] = useState({
+    totalSubmissions: 0,
+    newSubmissions: 0,
+    completedSubmissions: 0,
+    totalForms: 0
+  });
+  const [recentForms, setRecentForms] = useState<any[]>([]);
 
   console.log('AdminDashboard: State initialized, loading =', loading);
 
@@ -459,6 +479,14 @@ const AdminDashboard: React.FC = () => {
 
   const navigateToRevenue = () => {
     window.location.href = '/admin/billing';
+  };
+
+  const navigateToSchedule = () => {
+    window.location.href = '/admin/schedule';
+  };
+
+  const navigateToForms = () => {
+    window.location.href = '/admin/forms';
   };
 
   const navigateToProject = (projectId: string) => {
@@ -563,6 +591,23 @@ const AdminDashboard: React.FC = () => {
         const generators = await supabaseService.getGenerators();
         console.log('Generators fetched:', generators?.length || 0, generators);
         
+        // Fetch schedule data
+        console.log('Fetching schedule data...');
+        const scheduleStatsData = await getScheduleStats();
+        const recentSchedulesData = await getScheduleEvents({ 
+          date_range: {
+            start: new Date().toISOString(),
+            end: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+          }
+        });
+        console.log('Schedule data fetched:', scheduleStatsData, recentSchedulesData?.length || 0);
+        
+        // Fetch forms data
+        console.log('Fetching forms data...');
+        const formsStatsData = await getFormSubmissionStats();
+        const formsData = await getFormDefinitions();
+        console.log('Forms data fetched:', formsStatsData, formsData?.length || 0);
+        
         // Calculate stats
         const activeProjects = projects?.filter(p => p.status === 'in_progress').length || 0;
         const completedProjects = projects?.filter(p => p.status === 'completed').length || 0;
@@ -664,6 +709,43 @@ const AdminDashboard: React.FC = () => {
         );
         
         setRecentProjects(recent);
+        
+        // Set schedule data
+        setScheduleStats({
+          totalEvents: scheduleStatsData.total_events,
+          upcomingEvents: scheduleStatsData.upcoming_events,
+          overdueEvents: scheduleStatsData.overdue_events,
+          completedEvents: scheduleStatsData.completed_events
+        });
+        
+        // Set recent schedules (next 7 days)
+        setRecentSchedules(recentSchedulesData.slice(0, 5).map(event => ({
+          id: event.id,
+          title: event.title,
+          startTime: event.start_time,
+          endTime: event.end_time,
+          type: event.event_type,
+          priority: event.priority,
+          status: event.status,
+          location: event.location
+        })));
+        
+        // Set forms data
+        setFormsStats({
+          totalSubmissions: formsStatsData.total_submissions,
+          newSubmissions: formsStatsData.new_submissions,
+          completedSubmissions: formsStatsData.completed_submissions,
+          totalForms: formsData.length
+        });
+        
+        // Set recent forms (active forms)
+        setRecentForms(formsData.slice(0, 5).map(form => ({
+          id: form.id,
+          name: form.name,
+          slug: form.slug,
+          isActive: form.is_active,
+          submissions: 0 // This would need to be calculated from submissions
+        })));
         
         // Mock notifications
         setNotifications([
@@ -871,11 +953,151 @@ const AdminDashboard: React.FC = () => {
             />
           </div>
 
+          {/* Schedule and Forms Widgets */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            {/* Schedule Widget */}
+            <Card className="p-3 sm:p-4 lg:p-6 bg-white border-0 shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-orange-100 rounded-lg">
+                    <Calendar className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <h3 className="text-base sm:text-lg font-semibold text-slate-800">Schedule Overview</h3>
+                </div>
+                <Button
+                  variant="text"
+                  size="small"
+                  onClick={navigateToSchedule}
+                  className="text-xs sm:text-sm text-orange-600 hover:text-orange-700"
+                >
+                  View All
+                </Button>
+              </div>
+              
+              {/* Schedule Stats */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="text-center p-3 bg-orange-50 rounded-lg">
+                  <div className="text-lg font-bold text-orange-600">{scheduleStats.upcomingEvents}</div>
+                  <div className="text-xs text-slate-600">Upcoming</div>
+                </div>
+                <div className="text-center p-3 bg-red-50 rounded-lg">
+                  <div className="text-lg font-bold text-red-600">{scheduleStats.overdueEvents}</div>
+                  <div className="text-xs text-slate-600">Overdue</div>
+                </div>
+              </div>
+              
+              {/* Recent Schedule Events */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-slate-700 mb-3">Upcoming Events</h4>
+                {recentSchedules.length > 0 ? (
+                  recentSchedules.map((event) => (
+                    <div 
+                      key={event.id} 
+                      className="flex items-center justify-between p-2 bg-slate-50 rounded-lg hover:bg-slate-100 cursor-pointer transition-colors"
+                      onClick={() => navigateToSchedule()}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <h5 className="font-medium text-slate-800 text-sm truncate">{event.title}</h5>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Clock className="w-3 h-3 text-slate-400" />
+                          <span className="text-xs text-slate-500">
+                            {new Date(event.startTime).toLocaleDateString()} {new Date(event.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge 
+                          variant={event.priority === 'high' ? 'destructive' : event.priority === 'medium' ? 'secondary' : 'outline'} 
+                          className="text-xs"
+                        >
+                          {event.priority}
+                        </Badge>
+                        {event.location && (
+                          <MapPinIcon className="w-3 h-3 text-slate-400" />
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-slate-500">
+                    <Calendar className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+                    <p className="text-sm">No upcoming events</p>
+                  </div>
+                )}
+              </div>
+            </Card>
+
+            {/* Forms Widget */}
+            <Card className="p-3 sm:p-4 lg:p-6 bg-white border-0 shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <FileText className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <h3 className="text-base sm:text-lg font-semibold text-slate-800">Forms Overview</h3>
+                </div>
+                <Button
+                  variant="text"
+                  size="small"
+                  onClick={navigateToForms}
+                  className="text-xs sm:text-sm text-blue-600 hover:text-blue-700"
+                >
+                  View All
+                </Button>
+              </div>
+              
+              {/* Forms Stats */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="text-center p-3 bg-blue-50 rounded-lg">
+                  <div className="text-lg font-bold text-blue-600">{formsStats.newSubmissions}</div>
+                  <div className="text-xs text-slate-600">New</div>
+                </div>
+                <div className="text-center p-3 bg-green-50 rounded-lg">
+                  <div className="text-lg font-bold text-green-600">{formsStats.completedSubmissions}</div>
+                  <div className="text-xs text-slate-600">Completed</div>
+                </div>
+              </div>
+              
+              {/* Recent Forms */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-slate-700 mb-3">Active Forms</h4>
+                {recentForms.length > 0 ? (
+                  recentForms.map((form) => (
+                    <div 
+                      key={form.id} 
+                      className="flex items-center justify-between p-2 bg-slate-50 rounded-lg hover:bg-slate-100 cursor-pointer transition-colors"
+                      onClick={() => navigateToForms()}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <h5 className="font-medium text-slate-800 text-sm truncate">{form.name}</h5>
+                        <p className="text-xs text-slate-500 truncate">{form.slug}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge 
+                          variant={form.isActive ? 'default' : 'secondary'} 
+                          className="text-xs"
+                        >
+                          {form.isActive ? 'Active' : 'Inactive'}
+                        </Badge>
+                        <CheckCircle className="w-3 h-3 text-green-500" />
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-slate-500">
+                    <FileText className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+                    <p className="text-sm">No active forms</p>
+                  </div>
+                )}
+              </div>
+            </Card>
+          </div>
+
           {/* Charts and Recent Activity */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
             {/* Revenue Chart */}
             <div className="lg:col-span-2">
-              <Card className="p-3 sm:p-4 lg:p-6">
+              <Card className="p-3 sm:p-4 lg:p-6 bg-white border-0 shadow-lg">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4">
                   <h3 className="text-base sm:text-lg font-semibold text-slate-800">Revenue Trend</h3>
                   <FormControl size="small" className="w-full sm:w-32">
@@ -883,6 +1105,20 @@ const AdminDashboard: React.FC = () => {
                       value={selectedRange}
                       onChange={(e) => handleChartRangeChange(e.target.value)}
                       displayEmpty
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderColor: '#f97316',
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#ea580c',
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#f97316',
+                          },
+                        },
+                        '& .MuiSelect-select': {
+                          color: '#1e293b',
+                        },
+                      }}
                     >
                       <MenuItem value="7">7 days</MenuItem>
                       <MenuItem value="30">30 days</MenuItem>
@@ -892,17 +1128,50 @@ const AdminDashboard: React.FC = () => {
                 </div>
                 <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
                   <LineChart data={revenueChartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                    <XAxis dataKey="date" stroke="#64748b" />
-                    <YAxis stroke="#64748b" />
-                    <Tooltip />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis 
+                      dataKey="date" 
+                      stroke="#64748b" 
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis 
+                      stroke="#64748b" 
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value) => `$${value.toLocaleString()}`}
+                    />
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: 'white',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      }}
+                      labelStyle={{ color: '#1e293b', fontWeight: '600' }}
+                      formatter={(value: any) => [`$${value.toLocaleString()}`, 'Revenue']}
+                    />
                     <Line 
                       type="monotone" 
                       dataKey="revenue" 
-                      stroke="#3b82f6" 
+                      stroke="#f97316" 
                       strokeWidth={3} 
-                      dot={{ r: 4, fill: '#3b82f6' }} 
-                      activeDot={{ r: 6 }} 
+                      dot={{ 
+                        r: 5, 
+                        fill: '#f97316',
+                        stroke: 'white',
+                        strokeWidth: 2
+                      }} 
+                      activeDot={{ 
+                        r: 7,
+                        fill: '#ea580c',
+                        stroke: 'white',
+                        strokeWidth: 2
+                      }}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -1014,6 +1283,30 @@ const AdminDashboard: React.FC = () => {
                 >
                   <span className="hidden sm:inline">Add Generator</span>
                   <span className="sm:hidden">Add Generator</span>
+                </Button>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  startIcon={<Calendar />}
+                  component={Link}
+                  to="/admin/schedule"
+                  className="text-xs sm:text-sm"
+                >
+                  <span className="hidden sm:inline">Schedule</span>
+                  <span className="sm:hidden">Schedule</span>
+                </Button>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  startIcon={<FileText />}
+                  component={Link}
+                  to="/admin/forms"
+                  className="text-xs sm:text-sm"
+                >
+                  <span className="hidden sm:inline">Forms</span>
+                  <span className="sm:hidden">Forms</span>
                 </Button>
                 <Button
                   variant="outlined"
