@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -378,13 +377,13 @@ export default function Dashboard() {
                       <div key={ticket.id} className="p-3 border rounded-lg hover:bg-gray-50">
                         <div className="flex items-start justify-between mb-2">
                           <h4 className="font-medium text-sm">{ticket.title}</h4>
-                          <Badge variant="outline" size="sm" className={getPriorityColor(ticket.priority)}>
+                          <Badge variant="outline" className={getPriorityColor(ticket.priority)}>
                             {ticket.priority}
                           </Badge>
                         </div>
                         <p className="text-xs text-gray-600 mb-2">{ticket.customer}</p>
                         <div className="flex items-center justify-between">
-                          <Badge variant="secondary" size="sm" className={getStatusColor(ticket.status)}>
+                          <Badge variant="secondary" className={getStatusColor(ticket.status)}>
                             {ticket.status}
                           </Badge>
                           <span className="text-xs text-gray-500">{ticket.created}</span>
@@ -419,10 +418,10 @@ export default function Dashboard() {
                             <span className="text-xs text-gray-500">{task.time}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Badge variant="outline" size="sm">
+                            <Badge variant="outline">
                               {task.type}
                             </Badge>
-                            <Badge variant="secondary" size="sm" className={getPriorityColor(task.priority)}>
+                            <Badge variant="secondary" className={getPriorityColor(task.priority)}>
                               {task.priority}
                             </Badge>
                           </div>
