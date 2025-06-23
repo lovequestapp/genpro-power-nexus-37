@@ -43,6 +43,53 @@
   }
 }
 
+/* Mobile-optimized animations */
+@keyframes mobileFloat {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.02);
+  }
+}
+
+@keyframes mobileFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mobileBounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -15px, 0);
+  }
+  70% {
+    transform: translate3d(0, -7px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+@keyframes mobileSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
     animation: logo-spin infinite 20s linear;
@@ -93,4 +140,54 @@ html, body {
 /* Additional scroll reset utilities */
 .scroll-reset {
   scroll-behavior: auto !important;
+}
+
+/* Mobile-specific animation classes */
+@media (max-width: 768px) {
+  .animate-float {
+    animation: mobileFloat 4s ease-in-out infinite;
+  }
+  
+  .animate-fadeInUp {
+    animation: mobileFadeInUp 0.6s ease-out forwards;
+  }
+  
+  .animate-bounce {
+    animation: mobileBounce 1s ease-in-out;
+  }
+  
+  .animate-slideIn {
+    animation: mobileSlideIn 0.8s ease-out forwards;
+  }
+  
+  /* Ensure animations work on mobile Safari */
+  * {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  
+  /* Enable hardware acceleration for smooth animations */
+  .animate-float,
+  .animate-fadeInUp,
+  .animate-bounce,
+  .animate-slideIn {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform, opacity;
+  }
+}
+
+/* Ensure animations work on all devices */
+@media (prefers-reduced-motion: no-preference) {
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  @media (max-width: 768px) {
+    .animate-float {
+      animation: mobileFloat 4s ease-in-out infinite;
+    }
+  }
 }
