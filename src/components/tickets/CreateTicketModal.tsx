@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,12 +7,19 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import { ticketService } from '@/services/ticketService';
+import { useQuery } from '@tanstack/react-query';
 
 interface CreateTicketModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onTicketCreated: () => void;
   customerId?: string;
+}
+
+interface Customer {
+  id: string;
+  full_name: string;
+  email: string;
 }
 
 export function CreateTicketModal({
@@ -34,6 +40,15 @@ export function CreateTicketModal({
     estimated_time: '',
   });
 
+  // Fetch customers for dropdown
+  const { data: customers = [] } = useQuery({
+    queryKey: ['customers'],
+    queryFn: async () => {
+      return await ticketService.getCustomers();
+    },
+    enabled: open && !customerId, // Only fetch if modal is open and no customerId provided
+  });
+
   const handleSubmit = async () => {
     if (!formData.title.trim() || !formData.description.trim()) {
       toast({
@@ -49,7 +64,7 @@ export function CreateTicketModal({
       
       console.log('Creating ticket with data:', formData);
       
-      // Prepare the ticket data with proper customer_id handling
+      // Prepare the ticket data
       const ticketData = {
         title: formData.title.trim(),
         description: formData.description.trim(),
@@ -57,8 +72,8 @@ export function CreateTicketModal({
         type: formData.type,
         category: formData.category,
         status: 'open' as const,
-        customer_id: formData.customer_id?.trim() || null,
-        estimated_time: formData.estimated_time || null,
+        customer_id: formData.customer_id?.trim() || undefined,
+        estimated_time: formData.estimated_time || undefined,
       };
       
       console.log('Processed ticket data:', ticketData);
@@ -95,6 +110,21 @@ export function CreateTicketModal({
       setLoading(false);
     }
   };
+
+  // Reset form when modal opens/closes
+  useEffect(() => {
+    if (!open) {
+      setFormData({
+        title: '',
+        description: '',
+        priority: 'medium',
+        type: 'support',
+        category: 'general',
+        customer_id: customerId || '',
+        estimated_time: '',
+      });
+    }
+  }, [open, customerId]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -148,6 +178,29 @@ export function CreateTicketModal({
               </Select>
             </div>
           </div>
+
+          {!customerId && (
+            <div className="space-y-2">
+              <Label htmlFor="customer">Customer</Label>
+              <Select 
+                value={formData.customer_id} 
+                onValueChange={(value) => 
+                  setFormData({ ...formData, customer_id: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a customer" />
+                </SelectTrigger>
+                <SelectContent>
+                  {customers.map((customer: Customer) => (
+                    <SelectItem key={customer.id} value={customer.id}>
+                      {customer.full_name} ({customer.email})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="title">Title *</Label>

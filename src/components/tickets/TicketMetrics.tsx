@@ -1,125 +1,149 @@
-import { Service } from '@/types';
-import { Card } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Clock, AlertCircle, CheckCircle, Users, MessageSquare } from 'lucide-react';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { 
+  AlertCircle, 
+  Clock, 
+  CheckCircle, 
+  XCircle, 
+  TrendingUp,
+  Users,
+  MessageSquare
+} from 'lucide-react';
+
+interface Ticket {
+  id: string;
+  status: 'open' | 'in_progress' | 'resolved' | 'closed';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  type: string;
+  createdAt: string;
+}
 
 interface TicketMetricsProps {
-  tickets: Service[];
+  tickets: Ticket[];
 }
 
 export function TicketMetrics({ tickets }: TicketMetricsProps) {
-  const metrics = calculateMetrics(tickets);
+  const totalTickets = tickets.length;
+  const openTickets = tickets.filter(t => t.status === 'open').length;
+  const inProgressTickets = tickets.filter(t => t.status === 'in_progress').length;
+  const resolvedTickets = tickets.filter(t => t.status === 'resolved').length;
+  const closedTickets = tickets.filter(t => t.status === 'closed').length;
+  
+  const urgentTickets = tickets.filter(t => t.priority === 'urgent').length;
+  const highPriorityTickets = tickets.filter(t => t.priority === 'high').length;
+  
+  const resolutionRate = totalTickets > 0 ? ((resolvedTickets + closedTickets) / totalTickets * 100).toFixed(1) : '0';
+  const avgResponseTime = '2.5h'; // This would be calculated from actual data
+
+  const metrics = [
+    {
+      title: 'Total Tickets',
+      value: totalTickets,
+      icon: MessageSquare,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50'
+    },
+    {
+      title: 'Open',
+      value: openTickets,
+      icon: AlertCircle,
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-50'
+    },
+    {
+      title: 'In Progress',
+      value: inProgressTickets,
+      icon: Clock,
+      color: 'text-yellow-600',
+      bgColor: 'bg-yellow-50'
+    },
+    {
+      title: 'Resolved',
+      value: resolvedTickets,
+      icon: CheckCircle,
+      color: 'text-green-600',
+      bgColor: 'bg-green-50'
+    },
+    {
+      title: 'Closed',
+      value: closedTickets,
+      icon: XCircle,
+      color: 'text-gray-600',
+      bgColor: 'bg-gray-50'
+    },
+    {
+      title: 'Resolution Rate',
+      value: `${resolutionRate}%`,
+      icon: TrendingUp,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-50'
+    }
+  ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <Card className="p-4">
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-steel-500">Response Time</h3>
-            <Clock className="h-4 w-4 text-steel-400" />
-          </div>
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between text-sm">
-                <span>First Response</span>
-                <span>{metrics.firstResponseTime}</span>
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        {metrics.map((metric) => (
+          <Card key={metric.title} className="border-0 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">{metric.title}</p>
+                  <p className="text-2xl font-bold text-gray-900">{metric.value}</p>
+                </div>
+                <div className={`p-2 rounded-lg ${metric.bgColor}`}>
+                  <metric.icon className={`w-5 h-5 ${metric.color}`} />
+                </div>
               </div>
-              <Progress value={metrics.firstResponseTimeScore} className="bg-blue-100" />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm">
-                <span>Resolution Time</span>
-                <span>{metrics.resolutionTime}</span>
-              </div>
-              <Progress value={metrics.resolutionTimeScore} className="bg-green-100" />
-            </div>
-          </div>
-        </div>
-      </Card>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-      <Card className="p-4">
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-steel-500">Customer Satisfaction</h3>
-            <MessageSquare className="h-4 w-4 text-steel-400" />
-          </div>
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between text-sm">
-                <span>Response Rate</span>
-                <span>{metrics.responseRate}%</span>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="border-0 shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Priority Overview</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <span className="text-sm font-medium">Urgent</span>
+                </div>
+                <Badge variant="destructive">{urgentTickets}</Badge>
               </div>
-              <Progress value={metrics.responseRate} className="bg-blue-100" />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm">
-                <span>Resolution Rate</span>
-                <span>{metrics.resolutionRate}%</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                  <span className="text-sm font-medium">High</span>
+                </div>
+                <Badge variant="secondary">{highPriorityTickets}</Badge>
               </div>
-              <Progress value={metrics.resolutionRate} className="bg-green-100" />
             </div>
-          </div>
-        </div>
-      </Card>
+          </CardContent>
+        </Card>
 
-      <Card className="p-4">
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-steel-500">Team Performance</h3>
-            <Users className="h-4 w-4 text-steel-400" />
-          </div>
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between text-sm">
-                <span>Active Tickets</span>
-                <span>{metrics.activeTickets}</span>
+        <Card className="border-0 shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Performance</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Avg Response Time</span>
+                <span className="text-sm text-gray-600">{avgResponseTime}</span>
               </div>
-              <Progress
-                value={(metrics.activeTickets / metrics.totalTickets) * 100}
-                className="bg-orange-100"
-              />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm">
-                <span>Avg. Tickets per Agent</span>
-                <span>{metrics.ticketsPerAgent}</span>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Resolution Rate</span>
+                <span className="text-sm text-gray-600">{resolutionRate}%</span>
               </div>
-              <Progress
-                value={(metrics.ticketsPerAgent / 10) * 100}
-                className="bg-purple-100"
-              />
             </div>
-          </div>
-        </div>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
-}
-
-interface Metrics {
-  firstResponseTime: string;
-  firstResponseTimeScore: number;
-  resolutionTime: string;
-  resolutionTimeScore: number;
-  responseRate: number;
-  resolutionRate: number;
-  activeTickets: number;
-  totalTickets: number;
-  ticketsPerAgent: number;
-}
-
-function calculateMetrics(tickets: Service[]): Metrics {
-  // This is a placeholder implementation
-  // In a real application, you would calculate actual metrics based on ticket data
-  return {
-    firstResponseTime: '2h 30m',
-    firstResponseTimeScore: 75,
-    resolutionTime: '1d 5h',
-    resolutionTimeScore: 65,
-    responseRate: 85,
-    resolutionRate: 70,
-    activeTickets: tickets.filter((t) => t.status === 'open' || t.status === 'in_progress').length,
-    totalTickets: tickets.length,
-    ticketsPerAgent: Math.round(tickets.length / 3), // Assuming 3 agents
-  };
 }

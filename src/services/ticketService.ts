@@ -8,7 +8,7 @@ export interface Ticket {
   priority: 'low' | 'medium' | 'high' | 'urgent';
   type: 'bug' | 'feature' | 'support' | 'other';
   category: string;
-  customer_id?: string;
+  customer_id: string;
   assigned_to?: string;
   created_at: string;
   updated_at: string;
@@ -55,8 +55,8 @@ class TicketService {
       .from('tickets')
       .select(`
         *,
-        customer:customers(id, name, email),
-        assigned_user:profiles!assigned_to(id, full_name, email),
+        customer:profiles!customer_id(id, full_name, email, role),
+        assigned_user:profiles!assigned_to(id, full_name, email, role),
         comments:comments(
           id, content, author_id, created_at, is_internal,
           author:profiles(id, full_name, email)
@@ -90,9 +90,10 @@ class TicketService {
 
   async getCustomers() {
     const { data, error } = await supabase
-      .from('customers')
-      .select('id, name, email')
-      .order('name');
+      .from('profiles')
+      .select('id, full_name, email')
+      .eq('role', 'customer')
+      .order('full_name');
     if (error) throw error;
     return data;
   }
@@ -112,8 +113,8 @@ class TicketService {
       .from('tickets')
       .select(`
         *,
-        customer:customers(id, name, email),
-        assigned_user:profiles!assigned_to(id, full_name, email),
+        customer:profiles!customer_id(id, full_name, email, role),
+        assigned_user:profiles!assigned_to(id, full_name, email, role),
         comments:comments(
           id, content, author_id, created_at, is_internal,
           author:profiles(id, full_name, email),
@@ -129,13 +130,32 @@ class TicketService {
   }
 
   async createTicket(ticket: Omit<Ticket, 'id' | 'created_at' | 'updated_at'>) {
+    // Get current user to set as customer_id if not provided
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const ticketData = {
+      ...ticket,
+      customer_id: ticket.customer_id || user.id,
+      status: ticket.status || 'open',
+      category: ticket.category || 'general',
+      tags: ticket.tags || [],
+      metadata: ticket.metadata || {},
+      custom_fields: ticket.custom_fields || {}
+    };
+
+    console.log('Creating ticket with data:', ticketData);
+
     const { data, error } = await supabase
       .from('tickets')
-      .insert(ticket)
+      .insert(ticketData)
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
+    }
     return data;
   }
 
@@ -207,7 +227,7 @@ class TicketService {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
 
-    // Upload file to storage (you'll need to create a storage bucket)
+    // Upload file to storage
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}.${fileExt}`;
     const filePath = `tickets/${ticketId}/${fileName}`;
