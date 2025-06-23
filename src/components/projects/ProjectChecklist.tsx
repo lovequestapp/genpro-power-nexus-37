@@ -53,12 +53,14 @@ export function ProjectChecklist({ projectId, projectName }: ProjectChecklistPro
     }
   };
 
-  const handleItemToggle = async (item: ChecklistItem) => {
+  const handleItemToggle = async (item: ChecklistItem, checked: boolean) => {
     try {
       setSaving(item.id);
+      console.log('Updating item:', item.id, 'to checked:', checked);
+      
       const updatedItem = await checklistService.updateChecklistItem(item.id, {
-        is_verified: !item.is_verified,
-        notes: tempNotes[item.id] || item.notes
+        is_verified: checked,
+        notes: item.notes
       });
 
       // Update local state
@@ -73,7 +75,7 @@ export function ProjectChecklist({ projectId, projectName }: ProjectChecklistPro
 
       toast({
         title: 'Success',
-        description: `Item ${updatedItem.is_verified ? 'verified' : 'unverified'}`,
+        description: `Item ${checked ? 'verified' : 'unverified'}`,
       });
     } catch (error) {
       console.error('Error updating item:', error);
@@ -240,8 +242,9 @@ export function ProjectChecklist({ projectId, projectName }: ProjectChecklistPro
                   <Checkbox
                     id={`item-${item.id}`}
                     checked={item.is_verified}
-                    onCheckedChange={() => handleItemToggle(item)}
+                    onCheckedChange={(checked) => handleItemToggle(item, checked as boolean)}
                     disabled={saving === item.id}
+                    className="h-5 w-5"
                   />
                 </div>
                 
@@ -251,11 +254,12 @@ export function ProjectChecklist({ projectId, projectName }: ProjectChecklistPro
                       {index + 1}.
                     </span>
                     <h4 className={`font-medium ${
-                      item.is_verified ? 'text-green-800' : 'text-steel-900'
+                      item.is_verified ? 'text-green-800 line-through' : 'text-steel-900'
                     }`}>
                       {item.rule_name}
                     </h4>
                     {item.is_verified && <CheckCircle2 className="w-4 h-4 text-green-600" />}
+                    {saving === item.id && <RefreshCw className="w-4 h-4 animate-spin text-blue-600" />}
                   </div>
                   
                   <p className="text-sm text-steel-600 pl-6">
