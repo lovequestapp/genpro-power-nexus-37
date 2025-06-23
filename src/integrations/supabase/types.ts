@@ -2047,6 +2047,96 @@ export type Database = {
           },
         ]
       }
+      quotes: {
+        Row: {
+          additional_notes: string | null
+          address: string
+          budget_range: string | null
+          city: string
+          company: string | null
+          created_at: string | null
+          email: string
+          emergency_service: boolean | null
+          estimated_cost: number | null
+          estimated_timeline: string | null
+          financing: boolean | null
+          fuel_type: string | null
+          generator_type: string | null
+          id: string
+          installation_type: string | null
+          maintenance_plan: boolean | null
+          name: string
+          notes: string | null
+          phone: string
+          power_requirements: string | null
+          preferred_contact: string | null
+          project_description: string
+          service_type: string
+          status: string | null
+          timeline: string | null
+          updated_at: string | null
+          zip_code: string
+        }
+        Insert: {
+          additional_notes?: string | null
+          address: string
+          budget_range?: string | null
+          city: string
+          company?: string | null
+          created_at?: string | null
+          email: string
+          emergency_service?: boolean | null
+          estimated_cost?: number | null
+          estimated_timeline?: string | null
+          financing?: boolean | null
+          fuel_type?: string | null
+          generator_type?: string | null
+          id?: string
+          installation_type?: string | null
+          maintenance_plan?: boolean | null
+          name: string
+          notes?: string | null
+          phone: string
+          power_requirements?: string | null
+          preferred_contact?: string | null
+          project_description: string
+          service_type: string
+          status?: string | null
+          timeline?: string | null
+          updated_at?: string | null
+          zip_code: string
+        }
+        Update: {
+          additional_notes?: string | null
+          address?: string
+          budget_range?: string | null
+          city?: string
+          company?: string | null
+          created_at?: string | null
+          email?: string
+          emergency_service?: boolean | null
+          estimated_cost?: number | null
+          estimated_timeline?: string | null
+          financing?: boolean | null
+          fuel_type?: string | null
+          generator_type?: string | null
+          id?: string
+          installation_type?: string | null
+          maintenance_plan?: boolean | null
+          name?: string
+          notes?: string | null
+          phone?: string
+          power_requirements?: string | null
+          preferred_contact?: string | null
+          project_description?: string
+          service_type?: string
+          status?: string | null
+          timeline?: string | null
+          updated_at?: string | null
+          zip_code?: string
+        }
+        Relationships: []
+      }
       schedule_conflicts: {
         Row: {
           conflict_type: string

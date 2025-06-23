@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,13 +39,13 @@ const GetQuote = () => {
 
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-              {/* Form */}
-              <div className="lg:col-span-2">
+              {/* Form - Make sure it's prominently displayed */}
+              <div className="lg:col-span-2 order-1">
                 <QuoteForm />
               </div>
 
               {/* Benefits & Info */}
-              <div className="space-y-8">
+              <div className="space-y-8 order-2">
                 {/* Why Choose Us */}
                 <Card className="shadow-lg border-steel-200">
                   <CardHeader className="bg-gradient-to-r from-primary to-steel-700 text-white rounded-t-lg">

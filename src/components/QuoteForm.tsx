@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Loader2, CheckCircle, AlertCircle, Phone, Mail, MapPin, Calculator, Shield, Star, Clock, Zap } from 'lucide-react';
 import { toast } from 'sonner';
-import QuoteService, { QuoteRequest } from '@/services/quoteService';
+import { supabase } from '@/lib/supabase';
 
 interface QuoteFormData {
   name: string;
@@ -131,34 +132,54 @@ const QuoteForm = () => {
     setSubmitStatus('idle');
 
     try {
-      // Prepare the quote request data
-      const quoteRequest: QuoteRequest = {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        company: formData.company || undefined,
-        address: formData.address,
-        city: formData.city,
-        zipCode: formData.zipCode,
-        serviceType: formData.serviceType,
-        generatorType: formData.generatorType || undefined,
-        powerRequirements: formData.powerRequirements || undefined,
-        fuelType: formData.fuelType || undefined,
-        installationType: formData.installationType || undefined,
-        projectDescription: formData.projectDescription,
-        budgetRange: formData.budgetRange || undefined,
-        timeline: formData.timeline || undefined,
-        emergencyService: formData.emergencyService,
-        maintenancePlan: formData.maintenancePlan,
-        financing: formData.financing,
-        preferredContact: formData.preferredContact || undefined,
-        additionalNotes: formData.additionalNotes || undefined
-      };
+      // Submit to quotes table
+      const { data: quoteData, error: quoteError } = await supabase
+        .from('quotes')
+        .insert([{
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          company: formData.company || null,
+          address: formData.address,
+          city: formData.city,
+          zip_code: formData.zipCode,
+          service_type: formData.serviceType,
+          generator_type: formData.generatorType || null,
+          power_requirements: formData.powerRequirements || null,
+          fuel_type: formData.fuelType || null,
+          installation_type: formData.installationType || null,
+          project_description: formData.projectDescription,
+          budget_range: formData.budgetRange || null,
+          timeline: formData.timeline || null,
+          emergency_service: formData.emergencyService,
+          maintenance_plan: formData.maintenancePlan,
+          financing: formData.financing,
+          preferred_contact: formData.preferredContact || null,
+          additional_notes: formData.additionalNotes || null,
+          status: 'pending'
+        }])
+        .select()
+        .single();
 
-      // Submit the quote request
-      const response = await QuoteService.submitQuoteRequest(quoteRequest);
-      
-      setSubmittedQuoteId(response.id);
+      if (quoteError) {
+        console.error('Quote submission error:', quoteError);
+        throw new Error('Failed to submit quote request');
+      }
+
+      // Also submit to form submissions for tracking
+      try {
+        await supabase
+          .from('form_submissions')
+          .insert([{
+            form_slug: 'quote-request',
+            data: formData,
+            status: 'new'
+          }]);
+      } catch (formError) {
+        console.warn('Form submission tracking failed:', formError);
+      }
+
+      setSubmittedQuoteId(quoteData.id);
       setSubmitStatus('success');
       toast.success('Quote request submitted successfully! We\'ll get back to you within 24 hours.');
       
@@ -186,10 +207,8 @@ const QuoteForm = () => {
         additionalNotes: ''
       });
 
-      // Log the submission for debugging
       console.log('Quote submitted successfully:', {
-        quoteId: response.id,
-        data: quoteRequest,
+        quoteId: quoteData.id,
         timestamp: new Date().toISOString()
       });
 
@@ -197,7 +216,6 @@ const QuoteForm = () => {
       console.error('Error submitting form:', error);
       setSubmitStatus('error');
       
-      // Provide more specific error messages
       if (error instanceof Error) {
         toast.error(error.message);
       } else {
@@ -539,4 +557,4 @@ const QuoteForm = () => {
   );
 };
 
-export default QuoteForm; 
+export default QuoteForm;
