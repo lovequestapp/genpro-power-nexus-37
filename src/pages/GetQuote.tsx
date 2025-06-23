@@ -5,10 +5,20 @@ import { CheckCircle, Phone, Mail, MapPin, Clock, Shield, Star } from 'lucide-re
 import { Link } from 'react-router-dom';
 import ScrollToTop from '@/components/ScrollToTop';
 import DynamicForm from '@/components/forms/DynamicForm';
+import Header from '@/components/Header';
+import SEO from '../components/SEO';
 
 const GetQuote = () => {
   return (
-    <>
+    <div>
+      <SEO 
+        title="Free Generator Quote Houston | Get Generator Installation Estimate | HOU GEN PROS"
+        description="Get a free generator installation quote in Houston. Professional estimates for Generac generators, whole home backup power, and installation services. No obligation, competitive pricing."
+        keywords="free generator quote Houston, generator installation estimate Houston, Generac quote Houston, generator pricing Houston, generator cost estimate Houston, free generator consultation Houston, generator installation cost Houston"
+        canonical="/get-quote"
+        pageType="website"
+      />
+      <Header />
       <ScrollToTop />
       <div className="min-h-screen bg-gradient-to-br from-steel-50 via-white to-steel-100 py-32">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -157,7 +167,7 @@ const GetQuote = () => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

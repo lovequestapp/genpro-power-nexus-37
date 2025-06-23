@@ -96,6 +96,7 @@ import { Avatar } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { getRevenueStats } from '@/lib/billingService';
+import SEO from '../../components/SEO';
 
 const sidebarItems = [
   { label: 'Overview', icon: AccountBalanceWallet },
@@ -754,281 +755,284 @@ const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
-          <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800">Admin Dashboard</h1>
-            <p className="text-slate-600 mt-1 sm:mt-2 text-sm sm:text-base">Welcome back! Here's what's happening with your business.</p>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
-            <Button
-              variant="outlined"
-              size="small"
-              startIcon={<RefreshIcon />}
-              onClick={() => window.location.reload()}
-              className="text-xs sm:text-sm"
-              sx={{
-                fontSize: '0.75rem',
-                '@media (min-width: 640px)': {
-                  fontSize: '0.875rem'
-                }
-              }}
-            >
-              <span className="hidden sm:inline">Refresh</span>
-              <span className="sm:hidden">↻</span>
-            </Button>
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={<AddIcon />}
-              component={Link}
-              to="/admin/projects/new"
-              className="text-xs sm:text-sm"
-              sx={{
-                fontSize: '0.75rem',
-                '@media (min-width: 640px)': {
-                  fontSize: '0.875rem'
-                }
-              }}
-            >
-              <span className="hidden sm:inline">New Project</span>
-              <span className="sm:hidden">+</span>
-            </Button>
-          </div>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
-          <div className="relative">
-            <StatCard
-              title="Total Revenue"
-              value={`$${revenueData.totalRevenue.toLocaleString()}`}
-              change={revenueData.change}
-              icon={<DollarSignIcon className="w-4 h-4 sm:w-6 sm:h-6" />}
-              trend={revenueData.trend}
-              subtitle={getRevenueSubtitle()}
-              onClick={navigateToRevenue}
-              clickable
-            />
-            {/* Time Period Selector */}
-            <div className="absolute top-2 right-2 z-10">
-              <FormControl size="small" className="w-20">
-                <Select
-                  value={revenueTimePeriod}
-                  onChange={(e) => handleRevenueTimePeriodChange(e.target.value as 'month' | 'year' | 'all')}
-                  displayEmpty
-                  sx={{
-                    fontSize: '0.75rem',
-                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                    backdropFilter: 'blur(4px)',
-                    '& .MuiSelect-select': {
-                      padding: '4px 8px',
-                      fontSize: '0.75rem'
-                    }
-                  }}
-                >
-                  <MenuItem value="month">Month</MenuItem>
-                  <MenuItem value="year">Year</MenuItem>
-                  <MenuItem value="all">All</MenuItem>
-                </Select>
-              </FormControl>
+    <>
+      <SEO title="Admin Dashboard | HOU GEN PROS" description="Admin dashboard home page." canonical="/admin/dashboard" pageType="website" keywords="admin, dashboard" schema={null} />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800">Admin Dashboard</h1>
+              <p className="text-slate-600 mt-1 sm:mt-2 text-sm sm:text-base">Welcome back! Here's what's happening with your business.</p>
             </div>
-          </div>
-          <StatCard
-            title="Active Projects"
-            value={stats.projects.active}
-            change={stats.projects.change}
-            icon={<Assignment className="w-4 h-4 sm:w-6 sm:h-6" />}
-            trend="up"
-            subtitle={`${stats.projects.total} total`}
-            onClick={navigateToProjects}
-            clickable
-          />
-          <StatCard
-            title="Customers"
-            value={stats.leads.total}
-            change={stats.leads.change}
-            icon={<Group className="w-4 h-4 sm:w-6 sm:h-6" />}
-            trend="up"
-            subtitle={`${stats.leads.new} new this month`}
-            onClick={navigateToCustomers}
-            clickable
-          />
-          <StatCard
-            title="Generators"
-            value={stats.inventory.total}
-            change={stats.inventory.change}
-            icon={<WrenchIcon className="w-4 h-4 sm:w-6 sm:h-6" />}
-            trend="neutral"
-            subtitle={`${stats.inventory.lowStock} need maintenance`}
-            onClick={navigateToGenerators}
-            clickable
-          />
-        </div>
-
-        {/* Charts and Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          {/* Revenue Chart */}
-          <div className="lg:col-span-2">
-            <Card className="p-3 sm:p-4 lg:p-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4">
-                <h3 className="text-base sm:text-lg font-semibold text-slate-800">Revenue Trend</h3>
-                <FormControl size="small" className="w-full sm:w-32">
-                  <Select
-                    value={selectedRange}
-                    onChange={(e) => handleChartRangeChange(e.target.value)}
-                    displayEmpty
-                  >
-                    <MenuItem value="7">7 days</MenuItem>
-                    <MenuItem value="30">30 days</MenuItem>
-                    <MenuItem value="90">90 days</MenuItem>
-                  </Select>
-                </FormControl>
-              </div>
-              <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
-                <LineChart data={revenueChartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis dataKey="date" stroke="#64748b" />
-                  <YAxis stroke="#64748b" />
-                  <Tooltip />
-                  <Line 
-                    type="monotone" 
-                    dataKey="revenue" 
-                    stroke="#3b82f6" 
-                    strokeWidth={3} 
-                    dot={{ r: 4, fill: '#3b82f6' }} 
-                    activeDot={{ r: 6 }} 
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </Card>
-          </div>
-
-          {/* Recent Projects */}
-          <div>
-            <Card className="p-3 sm:p-4 lg:p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-base sm:text-lg font-semibold text-slate-800">Recent Projects</h3>
-                <Button
-                  variant="text"
-                  size="small"
-                  component={Link}
-                  to="/admin/projects"
-                  className="text-xs sm:text-sm"
-                >
-                  View All
-                </Button>
-              </div>
-              <div className="space-y-3 sm:space-y-4">
-                {recentProjects.map((project) => (
-                  <div 
-                    key={project.id} 
-                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-slate-50 rounded-lg hover:bg-slate-100 cursor-pointer transition-colors gap-2 sm:gap-0"
-                    onClick={() => navigateToProject(project.id)}
-                  >
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-slate-800 text-sm truncate">{project.title}</h4>
-                      <p className="text-xs sm:text-sm text-slate-600 truncate">{project.customer}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Progress value={project.progress} className="w-12 sm:w-16 h-2" />
-                        <span className="text-xs text-slate-500">{project.progress}%</span>
-                      </div>
-                    </div>
-                    <Badge variant={project.status === 'completed' ? 'default' : 'secondary'} className="text-xs">
-                      {project.status}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          </div>
-        </div>
-
-        {/* Notifications and Quick Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-          {/* Notifications */}
-          <Card className="p-3 sm:p-4 lg:p-6">
-            <h3 className="text-base sm:text-lg font-semibold text-slate-800 mb-3 sm:mb-4">Recent Notifications</h3>
-            <div className="space-y-2 sm:space-y-3">
-              {notifications.map((notification) => (
-                <div key={notification.id} className={`flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg ${
-                  notification.read ? 'bg-slate-50' : 'bg-blue-50'
-                }`}>
-                  <div className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${
-                    notification.type === 'warning' ? 'bg-yellow-500' :
-                    notification.type === 'success' ? 'bg-green-500' :
-                    notification.type === 'error' ? 'bg-red-500' : 'bg-blue-500'
-                  }`} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs sm:text-sm text-slate-800">{notification.message}</p>
-                    <p className="text-xs text-slate-500 mt-1">
-                      {notification.timestamp.toLocaleTimeString()}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card className="p-3 sm:p-4 lg:p-6">
-            <h3 className="text-base sm:text-lg font-semibold text-slate-800 mb-3 sm:mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
               <Button
                 variant="outlined"
-                fullWidth
+                size="small"
+                startIcon={<RefreshIcon />}
+                onClick={() => window.location.reload()}
+                className="text-xs sm:text-sm"
+                sx={{
+                  fontSize: '0.75rem',
+                  '@media (min-width: 640px)': {
+                    fontSize: '0.875rem'
+                  }
+                }}
+              >
+                <span className="hidden sm:inline">Refresh</span>
+                <span className="sm:hidden">↻</span>
+              </Button>
+              <Button
+                variant="contained"
                 size="small"
                 startIcon={<AddIcon />}
                 component={Link}
                 to="/admin/projects/new"
                 className="text-xs sm:text-sm"
+                sx={{
+                  fontSize: '0.75rem',
+                  '@media (min-width: 640px)': {
+                    fontSize: '0.875rem'
+                  }
+                }}
               >
                 <span className="hidden sm:inline">New Project</span>
-                <span className="sm:hidden">New Project</span>
-              </Button>
-              <Button
-                variant="outlined"
-                fullWidth
-                size="small"
-                startIcon={<Person />}
-                component={Link}
-                to="/admin/customers/new"
-                className="text-xs sm:text-sm"
-              >
-                <span className="hidden sm:inline">Add Customer</span>
-                <span className="sm:hidden">Add Customer</span>
-              </Button>
-              <Button
-                variant="outlined"
-                fullWidth
-                size="small"
-                startIcon={<WrenchIcon />}
-                component={Link}
-                to="/admin/generators/new"
-                className="text-xs sm:text-sm"
-              >
-                <span className="hidden sm:inline">Add Generator</span>
-                <span className="sm:hidden">Add Generator</span>
-              </Button>
-              <Button
-                variant="outlined"
-                fullWidth
-                size="small"
-                startIcon={<SettingsIcon />}
-                component={Link}
-                to="/admin/settings"
-                className="text-xs sm:text-sm"
-              >
-                <span className="hidden sm:inline">Settings</span>
-                <span className="sm:hidden">Settings</span>
+                <span className="sm:hidden">+</span>
               </Button>
             </div>
-          </Card>
+          </div>
+
+          {/* Stats Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
+            <div className="relative">
+              <StatCard
+                title="Total Revenue"
+                value={`$${revenueData.totalRevenue.toLocaleString()}`}
+                change={revenueData.change}
+                icon={<DollarSignIcon className="w-4 h-4 sm:w-6 sm:h-6" />}
+                trend={revenueData.trend}
+                subtitle={getRevenueSubtitle()}
+                onClick={navigateToRevenue}
+                clickable
+              />
+              {/* Time Period Selector */}
+              <div className="absolute top-2 right-2 z-10">
+                <FormControl size="small" className="w-20">
+                  <Select
+                    value={revenueTimePeriod}
+                    onChange={(e) => handleRevenueTimePeriodChange(e.target.value as 'month' | 'year' | 'all')}
+                    displayEmpty
+                    sx={{
+                      fontSize: '0.75rem',
+                      backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                      backdropFilter: 'blur(4px)',
+                      '& .MuiSelect-select': {
+                        padding: '4px 8px',
+                        fontSize: '0.75rem'
+                      }
+                    }}
+                  >
+                    <MenuItem value="month">Month</MenuItem>
+                    <MenuItem value="year">Year</MenuItem>
+                    <MenuItem value="all">All</MenuItem>
+                  </Select>
+                </FormControl>
+              </div>
+            </div>
+            <StatCard
+              title="Active Projects"
+              value={stats.projects.active}
+              change={stats.projects.change}
+              icon={<Assignment className="w-4 h-4 sm:w-6 sm:h-6" />}
+              trend="up"
+              subtitle={`${stats.projects.total} total`}
+              onClick={navigateToProjects}
+              clickable
+            />
+            <StatCard
+              title="Customers"
+              value={stats.leads.total}
+              change={stats.leads.change}
+              icon={<Group className="w-4 h-4 sm:w-6 sm:h-6" />}
+              trend="up"
+              subtitle={`${stats.leads.new} new this month`}
+              onClick={navigateToCustomers}
+              clickable
+            />
+            <StatCard
+              title="Generators"
+              value={stats.inventory.total}
+              change={stats.inventory.change}
+              icon={<WrenchIcon className="w-4 h-4 sm:w-6 sm:h-6" />}
+              trend="neutral"
+              subtitle={`${stats.inventory.lowStock} need maintenance`}
+              onClick={navigateToGenerators}
+              clickable
+            />
+          </div>
+
+          {/* Charts and Recent Activity */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            {/* Revenue Chart */}
+            <div className="lg:col-span-2">
+              <Card className="p-3 sm:p-4 lg:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4">
+                  <h3 className="text-base sm:text-lg font-semibold text-slate-800">Revenue Trend</h3>
+                  <FormControl size="small" className="w-full sm:w-32">
+                    <Select
+                      value={selectedRange}
+                      onChange={(e) => handleChartRangeChange(e.target.value)}
+                      displayEmpty
+                    >
+                      <MenuItem value="7">7 days</MenuItem>
+                      <MenuItem value="30">30 days</MenuItem>
+                      <MenuItem value="90">90 days</MenuItem>
+                    </Select>
+                  </FormControl>
+                </div>
+                <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
+                  <LineChart data={revenueChartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                    <XAxis dataKey="date" stroke="#64748b" />
+                    <YAxis stroke="#64748b" />
+                    <Tooltip />
+                    <Line 
+                      type="monotone" 
+                      dataKey="revenue" 
+                      stroke="#3b82f6" 
+                      strokeWidth={3} 
+                      dot={{ r: 4, fill: '#3b82f6' }} 
+                      activeDot={{ r: 6 }} 
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </Card>
+            </div>
+
+            {/* Recent Projects */}
+            <div>
+              <Card className="p-3 sm:p-4 lg:p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-base sm:text-lg font-semibold text-slate-800">Recent Projects</h3>
+                  <Button
+                    variant="text"
+                    size="small"
+                    component={Link}
+                    to="/admin/projects"
+                    className="text-xs sm:text-sm"
+                  >
+                    View All
+                  </Button>
+                </div>
+                <div className="space-y-3 sm:space-y-4">
+                  {recentProjects.map((project) => (
+                    <div 
+                      key={project.id} 
+                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-slate-50 rounded-lg hover:bg-slate-100 cursor-pointer transition-colors gap-2 sm:gap-0"
+                      onClick={() => navigateToProject(project.id)}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-slate-800 text-sm truncate">{project.title}</h4>
+                        <p className="text-xs sm:text-sm text-slate-600 truncate">{project.customer}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Progress value={project.progress} className="w-12 sm:w-16 h-2" />
+                          <span className="text-xs text-slate-500">{project.progress}%</span>
+                        </div>
+                      </div>
+                      <Badge variant={project.status === 'completed' ? 'default' : 'secondary'} className="text-xs">
+                        {project.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </div>
+          </div>
+
+          {/* Notifications and Quick Actions */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            {/* Notifications */}
+            <Card className="p-3 sm:p-4 lg:p-6">
+              <h3 className="text-base sm:text-lg font-semibold text-slate-800 mb-3 sm:mb-4">Recent Notifications</h3>
+              <div className="space-y-2 sm:space-y-3">
+                {notifications.map((notification) => (
+                  <div key={notification.id} className={`flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg ${
+                    notification.read ? 'bg-slate-50' : 'bg-blue-50'
+                  }`}>
+                    <div className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${
+                      notification.type === 'warning' ? 'bg-yellow-500' :
+                      notification.type === 'success' ? 'bg-green-500' :
+                      notification.type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+                    }`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs sm:text-sm text-slate-800">{notification.message}</p>
+                      <p className="text-xs text-slate-500 mt-1">
+                        {notification.timestamp.toLocaleTimeString()}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Quick Actions */}
+            <Card className="p-3 sm:p-4 lg:p-6">
+              <h3 className="text-base sm:text-lg font-semibold text-slate-800 mb-3 sm:mb-4">Quick Actions</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  startIcon={<AddIcon />}
+                  component={Link}
+                  to="/admin/projects/new"
+                  className="text-xs sm:text-sm"
+                >
+                  <span className="hidden sm:inline">New Project</span>
+                  <span className="sm:hidden">New Project</span>
+                </Button>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  startIcon={<Person />}
+                  component={Link}
+                  to="/admin/customers/new"
+                  className="text-xs sm:text-sm"
+                >
+                  <span className="hidden sm:inline">Add Customer</span>
+                  <span className="sm:hidden">Add Customer</span>
+                </Button>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  startIcon={<WrenchIcon />}
+                  component={Link}
+                  to="/admin/generators/new"
+                  className="text-xs sm:text-sm"
+                >
+                  <span className="hidden sm:inline">Add Generator</span>
+                  <span className="sm:hidden">Add Generator</span>
+                </Button>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  startIcon={<SettingsIcon />}
+                  component={Link}
+                  to="/admin/settings"
+                  className="text-xs sm:text-sm"
+                >
+                  <span className="hidden sm:inline">Settings</span>
+                  <span className="sm:hidden">Settings</span>
+                </Button>
+              </div>
+            </Card>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

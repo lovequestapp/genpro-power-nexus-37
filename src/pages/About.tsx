@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Phone, MessageSquare, Users, Award, MapPin, Calendar, CheckCircle, Shield, Wrench, Clock, Star, Building, Target, Heart } from 'lucide-react';
 import Header from '@/components/Header';
+import SEO from '../components/SEO';
 
 const About = () => {
   const stats = [{
@@ -66,6 +67,13 @@ const About = () => {
     icon: Shield
   }];
   return <div className="min-h-screen bg-white">
+      <SEO 
+        title="About HOU GEN PROS | Houston's Trusted Generator Installation Company | 15+ Years Experience"
+        description="Learn about HOU GEN PROS, Houston's premier generator installation company with 15+ years of experience. Licensed, insured, and trusted by 500+ Houston homeowners for Generac generator installation and maintenance."
+        keywords="Houston generator company, HOU GEN PROS about, generator installation company Houston, Generac dealer Houston, generator service company Texas, Houston generator experts, generator installation experience, licensed generator installer Houston, insured generator company Houston, trusted generator company Houston"
+        canonical="/about"
+        pageType="website"
+      />
       <Header />
       
       {/* Hero Section - Added more top padding */}

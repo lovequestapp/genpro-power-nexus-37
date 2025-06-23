@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ArrowRight, Phone, MessageSquare, Wrench, Shield, Clock, Zap, Settings, MapPin, Calendar, CheckCircle, AlertTriangle, Users, Award, Truck } from 'lucide-react';
 import Header from '@/components/Header';
 import ScheduleServiceForm from '@/components/ScheduleServiceForm';
+import SEO from '../components/SEO';
 
 const Services = () => {
   const [activeTab, setActiveTab] = useState('installation');
@@ -64,6 +65,13 @@ const Services = () => {
     code: 'PowerPro Elite Dealer'
   }];
   return <div className="min-h-screen bg-white">
+      <SEO 
+        title="Generator Services Houston | Installation, Repair & Maintenance | HOU GEN PROS"
+        description="Comprehensive generator services in Houston: installation, repair, maintenance, emergency service, and 24/7 support. Generac authorized dealer with same-day service available."
+        keywords="generator services Houston, generator installation Houston, generator repair Houston, generator maintenance Houston, emergency generator service Houston, Generac services Houston, standby generator installation, portable generator service, generator troubleshooting Houston, generator parts Houston, generator warranty service, 24/7 generator service Houston"
+        canonical="/services"
+        pageType="website"
+      />
       <Header />
       
       {/* Hero Section - Added more top padding */}

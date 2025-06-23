@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Phone, MessageSquare, AlertTriangle, Clock, MapPin, Shield, Zap, Truck, Users, CheckCircle, Star, Calendar, Fuel, Wrench, Timer } from 'lucide-react';
 import Header from '@/components/Header';
+import SEO from '../components/SEO';
 
 const Emergency = () => {
   const emergencyServices = [{
@@ -110,6 +111,13 @@ const Emergency = () => {
     }
   ];
   return <div className="min-h-screen bg-white">
+      <SEO 
+        title="Emergency Generator Service Houston | 24/7 Generator Repair | HOU GEN PROS"
+        description="24/7 emergency generator service in Houston. Immediate response for generator failures, power outages, and urgent repairs. Call (281) XXX-XXXX for emergency generator service."
+        keywords="emergency generator service Houston, 24/7 generator repair Houston, generator emergency Houston, generator failure Houston, power outage generator service, urgent generator repair Houston, generator breakdown Houston, emergency generator technician Houston"
+        canonical="/emergency"
+        pageType="website"
+      />
       <Header />
       
       {/* Hero Section - Added more top padding */}

@@ -31,6 +31,7 @@ import { TicketDetails } from '@/components/tickets/TicketDetails';
 import { TicketStats } from '@/components/tickets/TicketStats';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import SEO from '../../components/SEO';
 
 interface GeneratorStatus {
   status: string;
@@ -50,7 +51,7 @@ interface Stats {
   closed: number;
 }
 
-export default function Dashboard() {
+export default function CustomerDashboard() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
@@ -251,186 +252,189 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-steel-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-steel-900">Customer Dashboard</h1>
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" size="icon">
-              <Bell className="h-5 w-5" />
-            </Button>
-            <Button variant="outline" size="icon">
-              <Settings className="h-5 w-5" />
-            </Button>
+    <>
+      <SEO title="Customer Dashboard | HOU GEN PROS" description="Customer dashboard home page." canonical="/customer/dashboard" pageType="website" keywords="customer, dashboard" schema={null} />
+      <div className="min-h-screen bg-steel-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold text-steel-900">Customer Dashboard</h1>
+            <div className="flex items-center space-x-4">
+              <Button variant="outline" size="icon">
+                <Bell className="h-5 w-5" />
+              </Button>
+              <Button variant="outline" size="icon">
+                <Settings className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
-        </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid grid-cols-5 gap-4">
-            <TabsTrigger value="overview" className="flex items-center space-x-2">
-              <BarChart className="h-4 w-4" />
-              <span>Overview</span>
-            </TabsTrigger>
-            <TabsTrigger value="generators" className="flex items-center space-x-2">
-              <Power className="h-4 w-4" />
-              <span>Generators</span>
-            </TabsTrigger>
-            <TabsTrigger value="tickets" className="flex items-center space-x-2">
-              <MessageSquare className="h-4 w-4" />
-              <span>Tickets</span>
-            </TabsTrigger>
-            <TabsTrigger value="billing" className="flex items-center space-x-2">
-              <DollarSign className="h-4 w-4" />
-              <span>Billing</span>
-            </TabsTrigger>
-            <TabsTrigger value="services" className="flex items-center space-x-2">
-              <Wrench className="h-4 w-4" />
-              <span>Services</span>
-            </TabsTrigger>
-          </TabsList>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+            <TabsList className="grid grid-cols-5 gap-4">
+              <TabsTrigger value="overview" className="flex items-center space-x-2">
+                <BarChart className="h-4 w-4" />
+                <span>Overview</span>
+              </TabsTrigger>
+              <TabsTrigger value="generators" className="flex items-center space-x-2">
+                <Power className="h-4 w-4" />
+                <span>Generators</span>
+              </TabsTrigger>
+              <TabsTrigger value="tickets" className="flex items-center space-x-2">
+                <MessageSquare className="h-4 w-4" />
+                <span>Tickets</span>
+              </TabsTrigger>
+              <TabsTrigger value="billing" className="flex items-center space-x-2">
+                <DollarSign className="h-4 w-4" />
+                <span>Billing</span>
+              </TabsTrigger>
+              <TabsTrigger value="services" className="flex items-center space-x-2">
+                <Wrench className="h-4 w-4" />
+                <span>Services</span>
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="overview" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-2">Active Generators</h3>
-                <p className="text-3xl font-bold">
-                  {generators.filter(g => g.status === 'active').length}
-                </p>
-              </Card>
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-2">Pending Bills</h3>
-                <p className="text-3xl font-bold">
-                  {bills.filter(b => b.status === 'pending').length}
-                </p>
-              </Card>
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-2">Open Tickets</h3>
-                <p className="text-3xl font-bold">{stats.open}</p>
-              </Card>
-            </div>
-            <TicketStats stats={stats} />
-          </TabsContent>
-
-          <TabsContent value="generators">
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold">My Generators</h2>
+            <TabsContent value="overview" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="p-6">
+                  <h3 className="text-lg font-semibold mb-2">Active Generators</h3>
+                  <p className="text-3xl font-bold">
+                    {generators.filter(g => g.status === 'active').length}
+                  </p>
+                </Card>
+                <Card className="p-6">
+                  <h3 className="text-lg font-semibold mb-2">Pending Bills</h3>
+                  <p className="text-3xl font-bold">
+                    {bills.filter(b => b.status === 'pending').length}
+                  </p>
+                </Card>
+                <Card className="p-6">
+                  <h3 className="text-lg font-semibold mb-2">Open Tickets</h3>
+                  <p className="text-3xl font-bold">{stats.open}</p>
+                </Card>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {generators.map((generator) => (
-                  <Card key={generator.id} className="p-4">
-                    <h3 className="font-semibold">{generator.name}</h3>
-                    <p className="text-sm text-steel-500">{generator.type}</p>
-                    <div className="mt-2">
-                      <Badge variant={generator.status === 'active' ? 'default' : 'secondary'}>
-                        {generator.status}
-                      </Badge>
-                    </div>
-                    <div className="mt-4 space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>Fuel Level</span>
-                        <span>{generator.readings[0]?.fuelLevel || 0}%</span>
+              <TicketStats stats={stats} />
+            </TabsContent>
+
+            <TabsContent value="generators">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-2xl font-bold">My Generators</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {generators.map((generator) => (
+                    <Card key={generator.id} className="p-4">
+                      <h3 className="font-semibold">{generator.name}</h3>
+                      <p className="text-sm text-steel-500">{generator.type}</p>
+                      <div className="mt-2">
+                        <Badge variant={generator.status === 'active' ? 'default' : 'secondary'}>
+                          {generator.status}
+                        </Badge>
                       </div>
-                      <Progress value={generator.readings[0]?.fuelLevel || 0} />
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="tickets">
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold">Support Tickets</h2>
-                <Button onClick={() => setShowCreateTicket(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  New Ticket
-                </Button>
-              </div>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div className="lg:col-span-2">
-                  <TicketList
-                    tickets={tickets}
-                    onTicketSelect={(ticket) => setSelectedTicket(ticket)}
-                    selectedTicketId={selectedTicket?.id}
-                  />
+                      <div className="mt-4 space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Fuel Level</span>
+                          <span>{generator.readings[0]?.fuelLevel || 0}%</span>
+                        </div>
+                        <Progress value={generator.readings[0]?.fuelLevel || 0} />
+                      </div>
+                    </Card>
+                  ))}
                 </div>
-                <div>
-                  {selectedTicket && (
-                    <TicketDetails
-                      ticket={selectedTicket}
-                      onStatusChange={(status) => handleUpdateTicket(selectedTicket.id, { status })}
-                      onAssign={() => {}}
-                      onUnassign={() => {}}
-                      onAddComment={(content) => handleAddComment(selectedTicket.id, content)}
-                      staff={[]}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="tickets">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-2xl font-bold">Support Tickets</h2>
+                  <Button onClick={() => setShowCreateTicket(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    New Ticket
+                  </Button>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <div className="lg:col-span-2">
+                    <TicketList
+                      tickets={tickets}
+                      onTicketSelect={(ticket) => setSelectedTicket(ticket)}
+                      selectedTicketId={selectedTicket?.id}
                     />
-                  )}
+                  </div>
+                  <div>
+                    {selectedTicket && (
+                      <TicketDetails
+                        ticket={selectedTicket}
+                        onStatusChange={(status) => handleUpdateTicket(selectedTicket.id, { status })}
+                        onAssign={() => {}}
+                        onUnassign={() => {}}
+                        onAddComment={(content) => handleAddComment(selectedTicket.id, content)}
+                        staff={[]}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          </TabsContent>
+            </TabsContent>
 
-          <TabsContent value="billing">
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold">Billing History</h2>
+            <TabsContent value="billing">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-2xl font-bold">Billing History</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {bills.map((bill) => (
+                    <Card key={bill.id} className="p-4">
+                      <h3 className="font-semibold">Bill #{bill.id}</h3>
+                      <p className="text-sm text-steel-500">${bill.amount}</p>
+                      <div className="mt-2">
+                        <Badge variant={bill.status === 'paid' ? 'default' : 'secondary'}>
+                          {bill.status}
+                        </Badge>
+                      </div>
+                      <div className="mt-4">
+                        <p className="text-sm text-steel-500">Due: {new Date(bill.dueDate).toLocaleDateString()}</p>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {bills.map((bill) => (
-                  <Card key={bill.id} className="p-4">
-                    <h3 className="font-semibold">Bill #{bill.id}</h3>
-                    <p className="text-sm text-steel-500">${bill.amount}</p>
-                    <div className="mt-2">
-                      <Badge variant={bill.status === 'paid' ? 'default' : 'secondary'}>
-                        {bill.status}
-                      </Badge>
-                    </div>
-                    <div className="mt-4">
-                      <p className="text-sm text-steel-500">Due: {new Date(bill.dueDate).toLocaleDateString()}</p>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </TabsContent>
+            </TabsContent>
 
-          <TabsContent value="services">
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold">Service History</h2>
+            <TabsContent value="services">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-2xl font-bold">Service History</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {services.map((service) => (
+                    <Card key={service.id} className="p-4">
+                      <h3 className="font-semibold">{service.title}</h3>
+                      <p className="text-sm text-steel-500">{service.description}</p>
+                      <div className="mt-2">
+                        <Badge variant={service.status === 'resolved' ? 'default' : 'secondary'}>
+                          {service.status}
+                        </Badge>
+                      </div>
+                      <div className="mt-4">
+                        <p className="text-sm text-steel-500">
+                          {new Date(service.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {services.map((service) => (
-                  <Card key={service.id} className="p-4">
-                    <h3 className="font-semibold">{service.title}</h3>
-                    <p className="text-sm text-steel-500">{service.description}</p>
-                    <div className="mt-2">
-                      <Badge variant={service.status === 'resolved' ? 'default' : 'secondary'}>
-                        {service.status}
-                      </Badge>
-                    </div>
-                    <div className="mt-4">
-                      <p className="text-sm text-steel-500">
-                        {new Date(service.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+            </TabsContent>
+          </Tabs>
 
-        {showCreateTicket && (
-          <CreateTicketModal
-            open={showCreateTicket}
-            onOpenChange={setShowCreateTicket}
-            onTicketCreated={handleCreateTicket}
-          />
-        )}
+          {showCreateTicket && (
+            <CreateTicketModal
+              open={showCreateTicket}
+              onOpenChange={setShowCreateTicket}
+              onTicketCreated={handleCreateTicket}
+            />
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

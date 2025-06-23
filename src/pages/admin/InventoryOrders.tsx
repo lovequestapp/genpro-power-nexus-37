@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, Eye, Edit, Trash2, RefreshCw, Package, AlertTriangle, CheckCircle, XCircle, Truck, FileText, UserPlus } from 'lucide-react';
 import { supabaseService } from '@/services/supabase';
 import { PurchaseOrder, Supplier, PurchaseOrderItem } from '@/types/inventory';
+import SEO from '../../components/SEO';
 
 // Import Supabase configuration
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -724,201 +725,204 @@ export default function InventoryOrders() {
 
   console.log('InventoryOrders: Rendering main content');
   return (
-    <ErrorBoundary>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Purchase Orders</h1>
-            <p className="text-muted-foreground">Manage all purchase orders for inventory and supplies</p>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={handleCreate}><Plus className="w-4 h-4 mr-2" />New Order</Button>
-            <Button variant="outline" onClick={loadData}><RefreshCw className="w-4 h-4 mr-2" />Refresh</Button>
-          </div>
-        </div>
-        <Card>
-          <CardHeader>
-            <CardTitle>Orders List</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-4 mb-4">
-              <Input placeholder="Search PO number..." value={search} onChange={e => setSearch(e.target.value)} onBlur={loadData} />
-              <Select value={statusFilter} onValueChange={v => { setStatusFilter(v); setTimeout(loadData, 0); }}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="sent">Sent</SelectItem>
-                  <SelectItem value="confirmed">Confirmed</SelectItem>
-                  <SelectItem value="received">Received</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                </SelectContent>
-              </Select>
+    <>
+      <SEO title="Admin Inventory Orders | HOU GEN PROS" description="Admin dashboard inventory orders page." canonical="/admin/inventory/orders" pageType="website" keywords="admin, inventory orders, dashboard" schema={null} />
+      <ErrorBoundary>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold">Purchase Orders</h1>
+              <p className="text-muted-foreground">Manage all purchase orders for inventory and supplies</p>
             </div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>PO #</TableHead>
-                  <TableHead>Supplier</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredOrders.map(order => (
-                  <TableRow key={order.id}>
-                    <TableCell>{order.po_number}</TableCell>
-                    <TableCell>{order.supplier?.name || '-'}</TableCell>
-                    <TableCell>
-                      {order.status === 'draft' && <span className="text-gray-500">Draft</span>}
-                      {order.status === 'sent' && <span className="text-blue-600">Sent</span>}
-                      {order.status === 'confirmed' && <span className="text-green-600">Confirmed</span>}
-                      {order.status === 'received' && <span className="text-green-800 font-semibold">Received</span>}
-                      {order.status === 'cancelled' && <span className="text-red-600">Cancelled</span>}
-                    </TableCell>
-                    <TableCell>{order.order_date}</TableCell>
-                    <TableCell>${order.total_amount?.toFixed(2) || '0.00'}</TableCell>
-                    <TableCell>
-                      <Button variant="ghost" size="sm" onClick={() => setViewOrder(order)}><Eye className="w-4 h-4" /></Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleEdit(order)}><Edit className="w-4 h-4" /></Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDelete(order)}><Trash2 className="w-4 h-4" /></Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            {filteredOrders.length === 0 && !loading && (
-              <div className="text-center py-8">
-                <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No orders found</h3>
-                <p className="text-muted-foreground mb-4">Try adjusting your filters or search terms.</p>
-                <Button onClick={handleCreate}><Plus className="w-4 h-4 mr-2" />Create First Order</Button>
+            <div className="flex gap-2">
+              <Button onClick={handleCreate}><Plus className="w-4 h-4 mr-2" />New Order</Button>
+              <Button variant="outline" onClick={loadData}><RefreshCw className="w-4 h-4 mr-2" />Refresh</Button>
+            </div>
+          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Orders List</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-4 mb-4">
+                <Input placeholder="Search PO number..." value={search} onChange={e => setSearch(e.target.value)} onBlur={loadData} />
+                <Select value={statusFilter} onValueChange={v => { setStatusFilter(v); setTimeout(loadData, 0); }}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="sent">Sent</SelectItem>
+                    <SelectItem value="confirmed">Confirmed</SelectItem>
+                    <SelectItem value="received">Received</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            )}
-          </CardContent>
-        </Card>
-        {/* Create/Edit Order Dialog */}
-        <Dialog open={showForm} onOpenChange={v => { 
-          console.log('InventoryOrders: Dialog state changing', v);
-          setShowForm(v); 
-          if (!v) setEditingOrder(null); 
-        }}>
-          <DialogContent className="max-w-3xl">
-            <DialogHeader>
-              <DialogTitle>{editingOrder ? 'Edit Order' : 'New Purchase Order'}</DialogTitle>
-              <DialogDescription>{editingOrder ? 'Edit the order details below.' : 'Fill out the form to create a new purchase order.'}</DialogDescription>
-            </DialogHeader>
-            {(() => {
-              try {
-                // Test if we can render a simple form first
-                if (suppliers.length === 0) {
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>PO #</TableHead>
+                    <TableHead>Supplier</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Total</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredOrders.map(order => (
+                    <TableRow key={order.id}>
+                      <TableCell>{order.po_number}</TableCell>
+                      <TableCell>{order.supplier?.name || '-'}</TableCell>
+                      <TableCell>
+                        {order.status === 'draft' && <span className="text-gray-500">Draft</span>}
+                        {order.status === 'sent' && <span className="text-blue-600">Sent</span>}
+                        {order.status === 'confirmed' && <span className="text-green-600">Confirmed</span>}
+                        {order.status === 'received' && <span className="text-green-800 font-semibold">Received</span>}
+                        {order.status === 'cancelled' && <span className="text-red-600">Cancelled</span>}
+                      </TableCell>
+                      <TableCell>{order.order_date}</TableCell>
+                      <TableCell>${order.total_amount?.toFixed(2) || '0.00'}</TableCell>
+                      <TableCell>
+                        <Button variant="ghost" size="sm" onClick={() => setViewOrder(order)}><Eye className="w-4 h-4" /></Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleEdit(order)}><Edit className="w-4 h-4" /></Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleDelete(order)}><Trash2 className="w-4 h-4" /></Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              {filteredOrders.length === 0 && !loading && (
+                <div className="text-center py-8">
+                  <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No orders found</h3>
+                  <p className="text-muted-foreground mb-4">Try adjusting your filters or search terms.</p>
+                  <Button onClick={handleCreate}><Plus className="w-4 h-4 mr-2" />Create First Order</Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          {/* Create/Edit Order Dialog */}
+          <Dialog open={showForm} onOpenChange={v => { 
+            console.log('InventoryOrders: Dialog state changing', v);
+            setShowForm(v); 
+            if (!v) setEditingOrder(null); 
+          }}>
+            <DialogContent className="max-w-3xl">
+              <DialogHeader>
+                <DialogTitle>{editingOrder ? 'Edit Order' : 'New Purchase Order'}</DialogTitle>
+                <DialogDescription>{editingOrder ? 'Edit the order details below.' : 'Fill out the form to create a new purchase order.'}</DialogDescription>
+              </DialogHeader>
+              {(() => {
+                try {
+                  // Test if we can render a simple form first
+                  if (suppliers.length === 0) {
+                    return (
+                      <div className="p-4 text-center">
+                        <p className="text-muted-foreground mb-4">Loading suppliers...</p>
+                        <Button variant="outline" onClick={() => setShowForm(false)}>Close</Button>
+                      </div>
+                    );
+                  }
+                  
                   return (
-                    <div className="p-4 text-center">
-                      <p className="text-muted-foreground mb-4">Loading suppliers...</p>
-                      <Button variant="outline" onClick={() => setShowForm(false)}>Close</Button>
+                    <PurchaseOrderForm 
+                      order={editingOrder || undefined} 
+                      suppliers={suppliers} 
+                      onSave={handleSave} 
+                      onCancel={() => setShowForm(false)} 
+                      onSupplierCreated={(supplier) => {
+                        setSuppliers(prevSuppliers => [...prevSuppliers, supplier]);
+                      }} 
+                    />
+                  );
+                } catch (error) {
+                  console.error('InventoryOrders: Error rendering PurchaseOrderForm:', error);
+                  return (
+                    <div className="p-4 text-center text-red-600">
+                      <AlertTriangle className="mx-auto h-8 w-8 mb-2" />
+                      <p>Failed to load order form. Please try again.</p>
+                      <Button 
+                        variant="outline" 
+                        className="mt-2" 
+                        onClick={() => setShowForm(false)}
+                      >
+                        Close
+                      </Button>
                     </div>
                   );
                 }
-                
-                return (
-                  <PurchaseOrderForm 
-                    order={editingOrder || undefined} 
-                    suppliers={suppliers} 
-                    onSave={handleSave} 
-                    onCancel={() => setShowForm(false)} 
-                    onSupplierCreated={(supplier) => {
-                      setSuppliers(prevSuppliers => [...prevSuppliers, supplier]);
-                    }} 
-                  />
-                );
-              } catch (error) {
-                console.error('InventoryOrders: Error rendering PurchaseOrderForm:', error);
-                return (
-                  <div className="p-4 text-center text-red-600">
-                    <AlertTriangle className="mx-auto h-8 w-8 mb-2" />
-                    <p>Failed to load order form. Please try again.</p>
-                    <Button 
-                      variant="outline" 
-                      className="mt-2" 
-                      onClick={() => setShowForm(false)}
-                    >
-                      Close
-                    </Button>
-                  </div>
-                );
-              }
-            })()}
-          </DialogContent>
-        </Dialog>
-        {/* View Order Dialog */}
-        <Dialog open={!!viewOrder} onOpenChange={v => setViewOrder(v ? viewOrder : null)}>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Order Details</DialogTitle>
-            </DialogHeader>
-            {viewOrder && (
-              <div className="space-y-4">
-                <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
-                  <div>
-                    <div className="font-semibold">PO Number:</div>
-                    <div>{viewOrder.po_number}</div>
+              })()}
+            </DialogContent>
+          </Dialog>
+          {/* View Order Dialog */}
+          <Dialog open={!!viewOrder} onOpenChange={v => setViewOrder(v ? viewOrder : null)}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Order Details</DialogTitle>
+              </DialogHeader>
+              {viewOrder && (
+                <div className="space-y-4">
+                  <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
+                    <div>
+                      <div className="font-semibold">PO Number:</div>
+                      <div>{viewOrder.po_number}</div>
+                    </div>
+                    <div>
+                      <div className="font-semibold">Supplier:</div>
+                      <div>{viewOrder.supplier?.name || '-'}</div>
+                    </div>
+                    <div>
+                      <div className="font-semibold">Status:</div>
+                      <div>{viewOrder.status}</div>
+                    </div>
+                    <div>
+                      <div className="font-semibold">Order Date:</div>
+                      <div>{viewOrder.order_date}</div>
+                    </div>
                   </div>
                   <div>
-                    <div className="font-semibold">Supplier:</div>
-                    <div>{viewOrder.supplier?.name || '-'}</div>
-                  </div>
-                  <div>
-                    <div className="font-semibold">Status:</div>
-                    <div>{viewOrder.status}</div>
-                  </div>
-                  <div>
-                    <div className="font-semibold">Order Date:</div>
-                    <div>{viewOrder.order_date}</div>
-                  </div>
-                </div>
-                <div>
-                  <div className="font-semibold mb-2">Order Items</div>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Item</TableHead>
-                        <TableHead>Qty</TableHead>
-                        <TableHead>Unit Cost</TableHead>
-                        <TableHead>Total</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {viewOrder.items?.map((item, idx) => (
-                        <TableRow key={idx}>
-                          <TableCell>{item.item_name}</TableCell>
-                          <TableCell>{item.quantity}</TableCell>
-                          <TableCell>${item.unit_cost?.toFixed(2)}</TableCell>
-                          <TableCell>${item.total_cost?.toFixed(2)}</TableCell>
+                    <div className="font-semibold mb-2">Order Items</div>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Item</TableHead>
+                          <TableHead>Qty</TableHead>
+                          <TableHead>Unit Cost</TableHead>
+                          <TableHead>Total</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-                <div className="flex flex-col md:flex-row gap-4 justify-end">
-                  <div className="space-y-1">
-                    <div>Subtotal: <span className="font-semibold">${viewOrder.items?.reduce((sum, it) => sum + ((it.quantity || 0) * (it.unit_cost || 0)), 0).toFixed(2)}</span></div>
-                    <div>Tax: <span className="font-semibold">${viewOrder.tax_amount?.toFixed(2) || '0.00'}</span></div>
-                    <div>Shipping: <span className="font-semibold">${viewOrder.shipping_amount?.toFixed(2) || '0.00'}</span></div>
-                    <div>Total: <span className="font-bold text-lg">${viewOrder.total_amount?.toFixed(2) || '0.00'}</span></div>
+                      </TableHeader>
+                      <TableBody>
+                        {viewOrder.items?.map((item, idx) => (
+                          <TableRow key={idx}>
+                            <TableCell>{item.item_name}</TableCell>
+                            <TableCell>{item.quantity}</TableCell>
+                            <TableCell>${item.unit_cost?.toFixed(2)}</TableCell>
+                            <TableCell>${item.total_cost?.toFixed(2)}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  <div className="flex flex-col md:flex-row gap-4 justify-end">
+                    <div className="space-y-1">
+                      <div>Subtotal: <span className="font-semibold">${viewOrder.items?.reduce((sum, it) => sum + ((it.quantity || 0) * (it.unit_cost || 0)), 0).toFixed(2)}</span></div>
+                      <div>Tax: <span className="font-semibold">${viewOrder.tax_amount?.toFixed(2) || '0.00'}</span></div>
+                      <div>Shipping: <span className="font-semibold">${viewOrder.shipping_amount?.toFixed(2) || '0.00'}</span></div>
+                      <div>Total: <span className="font-bold text-lg">${viewOrder.total_amount?.toFixed(2) || '0.00'}</span></div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
-        {loading && (
-          <div className="flex items-center justify-center h-32">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        )}
-      </div>
-    </ErrorBoundary>
+              )}
+            </DialogContent>
+          </Dialog>
+          {loading && (
+            <div className="flex items-center justify-center h-32">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          )}
+        </div>
+      </ErrorBoundary>
+    </>
   );
 } 

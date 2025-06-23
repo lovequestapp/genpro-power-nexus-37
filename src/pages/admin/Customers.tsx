@@ -14,6 +14,7 @@ import { toast } from '@/hooks/use-toast';
 import { Edit, Trash, Plus, Search, Filter, Download, Mail, Phone, Building, Calendar, DollarSign, FileText, RefreshCw, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import type { Customer } from '@/lib/supabase';
+import SEO from '../../components/SEO';
 
 type CustomerFormData = {
   name: string;
@@ -262,271 +263,274 @@ export default function CustomersPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold">Customer Management</h1>
-          <p className="text-muted-foreground mt-1">Manage your customer relationships and track their history</p>
-        </div>
-        <div className="flex gap-3">
-          <Button 
-            variant="outline" 
-            onClick={() => {
-              console.log('Manual refresh triggered');
-              queryClient.invalidateQueries({ queryKey: ['customers'] });
-              queryClient.refetchQueries({ queryKey: ['customers'] });
-            }}
-          >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Refresh
-          </Button>
-          <Button variant="outline" onClick={() => window.print()}>
-            <Download className="w-4 h-4 mr-2" />
-            Export
-          </Button>
-          <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={openAddModal}>
-                <Plus className="w-4 h-4 mr-2" /> Add Customer
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>{editCustomer ? 'Edit Customer' : 'Add New Customer'}</DialogTitle>
-                <DialogDescription>
-                  {editCustomer ? 'Update customer information below.' : 'Fill in the customer details below to add them to your database.'}
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium">Name *</label>
-                      <Input 
-                        placeholder="Full Name" 
-                        value={form.name} 
-                        onChange={e => setForm(f => ({ ...f, name: e.target.value }))} 
-                        required 
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">Email *</label>
-                      <Input 
-                        placeholder="email@example.com" 
-                        value={form.email} 
-                        onChange={e => setForm(f => ({ ...f, email: e.target.value }))} 
-                        type="email" 
-                        required 
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">Phone</label>
-                      <Input 
-                        placeholder="(555) 123-4567" 
-                        value={form.phone || ''} 
-                        onChange={e => setForm(f => ({ ...f, phone: e.target.value || null }))} 
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">Address</label>
-                      <Textarea 
-                        placeholder="Full Address" 
-                        value={form.address || ''} 
-                        onChange={e => setForm(f => ({ ...f, address: e.target.value || null }))} 
-                        rows={2}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium">Company</label>
-                      <Input 
-                        placeholder="Company Name" 
-                        value={form.company || ''} 
-                        onChange={e => setForm(f => ({ ...f, company: e.target.value || null }))} 
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">Customer Type</label>
-                      <select 
-                        className="w-full p-2 border rounded-md bg-white"
-                        value={form.type}
-                        onChange={e => setForm(f => ({ ...f, type: e.target.value as 'residential' | 'commercial' }))}
-                      >
-                        <option value="residential">Residential</option>
-                        <option value="commercial">Commercial</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">Status</label>
-                      <select 
-                        className="w-full p-2 border rounded-md bg-white"
-                        value={form.status}
-                        onChange={e => setForm(f => ({ ...f, status: e.target.value as 'active' | 'inactive' }))}
-                      >
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Notes</label>
-                  <Textarea 
-                    placeholder="Additional notes about this customer..." 
-                    value={form.notes || ''} 
-                    onChange={e => setForm(f => ({ ...f, notes: e.target.value || null }))} 
-                    rows={3}
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={mutation.isPending}>
-                  {mutation.isPending ? 'Saving...' : (editCustomer ? 'Update Customer' : 'Add Customer')}
+    <>
+      <SEO title="Admin Customers | HOU GEN PROS" description="Admin dashboard customers page." canonical="/admin/customers" pageType="website" keywords="admin, customers, dashboard" schema={null} />
+      <div className="p-6 space-y-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold">Customer Management</h1>
+            <p className="text-muted-foreground mt-1">Manage your customer relationships and track their history</p>
+          </div>
+          <div className="flex gap-3">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                console.log('Manual refresh triggered');
+                queryClient.invalidateQueries({ queryKey: ['customers'] });
+                queryClient.refetchQueries({ queryKey: ['customers'] });
+              }}
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Refresh
+            </Button>
+            <Button variant="outline" onClick={() => window.print()}>
+              <Download className="w-4 h-4 mr-2" />
+              Export
+            </Button>
+            <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+              <DialogTrigger asChild>
+                <Button onClick={openAddModal}>
+                  <Plus className="w-4 h-4 mr-2" /> Add Customer
                 </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>{editCustomer ? 'Edit Customer' : 'Add New Customer'}</DialogTitle>
+                  <DialogDescription>
+                    {editCustomer ? 'Update customer information below.' : 'Fill in the customer details below to add them to your database.'}
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium">Name *</label>
+                        <Input 
+                          placeholder="Full Name" 
+                          value={form.name} 
+                          onChange={e => setForm(f => ({ ...f, name: e.target.value }))} 
+                          required 
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium">Email *</label>
+                        <Input 
+                          placeholder="email@example.com" 
+                          value={form.email} 
+                          onChange={e => setForm(f => ({ ...f, email: e.target.value }))} 
+                          type="email" 
+                          required 
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium">Phone</label>
+                        <Input 
+                          placeholder="(555) 123-4567" 
+                          value={form.phone || ''} 
+                          onChange={e => setForm(f => ({ ...f, phone: e.target.value || null }))} 
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium">Address</label>
+                        <Textarea 
+                          placeholder="Full Address" 
+                          value={form.address || ''} 
+                          onChange={e => setForm(f => ({ ...f, address: e.target.value || null }))} 
+                          rows={2}
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium">Company</label>
+                        <Input 
+                          placeholder="Company Name" 
+                          value={form.company || ''} 
+                          onChange={e => setForm(f => ({ ...f, company: e.target.value || null }))} 
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium">Customer Type</label>
+                        <select 
+                          className="w-full p-2 border rounded-md bg-white"
+                          value={form.type}
+                          onChange={e => setForm(f => ({ ...f, type: e.target.value as 'residential' | 'commercial' }))}
+                        >
+                          <option value="residential">Residential</option>
+                          <option value="commercial">Commercial</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium">Status</label>
+                        <select 
+                          className="w-full p-2 border rounded-md bg-white"
+                          value={form.status}
+                          onChange={e => setForm(f => ({ ...f, status: e.target.value as 'active' | 'inactive' }))}
+                        >
+                          <option value="active">Active</option>
+                          <option value="inactive">Inactive</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Notes</label>
+                    <Textarea 
+                      placeholder="Additional notes about this customer..." 
+                      value={form.notes || ''} 
+                      onChange={e => setForm(f => ({ ...f, notes: e.target.value || null }))} 
+                      rows={3}
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={mutation.isPending}>
+                    {mutation.isPending ? 'Saving...' : (editCustomer ? 'Update Customer' : 'Add Customer')}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
-      </div>
 
-      <div className="flex gap-4 mb-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-          <Input 
-            placeholder="Search customers by name, email, or company..." 
-            value={search} 
-            onChange={e => setSearch(e.target.value)} 
-            className="pl-10" 
-          />
+        <div className="flex gap-4 mb-6">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Input 
+              placeholder="Search customers by name, email, or company..." 
+              value={search} 
+              onChange={e => setSearch(e.target.value)} 
+              className="pl-10" 
+            />
+          </div>
+          <Button variant="outline">
+            <Filter className="w-4 h-4 mr-2" />
+            Filters
+          </Button>
         </div>
-        <Button variant="outline">
-          <Filter className="w-4 h-4 mr-2" />
-          Filters
-        </Button>
-      </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="all">All Customers ({customers?.length || 0})</TabsTrigger>
-          <TabsTrigger value="active">Active ({customers?.filter(c => c.status === 'active').length || 0})</TabsTrigger>
-          <TabsTrigger value="inactive">Inactive ({customers?.filter(c => c.status === 'inactive').length || 0})</TabsTrigger>
-          <TabsTrigger value="commercial">Commercial ({customers?.filter(c => c.type === 'commercial').length || 0})</TabsTrigger>
-          <TabsTrigger value="residential">Residential ({customers?.filter(c => c.type === 'residential').length || 0})</TabsTrigger>
-        </TabsList>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="all">All Customers ({customers?.length || 0})</TabsTrigger>
+            <TabsTrigger value="active">Active ({customers?.filter(c => c.status === 'active').length || 0})</TabsTrigger>
+            <TabsTrigger value="inactive">Inactive ({customers?.filter(c => c.status === 'inactive').length || 0})</TabsTrigger>
+            <TabsTrigger value="commercial">Commercial ({customers?.filter(c => c.type === 'commercial').length || 0})</TabsTrigger>
+            <TabsTrigger value="residential">Residential ({customers?.filter(c => c.type === 'residential').length || 0})</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value={activeTab}>
-          <Card>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  <TableRow><TableCell colSpan={6} className="text-center py-8">Loading customers...</TableCell></TableRow>
-                ) : filteredCustomers.length ? filteredCustomers.map(customer => (
-                  <TableRow key={customer.id} className="hover:bg-steel-50 cursor-pointer">
-                    <TableCell>
-                      <div 
-                        className="cursor-pointer hover:text-orange-600 transition-colors"
-                        onClick={() => handleView(customer)}
-                      >
-                        <div className="font-medium">{customer.name}</div>
-                        {customer.company && <div className="text-sm text-muted-foreground">{customer.company}</div>}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="flex items-center text-sm">
-                          <Mail className="w-3 h-3 mr-2" />
-                          {customer.email}
-                        </div>
-                        {customer.phone && (
-                          <div className="flex items-center text-sm">
-                            <Phone className="w-3 h-3 mr-2" />
-                            {customer.phone}
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={customer.type === 'commercial' ? 'default' : 'secondary'}>
-                        {customer.type}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={customer.status === 'active' ? 'default' : 'destructive'}>
-                        {customer.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center text-sm text-muted-foreground">
-                        <Calendar className="w-3 h-3 mr-2" />
-                        {customer.created_at ? format(new Date(customer.created_at), 'MMM d, yyyy') : 'N/A'}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleView(customer);
-                          }}
-                          title="View customer details"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEdit(customer);
-                          }}
-                          title="Edit customer"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(customer);
-                          }}
-                          title="Delete customer"
-                        >
-                          <Trash className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )) : (
+          <TabsContent value={activeTab}>
+            <Card>
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8">
-                      <div className="flex flex-col items-center gap-2">
-                        <FileText className="w-8 h-8 text-muted-foreground" />
-                        <p className="text-muted-foreground">No customers found.</p>
-                        <Button onClick={openAddModal} size="sm">
-                          <Plus className="w-4 h-4 mr-2" />
-                          Add your first customer
-                        </Button>
-                      </div>
-                    </TableCell>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Contact</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+                </TableHeader>
+                <TableBody>
+                  {isLoading ? (
+                    <TableRow><TableCell colSpan={6} className="text-center py-8">Loading customers...</TableCell></TableRow>
+                  ) : filteredCustomers.length ? filteredCustomers.map(customer => (
+                    <TableRow key={customer.id} className="hover:bg-steel-50 cursor-pointer">
+                      <TableCell>
+                        <div 
+                          className="cursor-pointer hover:text-orange-600 transition-colors"
+                          onClick={() => handleView(customer)}
+                        >
+                          <div className="font-medium">{customer.name}</div>
+                          {customer.company && <div className="text-sm text-muted-foreground">{customer.company}</div>}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          <div className="flex items-center text-sm">
+                            <Mail className="w-3 h-3 mr-2" />
+                            {customer.email}
+                          </div>
+                          {customer.phone && (
+                            <div className="flex items-center text-sm">
+                              <Phone className="w-3 h-3 mr-2" />
+                              {customer.phone}
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={customer.type === 'commercial' ? 'default' : 'secondary'}>
+                          {customer.type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={customer.status === 'active' ? 'default' : 'destructive'}>
+                          {customer.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center text-sm text-muted-foreground">
+                          <Calendar className="w-3 h-3 mr-2" />
+                          {customer.created_at ? format(new Date(customer.created_at), 'MMM d, yyyy') : 'N/A'}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleView(customer);
+                            }}
+                            title="View customer details"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(customer);
+                            }}
+                            title="Edit customer"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(customer);
+                            }}
+                            title="Delete customer"
+                          >
+                            <Trash className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )) : (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8">
+                        <div className="flex flex-col items-center gap-2">
+                          <FileText className="w-8 h-8 text-muted-foreground" />
+                          <p className="text-muted-foreground">No customers found.</p>
+                          <Button onClick={openAddModal} size="sm">
+                            <Plus className="w-4 h-4 mr-2" />
+                            Add your first customer
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </>
   );
 }

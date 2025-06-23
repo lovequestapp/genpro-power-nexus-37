@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,6 +26,7 @@ import { StripeAnalytics } from '@/components/stripe/StripeAnalytics';
 import { StripeIntegration } from '@/components/invoicing/StripeIntegration';
 import { StripeService } from '@/services/stripeService';
 import { useToast } from '@/components/ui/use-toast';
+import SEO from '../../components/SEO';
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
@@ -172,195 +172,198 @@ export default function StripeDashboard() {
   const pendingBalance = stripeData?.balance?.pending?.[0]?.amount || 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-4xl font-bold text-slate-800">Stripe Dashboard</h1>
-            <p className="text-slate-600 mt-2">Manage your payments, customers, and revenue</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            {isConnected ? (
-              <Badge className="bg-green-100 text-green-800">
-                <CheckCircle className="w-4 h-4 mr-1" />
-                Connected
-              </Badge>
-            ) : (
-              <Badge className="bg-red-100 text-red-800">
-                <AlertCircle className="w-4 h-4 mr-1" />
-                Not Connected
-              </Badge>
-            )}
-            <Button variant="outline" onClick={fetchStripeData}>
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Refresh
-            </Button>
-          </div>
-        </div>
-
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="transactions">Transactions</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-6">
-            {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <MetricCard
-                title="Total Revenue"
-                value={`$${(totalRevenue / 100).toFixed(2)}`}
-                change={8.2}
-                trend="up"
-                icon={<DollarSign className="h-4 w-4 text-green-600" />}
-                color="green"
-                subtitle="All time"
-              />
-              <MetricCard
-                title="Customers"
-                value={totalCustomers}
-                change={12.5}
-                trend="up"
-                icon={<Users className="h-4 w-4 text-blue-600" />}
-                color="blue"
-                subtitle="Active customers"
-              />
-              <MetricCard
-                title="Available Balance"
-                value={`$${(availableBalance / 100).toFixed(2)}`}
-                icon={<CreditCard className="h-4 w-4 text-purple-600" />}
-                color="purple"
-                subtitle="Ready for payout"
-              />
-              <MetricCard
-                title="Pending Balance"
-                value={`$${(pendingBalance / 100).toFixed(2)}`}
-                icon={<Calendar className="h-4 w-4 text-orange-600" />}
-                color="orange"
-                subtitle="Processing"
-              />
+    <>
+      <SEO title="Admin Stripe Dashboard | HOU GEN PROS" description="Admin dashboard stripe dashboard page." canonical="/admin/stripe-dashboard" pageType="website" keywords="admin, stripe dashboard, dashboard" schema={null} />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+        <div className="max-w-7xl mx-auto space-y-6">
+          {/* Header */}
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-4xl font-bold text-slate-800">Stripe Dashboard</h1>
+              <p className="text-slate-600 mt-2">Manage your payments, customers, and revenue</p>
             </div>
+            <div className="flex items-center space-x-4">
+              {isConnected ? (
+                <Badge className="bg-green-100 text-green-800">
+                  <CheckCircle className="w-4 h-4 mr-1" />
+                  Connected
+                </Badge>
+              ) : (
+                <Badge className="bg-red-100 text-red-800">
+                  <AlertCircle className="w-4 h-4 mr-1" />
+                  Not Connected
+                </Badge>
+              )}
+              <Button variant="outline" onClick={fetchStripeData}>
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Refresh
+              </Button>
+            </div>
+          </div>
 
-            {/* Recent Activity */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Recent Payments */}
+          <Tabs defaultValue="overview" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsTrigger value="transactions">Transactions</TabsTrigger>
+              <TabsTrigger value="settings">Settings</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="overview" className="space-y-6">
+              {/* Key Metrics */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <MetricCard
+                  title="Total Revenue"
+                  value={`$${(totalRevenue / 100).toFixed(2)}`}
+                  change={8.2}
+                  trend="up"
+                  icon={<DollarSign className="h-4 w-4 text-green-600" />}
+                  color="green"
+                  subtitle="All time"
+                />
+                <MetricCard
+                  title="Customers"
+                  value={totalCustomers}
+                  change={12.5}
+                  trend="up"
+                  icon={<Users className="h-4 w-4 text-blue-600" />}
+                  color="blue"
+                  subtitle="Active customers"
+                />
+                <MetricCard
+                  title="Available Balance"
+                  value={`$${(availableBalance / 100).toFixed(2)}`}
+                  icon={<CreditCard className="h-4 w-4 text-purple-600" />}
+                  color="purple"
+                  subtitle="Ready for payout"
+                />
+                <MetricCard
+                  title="Pending Balance"
+                  value={`$${(pendingBalance / 100).toFixed(2)}`}
+                  icon={<Calendar className="h-4 w-4 text-orange-600" />}
+                  color="orange"
+                  subtitle="Processing"
+                />
+              </div>
+
+              {/* Recent Activity */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Recent Payments */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <CreditCard className="w-5 h-5 mr-2" />
+                      Recent Payments
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {stripeData?.payments?.data?.slice(0, 5).map((payment: any) => (
+                        <div key={payment.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                          <div>
+                            <p className="font-medium">${(payment.amount / 100).toFixed(2)}</p>
+                            <p className="text-sm text-gray-500">{payment.currency.toUpperCase()}</p>
+                          </div>
+                          <Badge variant={payment.status === 'succeeded' ? 'default' : 'secondary'}>
+                            {payment.status}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Quick Actions */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Zap className="w-5 h-5 mr-2" />
+                      Quick Actions
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Button 
+                      className="w-full justify-start" 
+                      variant="outline"
+                      onClick={handleCreatePayout}
+                      disabled={availableBalance < 100}
+                    >
+                      <DollarSign className="w-4 h-4 mr-2" />
+                      Create Payout ({availableBalance < 100 ? 'Insufficient funds' : `$${(availableBalance / 100).toFixed(2)}`})
+                    </Button>
+                    <Button 
+                      className="w-full justify-start" 
+                      variant="outline"
+                      onClick={() => handleExportData('payments')}
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Export Payments
+                    </Button>
+                    <Button 
+                      className="w-full justify-start" 
+                      variant="outline"
+                      onClick={() => handleExportData('customers')}
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Export Customers
+                    </Button>
+                    <Button 
+                      className="w-full justify-start" 
+                      variant="outline"
+                      onClick={() => handleExportData('all')}
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Export All Data
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="analytics">
+              <StripeAnalytics timeRange={selectedTimeRange as any} />
+            </TabsContent>
+
+            <TabsContent value="transactions" className="space-y-6">
+              {/* Transaction Filters */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <CreditCard className="w-5 h-5 mr-2" />
-                    Recent Payments
-                  </CardTitle>
+                  <CardTitle>Transaction History</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {stripeData?.payments?.data?.slice(0, 5).map((payment: any) => (
-                      <div key={payment.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                        <div>
-                          <p className="font-medium">${(payment.amount / 100).toFixed(2)}</p>
-                          <p className="text-sm text-gray-500">{payment.currency.toUpperCase()}</p>
+                    {stripeData?.payments?.data?.map((payment: any) => (
+                      <div key={payment.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                            <CreditCard className="w-5 h-5 text-blue-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium">${(payment.amount / 100).toFixed(2)} {payment.currency.toUpperCase()}</p>
+                            <p className="text-sm text-gray-500">
+                              {new Date(payment.created * 1000).toLocaleDateString()}
+                            </p>
+                          </div>
                         </div>
-                        <Badge variant={payment.status === 'succeeded' ? 'default' : 'secondary'}>
-                          {payment.status}
-                        </Badge>
+                        <div className="text-right">
+                          <Badge variant={payment.status === 'succeeded' ? 'default' : 'secondary'}>
+                            {payment.status}
+                          </Badge>
+                          <p className="text-sm text-gray-500 mt-1">ID: {payment.id}</p>
+                        </div>
                       </div>
                     ))}
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
 
-              {/* Quick Actions */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Zap className="w-5 h-5 mr-2" />
-                    Quick Actions
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button 
-                    className="w-full justify-start" 
-                    variant="outline"
-                    onClick={handleCreatePayout}
-                    disabled={availableBalance < 100}
-                  >
-                    <DollarSign className="w-4 h-4 mr-2" />
-                    Create Payout ({availableBalance < 100 ? 'Insufficient funds' : `$${(availableBalance / 100).toFixed(2)}`})
-                  </Button>
-                  <Button 
-                    className="w-full justify-start" 
-                    variant="outline"
-                    onClick={() => handleExportData('payments')}
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Export Payments
-                  </Button>
-                  <Button 
-                    className="w-full justify-start" 
-                    variant="outline"
-                    onClick={() => handleExportData('customers')}
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Export Customers
-                  </Button>
-                  <Button 
-                    className="w-full justify-start" 
-                    variant="outline"
-                    onClick={() => handleExportData('all')}
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Export All Data
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="analytics">
-            <StripeAnalytics timeRange={selectedTimeRange as any} />
-          </TabsContent>
-
-          <TabsContent value="transactions" className="space-y-6">
-            {/* Transaction Filters */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Transaction History</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {stripeData?.payments?.data?.map((payment: any) => (
-                    <div key={payment.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                          <CreditCard className="w-5 h-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <p className="font-medium">${(payment.amount / 100).toFixed(2)} {payment.currency.toUpperCase()}</p>
-                          <p className="text-sm text-gray-500">
-                            {new Date(payment.created * 1000).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <Badge variant={payment.status === 'succeeded' ? 'default' : 'secondary'}>
-                          {payment.status}
-                        </Badge>
-                        <p className="text-sm text-gray-500 mt-1">ID: {payment.id}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="settings">
-            <StripeIntegration />
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="settings">
+              <StripeIntegration />
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

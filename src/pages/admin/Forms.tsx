@@ -43,6 +43,7 @@ import type {
 } from '@/types/forms';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import SEO from '../../components/SEO';
 
 export default function FormsPage() {
   const { toast } = useToast();
@@ -316,179 +317,182 @@ export default function FormsPage() {
   );
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Forms & Submissions</h1>
-          <p className="text-gray-600 mt-1">Manage form submissions and track performance</p>
+    <>
+      <SEO title="Admin Forms | HOU GEN PROS" description="Admin dashboard forms page." canonical="/admin/forms" pageType="website" keywords="admin, forms, dashboard" schema={null} />
+      <div className="p-6 space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Forms & Submissions</h1>
+            <p className="text-gray-600 mt-1">Manage form submissions and track performance</p>
+          </div>
+          <Button onClick={loadData} variant="outline">
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Refresh
+          </Button>
         </div>
-        <Button onClick={loadData} variant="outline">
-          <RefreshCw className="w-4 h-4 mr-2" />
-          Refresh
-        </Button>
-      </div>
 
-      {renderStatsCards()}
+        {renderStatsCards()}
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="submissions">Submissions</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="forms">Form Builder</TabsTrigger>
-        </TabsList>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="submissions">Submissions</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="forms">Form Builder</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="submissions" className="mt-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Form Submissions</CardTitle>
-                  <CardDescription>
-                    View and manage all form submissions
-                  </CardDescription>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Select
-                    value={selectedForm}
-                    onValueChange={(value) => {
-                      setSelectedForm(value);
-                      setFilters(prev => ({
-                        ...prev,
-                        form_id: value === 'all' ? undefined : value
-                      }));
-                    }}
-                  >
-                    <SelectTrigger className="w-48">
-                      <SelectValue placeholder="Filter by form" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Forms</SelectItem>
-                      {forms.map(form => (
-                        <SelectItem key={form.id} value={form.id}>
-                          {form.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    placeholder="Search submissions..."
-                    className="w-64"
-                    onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-                  />
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <div className="flex items-center justify-center h-32">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                </div>
-              ) : submissions.length > 0 ? (
-                <div className="space-y-4">
-                  {submissions.map(renderSubmissionCard)}
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <FileText className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No submissions found</h3>
-                  <p className="text-gray-600">
-                    {filters.search ? 'Try adjusting your search terms' : 'No form submissions yet'}
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="analytics" className="mt-6">
-          {renderAnalyticsChart()}
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Trends</CardTitle>
-              <CardDescription>Form performance over the last 30 days</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {analytics?.recent_trends.slice(0, 7).map((trend) => (
-                  <div key={trend.date} className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
-                      {format(new Date(trend.date), 'MMM dd')}
-                    </span>
-                    <div className="flex items-center space-x-4 text-sm">
-                      <span>{trend.views} views</span>
-                      <span>{trend.submissions} submissions</span>
-                      <span className="text-green-600">
-                        {trend.conversion_rate.toFixed(1)}% conversion
-                      </span>
-                    </div>
+          <TabsContent value="submissions" className="mt-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Form Submissions</CardTitle>
+                    <CardDescription>
+                      View and manage all form submissions
+                    </CardDescription>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="forms" className="mt-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Form Definitions</CardTitle>
-                  <CardDescription>
-                    Manage your form templates and configurations
-                  </CardDescription>
+                  <div className="flex items-center space-x-2">
+                    <Select
+                      value={selectedForm}
+                      onValueChange={(value) => {
+                        setSelectedForm(value);
+                        setFilters(prev => ({
+                          ...prev,
+                          form_id: value === 'all' ? undefined : value
+                        }));
+                      }}
+                    >
+                      <SelectTrigger className="w-48">
+                        <SelectValue placeholder="Filter by form" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Forms</SelectItem>
+                        {forms.map(form => (
+                          <SelectItem key={form.id} value={form.id}>
+                            {form.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      placeholder="Search submissions..."
+                      className="w-64"
+                      onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                    />
+                  </div>
                 </div>
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create New Form
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {forms.map(form => (
-                  <Card key={form.id} className="hover:shadow-md transition-shadow">
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg">{form.name}</CardTitle>
-                        <Badge variant={form.is_active ? "default" : "secondary"}>
-                          {form.is_active ? "Active" : "Inactive"}
-                        </Badge>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="flex items-center justify-center h-32">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                  </div>
+                ) : submissions.length > 0 ? (
+                  <div className="space-y-4">
+                    {submissions.map(renderSubmissionCard)}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <FileText className="h-16 w-16 mx-auto text-gray-300 mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No submissions found</h3>
+                    <p className="text-gray-600">
+                      {filters.search ? 'Try adjusting your search terms' : 'No form submissions yet'}
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="mt-6">
+            {renderAnalyticsChart()}
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Trends</CardTitle>
+                <CardDescription>Form performance over the last 30 days</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {analytics?.recent_trends.slice(0, 7).map((trend) => (
+                    <div key={trend.date} className="flex items-center justify-between">
+                      <span className="text-sm font-medium">
+                        {format(new Date(trend.date), 'MMM dd')}
+                      </span>
+                      <div className="flex items-center space-x-4 text-sm">
+                        <span>{trend.views} views</span>
+                        <span>{trend.submissions} submissions</span>
+                        <span className="text-green-600">
+                          {trend.conversion_rate.toFixed(1)}% conversion
+                        </span>
                       </div>
-                      <CardDescription>{form.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span>Fields:</span>
-                          <span className="font-medium">{form.fields.length}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="forms" className="mt-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Form Definitions</CardTitle>
+                    <CardDescription>
+                      Manage your form templates and configurations
+                    </CardDescription>
+                  </div>
+                  <Button>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create New Form
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {forms.map(form => (
+                    <Card key={form.id} className="hover:shadow-md transition-shadow">
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg">{form.name}</CardTitle>
+                          <Badge variant={form.is_active ? "default" : "secondary"}>
+                            {form.is_active ? "Active" : "Inactive"}
+                          </Badge>
                         </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <span>Slug:</span>
-                          <code className="text-xs bg-gray-100 px-2 py-1 rounded">
-                            {form.slug}
-                          </code>
+                        <CardDescription>{form.description}</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span>Fields:</span>
+                            <span className="font-medium">{form.fields.length}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <span>Slug:</span>
+                            <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                              {form.slug}
+                            </code>
+                          </div>
+                          <div className="flex items-center space-x-2 pt-2">
+                            <Button variant="outline" size="sm">
+                              <Edit className="w-4 h-4 mr-1" />
+                              Edit
+                            </Button>
+                            <Button variant="outline" size="sm">
+                              <Eye className="w-4 h-4 mr-1" />
+                              Preview
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-2 pt-2">
-                          <Button variant="outline" size="sm">
-                            <Edit className="w-4 h-4 mr-1" />
-                            Edit
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Eye className="w-4 h-4 mr-1" />
-                            Preview
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </>
   );
 } 

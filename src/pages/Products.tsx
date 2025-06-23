@@ -5,6 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Header from '@/components/Header';
+import SEO from '../components/SEO';
 
 interface GeneratorProduct {
   id: string;
@@ -178,56 +181,66 @@ const ProductCard = ({ product }: { product: GeneratorProduct }) => {
 
 const Products = () => {
   return (
-    <div className="section-padding bg-white">
-      <div className="container mx-auto container-padding">
-        <div className="max-w-3xl mx-auto text-center mb-16">
+    <div>
+      <SEO 
+        title="Generator Products Houston | Generac, Standby & Portable Generators | HOU GEN PROS"
+        description="Premium generator products in Houston: Generac standby generators, portable generators, whole home backup power systems. Authorized Generac dealer with competitive pricing and financing options."
+        keywords="generator products Houston, Generac generators Houston, standby generators Houston, portable generators Houston, whole home generators Houston, backup power systems Houston, generator sales Houston, Generac dealer Houston, generator financing Houston, generator warranty Houston"
+        canonical="/products"
+        pageType="website"
+      />
+      <Header />
+      <div className="section-padding bg-white">
+        <div className="container mx-auto container-padding">
+          <div className="max-w-3xl mx-auto text-center mb-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              <Badge variant="outline" className="mb-6 text-accent border-accent">
+                Generac Home Generators - In Stock Now!
+              </Badge>
+              <h1 className="text-gradient mb-6">
+                Brand New Generac Generators
+              </h1>
+              <p className="text-xl text-steel-600">
+                Whole home backup power for Houston & surrounding areas. Professional installation available with 3-5 hour setup and 5-year manufacturer warranty.
+              </p>
+            </motion.div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+            {generators.map((generator) => (
+              <ProductCard key={generator.id} product={generator} />
+            ))}
+          </div>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            className="mt-16 text-center"
           >
-            <Badge variant="outline" className="mb-6 text-accent border-accent">
-              Generac Home Generators - In Stock Now!
-            </Badge>
-            <h1 className="text-gradient mb-6">
-              Brand New Generac Generators
-            </h1>
-            <p className="text-xl text-steel-600">
-              Whole home backup power for Houston & surrounding areas. Professional installation available with 3-5 hour setup and 5-year manufacturer warranty.
-            </p>
+            <div className="max-w-2xl mx-auto">
+              <h3 className="text-2xl font-bold text-steel-800 mb-4">
+                Need Help Choosing?
+              </h3>
+              <p className="text-steel-600 mb-8">
+                Our experts are here to help you select the perfect generator for your home. Contact us for a free consultation.
+              </p>
+              <Link to="/get-quote">
+                <Button 
+                  size="lg"
+                  className="accent-gradient text-white px-8"
+                >
+                  Schedule a Consultation
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+            </div>
           </motion.div>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
-          {generators.map((generator) => (
-            <ProductCard key={generator.id} product={generator} />
-          ))}
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-16 text-center"
-        >
-          <div className="max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold text-steel-800 mb-4">
-              Need Help Choosing?
-            </h3>
-            <p className="text-steel-600 mb-8">
-              Our experts are here to help you select the perfect generator for your home. Contact us for a free consultation.
-            </p>
-            <Link to="/get-quote">
-              <Button 
-                size="lg"
-                className="accent-gradient text-white px-8"
-              >
-                Schedule a Consultation
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
-          </div>
-        </motion.div>
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Phone, MessageSquare, Building2, Home, Factory, ShoppingCart, GraduationCap, Activity, Wrench, CheckCircle, Shield, Clock, Users, Building, Stethoscope, TrendingUp } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import SEO from '../components/SEO';
 
 const Industries = () => {
   const industries = [
@@ -145,6 +146,14 @@ const Industries = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <SEO 
+        title="Commercial Generator Services Houston | Industrial, Healthcare, Retail & More | HOU GEN PROS"
+        description="Commercial generator solutions for all industries in Houston: healthcare, retail, manufacturing, hospitality, education, and more. Reliable backup power for your business."
+        keywords="commercial generators Houston, industrial generators Houston, healthcare generators Houston, retail generators Houston, manufacturing generators Houston, hospitality generators Houston, education generators Houston, office generators Houston, warehouse generators Houston, restaurant generators Houston, church generators Houston, bank generators Houston"
+        canonical="/industries"
+        pageType="website"
+      />
+      <Header />
       {/* Hero Section - Added more top padding */}
       <section className="pt-32 pb-20 bg-gradient-to-br from-primary via-steel-800 to-steel-900 text-white">
         <div className="container mx-auto px-6">
