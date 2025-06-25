@@ -20,36 +20,39 @@ const About = () => {
     number: '24/7',
     label: 'Emergency Support'
   }];
+  
   const values = [{
-    title: 'Reliability',
-    description: 'We deliver dependable power solutions and responsive service you can count on, day or night.',
+    title: 'Quality',
+    description: 'We use only the highest-grade equipment and materials, ensuring every installation meets the strictest industry standards.',
     icon: Shield
   }, {
-    title: 'Expertise',
-    description: 'Our certified technicians bring years of experience and specialized knowledge to every project.',
-    icon: Wrench
+    title: 'Communication',
+    description: 'Clear, honest communication at every step. We keep you informed from initial consultation through project completion.',
+    icon: MessageSquare
   }, {
-    title: 'Commitment',
-    description: 'We are dedicated to exceeding customer expectations and building long-term partnerships.',
+    title: 'Trust',
+    description: 'Built on reliability and integrity, we stand behind our work with comprehensive warranties and ongoing support.',
     icon: Heart
   }];
-  const timeline = [{
-    year: '2023',
-    title: 'Company Founded',
-    description: 'HOU GEN PROS was established with a vision to provide reliable power solutions to Houston businesses and homeowners.'
+
+  const principles = [{
+    title: 'Expert Installation',
+    description: 'Our certified technicians bring specialized knowledge and years of experience to every generator installation project.',
+    icon: Wrench
   }, {
-    year: '2024',
-    title: 'Rapid Growth',
-    description: 'Expanded our service offerings and built a strong reputation in the Houston market through exceptional customer service.'
+    title: 'Customer-First Approach',
+    description: 'Your needs come first. We listen carefully, provide honest assessments, and deliver solutions that truly work for you.',
+    icon: Users
   }, {
-    year: '2024',
-    title: 'Professional Team',
-    description: 'Assembled a team of certified technicians and established partnerships with leading generator manufacturers.'
+    title: 'Reliable Service',
+    description: 'From emergency repairs to routine maintenance, we provide dependable service you can count on when you need it most.',
+    icon: Clock
   }, {
-    year: '2025',
-    title: 'Industry Recognition',
-    description: 'Gaining recognition as a trusted generator service provider with a growing base of satisfied customers across Houston.'
+    title: 'Transparent Pricing',
+    description: 'No hidden fees or surprise charges. We provide clear, upfront pricing so you know exactly what to expect.',
+    icon: CheckCircle
   }];
+
   const certifications = [{
     name: 'Licensed Electrical Contractor',
     description: 'Fully licensed, bonded, and insured for all electrical and generator services.',
@@ -67,6 +70,7 @@ const About = () => {
     description: 'Accredited by the Better Business Bureau with an A+ rating.',
     icon: Shield
   }];
+
   return <div className="min-h-screen bg-white">
       <SEO 
         title="About HOU GEN PROS | Houston's Trusted Generator Installation Company | Professional Power Solutions"
@@ -77,7 +81,7 @@ const About = () => {
       />
       <Header />
       
-      {/* Hero Section - Added more top padding */}
+      {/* Hero Section */}
       <section className="pt-32 pb-20 bg-gradient-to-br from-primary via-steel-800 to-steel-900 text-white">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center">
@@ -85,12 +89,12 @@ const About = () => {
               Houston's Premier Generator Experts
             </Badge>
             <h1 className="text-5xl md:text-6xl font-bold mb-8 leading-tight">
-              Powering Houston's
-              <span className="block text-accent">Future Today</span>
+              Built on Quality,
+              <span className="block text-accent">Trust & Communication</span>
             </h1>
             <p className="text-xl text-white mb-10 leading-relaxed max-w-3xl mx-auto">
-              As Houston's newest and most dedicated generator company, we've built our reputation 
-              on reliability, expertise, and unwavering commitment to keeping your power on when it matters most.
+              As Houston's dedicated generator company, we've built our reputation on three core principles: 
+              delivering exceptional quality, maintaining transparent communication, and earning your trust through reliable service.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Button size="lg" className="bg-accent hover:bg-orange-600 text-white px-8 py-4">
@@ -99,7 +103,7 @@ const About = () => {
               </Button>
               <Button size="lg" variant="outline" className="border-2 border-white hover:bg-white px-8 py-4 text-steel-800">
                 <MessageSquare className="w-5 h-5 mr-2" />
-                Our Story
+                Learn More
               </Button>
             </div>
           </div>
@@ -118,13 +122,13 @@ const About = () => {
         </div>
       </section>
 
-      {/* Company Values */}
+      {/* Core Values */}
       <section className="py-20 bg-steel-50">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-primary mb-6">Our Values</h2>
+            <h2 className="text-4xl font-bold text-primary mb-6">Our Foundation</h2>
             <p className="text-xl text-steel-600 max-w-3xl mx-auto">
-              The principles that guide everything we do for our Houston customers.
+              Three core values guide everything we do for our Houston customers.
             </p>
           </div>
           
@@ -145,29 +149,29 @@ const About = () => {
         </div>
       </section>
 
-      {/* Company Timeline */}
+      {/* Service Principles */}
       <section className="py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-primary mb-6">Our Journey</h2>
+            <h2 className="text-4xl font-bold text-primary mb-6">How We Work</h2>
             <p className="text-xl text-steel-600 max-w-3xl mx-auto">
-              From startup to Houston's trusted generator company - here's how we're building our reputation.
+              Our commitment to excellence shows in every aspect of our service delivery.
             </p>
           </div>
           
-          <div className="max-w-4xl mx-auto">
-            <div className="space-y-8">
-              {timeline.map((event, index) => <div key={index} className="flex items-start">
-                  <div className="flex-shrink-0 w-24 text-right mr-8">
-                    <div className="text-2xl font-bold text-accent">{event.year}</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {principles.map((principle, index) => {
+            const IconComponent = principle.icon;
+            return <Card key={index} className="flex items-start p-6 hover:shadow-lg transition-shadow duration-300 border-steel-200">
+                  <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                    <IconComponent className="w-6 h-6 text-white" />
                   </div>
-                  <div className="flex-shrink-0 w-4 h-4 bg-accent rounded-full mt-2 mr-8"></div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold text-primary mb-2">{event.title}</h3>
-                    <p className="text-steel-600">{event.description}</p>
+                  <div>
+                    <h3 className="font-bold text-primary mb-3 text-lg">{principle.title}</h3>
+                    <p className="text-steel-600">{principle.description}</p>
                   </div>
-                </div>)}
-            </div>
+                </Card>;
+          })}
           </div>
         </div>
       </section>
@@ -197,9 +201,9 @@ const About = () => {
       {/* Contact Section */}
       <section className="py-20 bg-primary text-white">
         <div className="container mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to Work with Houston's Finest?</h2>
+          <h2 className="text-4xl font-bold mb-6">Experience the Difference</h2>
           <p className="text-xl text-white mb-10 max-w-3xl mx-auto">
-            Experience the difference that comes from working with Houston's most dedicated generator professionals.
+            Ready to work with Houston's most trusted generator professionals? Let's discuss your power solution needs.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Button size="lg" className="bg-accent hover:bg-orange-600 text-white px-8 py-4">
