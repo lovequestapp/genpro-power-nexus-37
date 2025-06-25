@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,11 +8,11 @@ import SEO from '../components/SEO';
 
 const About = () => {
   const stats = [{
-    number: '15+',
-    label: 'Years in Business'
-  }, {
-    number: '500+',
+    number: '100+',
     label: 'Projects Completed'
+  }, {
+    number: '50+',
+    label: 'Happy Customers'
   }, {
     number: '99.9%',
     label: 'Uptime Guarantee'
@@ -33,21 +34,21 @@ const About = () => {
     icon: Heart
   }];
   const timeline = [{
-    year: '2008',
-    title: 'Company Founded',
-    description: 'HOU GEN PROS was established with a vision to provide reliable power solutions to Houston businesses.'
-  }, {
-    year: '2012',
-    title: 'Expanded Services',
-    description: 'Introduced comprehensive maintenance programs and 24/7 emergency support services.'
-  }, {
-    year: '2018',
-    title: 'New Headquarters',
-    description: 'Opened a state-of-the-art headquarters and service center in Northwest Houston.'
-  }, {
     year: '2023',
-    title: 'Industry Leader',
-    description: 'Recognized as Houston\'s premier generator service company with hundreds of satisfied clients.'
+    title: 'Company Founded',
+    description: 'HOU GEN PROS was established with a vision to provide reliable power solutions to Houston businesses and homeowners.'
+  }, {
+    year: '2024',
+    title: 'Rapid Growth',
+    description: 'Expanded our service offerings and built a strong reputation in the Houston market through exceptional customer service.'
+  }, {
+    year: '2024',
+    title: 'Professional Team',
+    description: 'Assembled a team of certified technicians and established partnerships with leading generator manufacturers.'
+  }, {
+    year: '2025',
+    title: 'Industry Recognition',
+    description: 'Gaining recognition as a trusted generator service provider with a growing base of satisfied customers across Houston.'
   }];
   const certifications = [{
     name: 'Licensed Electrical Contractor',
@@ -68,8 +69,8 @@ const About = () => {
   }];
   return <div className="min-h-screen bg-white">
       <SEO 
-        title="About HOU GEN PROS | Houston's Trusted Generator Installation Company | 15+ Years Experience"
-        description="Learn about HOU GEN PROS, Houston's premier generator installation company with 15+ years of experience. Licensed, insured, and trusted by 500+ Houston homeowners for Generac generator installation and maintenance."
+        title="About HOU GEN PROS | Houston's Trusted Generator Installation Company | Professional Power Solutions"
+        description="Learn about HOU GEN PROS, Houston's premier generator installation company. Licensed, insured, and trusted by Houston homeowners for Generac generator installation and maintenance."
         keywords="Houston generator company, HOU GEN PROS about, generator installation company Houston, Generac dealer Houston, generator service company Texas, Houston generator experts, generator installation experience, licensed generator installer Houston, insured generator company Houston, trusted generator company Houston"
         canonical="/about"
         pageType="website"
@@ -85,10 +86,10 @@ const About = () => {
             </Badge>
             <h1 className="text-5xl md:text-6xl font-bold mb-8 leading-tight">
               Powering Houston's
-              <span className="block text-accent">Future Since 2008</span>
+              <span className="block text-accent">Future Today</span>
             </h1>
             <p className="text-xl text-white mb-10 leading-relaxed max-w-3xl mx-auto">
-              From humble beginnings to Houston's most trusted generator company, we've built our reputation 
+              As Houston's newest and most dedicated generator company, we've built our reputation 
               on reliability, expertise, and unwavering commitment to keeping your power on when it matters most.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
@@ -150,7 +151,7 @@ const About = () => {
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-primary mb-6">Our Journey</h2>
             <p className="text-xl text-steel-600 max-w-3xl mx-auto">
-              From startup to Houston's most trusted generator company - here's how we built our reputation.
+              From startup to Houston's trusted generator company - here's how we're building our reputation.
             </p>
           </div>
           
@@ -196,9 +197,9 @@ const About = () => {
       {/* Contact Section */}
       <section className="py-20 bg-primary text-white">
         <div className="container mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to Work with Houston's Best?</h2>
+          <h2 className="text-4xl font-bold mb-6">Ready to Work with Houston's Finest?</h2>
           <p className="text-xl text-white mb-10 max-w-3xl mx-auto">
-            Experience the difference that comes from working with Houston's most trusted generator professionals.
+            Experience the difference that comes from working with Houston's most dedicated generator professionals.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Button size="lg" className="bg-accent hover:bg-orange-600 text-white px-8 py-4">
